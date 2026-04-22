@@ -24,10 +24,10 @@ description: Creates, numbers, tracks, and links Architecture Decision Records w
 ```markdown
 # ADR Index
 
-| Number | Title | Status | Governs |
-|--------|-------|--------|---------|
-| ADR-0001 | Use PostgreSQL for session storage | Accepted | specs/001-user-login |
-| ADR-0002 | JWT over session cookies | Proposed | specs/001-user-login |
+| Number | Title | Status | Governs | Covers |
+|--------|-------|--------|---------|--------|
+| ADR-0001 | Use PostgreSQL for session storage | Accepted | specs/001-user-login | decision:001-user-login:session-storage |
+| ADR-0002 | JWT over session cookies | Proposed | specs/001-user-login | decision:001-user-login:auth-token-format |
 ```
 
 ## ADR Lifecycle
@@ -48,11 +48,14 @@ Proposed → Accepted → Implemented → Superseded
 1. Read ADR-INDEX.md → determine next number
 2. Convert title to kebab-case filename: `ADR-NNNN-use-postgresql.md`
 3. Copy `templates/adr-template.md` → fill `date:` with today
-4. If triggered from drift alert: pre-fill `## Context` with drift details
-5. Prompt user: Context → Decision → Consequences → Alternatives
-6. Ask: "Which spec does this govern?" → set `governs:` frontmatter
-7. Append row to ADR-INDEX.md
-8. Confirm: "ADR-NNNN created and indexed."
+4. Ask: "Which spec does this govern?" → set `governs:` frontmatter
+5. Set `covers:`:
+   - drift item: `drift:<spec-slug>:<type>:<identifier>`
+   - planned decision: `decision:<spec-slug>:<decision-name>`
+6. If triggered from drift alert: pre-fill `## Context` with drift details
+7. Prompt user: Context → Decision → Consequences → Alternatives
+8. Append row to ADR-INDEX.md
+9. Confirm: "ADR-NNNN created and indexed."
 
 ## Updating Status (`/spec-adr status <number> <new-status>`)
 1. Find ADR file by number prefix in `.specify/adr/`
@@ -68,11 +71,13 @@ Find and display full content of `ADR-NNNN-*.md`.
 
 ## Linking Convention
 - ADR `governs:` field → spec path (e.g., `specs/001-user-login`)
+- ADR `covers:` field → exact drift keys or decision keys
 - Spec `## Related ADRs` section → list governing ADR numbers
 - Plan `## ADRs` section → list ADRs created during planning
 - Drift report → cite ADR number when drift is resolved
 
 ## Invariants
 - Every ADR must have `governs:` set before status moves past Proposed
+- Every CRITICAL/HIGH drift item must match an ADR `covers:` entry before implementation resumes
 - `supersedes:` required if status = Superseded
 - ADR-INDEX.md must stay in sync with files on disk

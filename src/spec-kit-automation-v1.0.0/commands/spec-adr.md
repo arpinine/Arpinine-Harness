@@ -20,10 +20,14 @@ Manage Architecture Decision Records (ADRs).
 2. Increment and zero-pad: next number = `NNNN`
 3. Create `.specify/adr/ADR-NNNN-<kebab-title>.md` from `templates/adr-template.md`
 4. Set `date:` to today
-5. If invoked from a drift alert: pre-fill `## Context` with drift details
-6. Prompt user to fill: Context → Decision → Consequences → Alternatives Considered
-7. Ask: "Which spec does this govern?" → set `governs:` frontmatter (e.g., `specs/001-user-login`)
-8. Append row to ADR-INDEX.md: `| ADR-NNNN | <title> | Proposed | <governs> |`
+5. Ask: "Which spec does this govern?" → set `governs:` frontmatter (e.g., `specs/001-user-login`)
+6. If invoked from a drift alert:
+   - pre-fill `## Context` with drift details
+   - derive a stable drift key such as `drift:001-user-login:route:GET-/api/users/profile`
+   - store that key in `covers:`
+7. If this ADR documents a planned engineering choice rather than drift, add a decision key such as `decision:001-user-login:session-storage` to `covers:`
+8. Prompt user to fill: Context → Decision → Consequences → Alternatives Considered
+9. Append row to ADR-INDEX.md: `| ADR-NNNN | <title> | Proposed | <governs> | <covers> |`
 9. Confirm: "ADR-NNNN created at `.specify/adr/ADR-NNNN-<title>.md`"
 
 ## Steps: `list`

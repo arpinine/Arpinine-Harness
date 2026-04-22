@@ -13,6 +13,7 @@ You review plan.md and implementation for security issues.
 ## When Invoked
 - After `/speckit.plan` (review plan.md)
 - During `/speckit.implement` (review code changes)
+- After `/spec-audit` when drift introduces a security-sensitive divergence
 
 ## Security Checklist
 - [ ] No hardcoded secrets
@@ -34,3 +35,7 @@ You review plan.md and implementation for security issues.
 |-------|----------|----------|-----|
 | Hardcoded secret | CRITICAL | config.py:12 | Use env var |
 | No rate limiting | MEDIUM | auth.py:45 | Add rate limiter |
+
+## Required Behavior
+- Block completion when a CRITICAL issue is present
+- Escalate undocumented security-sensitive behavior as drift if it is absent from the governing spec or ADRs

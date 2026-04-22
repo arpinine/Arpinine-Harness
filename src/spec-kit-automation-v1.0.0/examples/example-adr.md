@@ -3,6 +3,8 @@ governs: specs/001-user-login
 supersedes: ~
 status: Accepted
 date: 2026-04-22
+covers:
+  - decision:001-user-login:session-storage
 ---
 
 # ADR-0001: Use PostgreSQL for Session Storage

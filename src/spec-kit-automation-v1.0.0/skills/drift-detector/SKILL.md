@@ -10,6 +10,13 @@ description: Detects and classifies drift between specs and code; triggers ADR c
 - On `/spec-audit` command (full analysis)
 - Before PR merge
 
+The PostToolUse hook is intentionally lightweight:
+- missing file references from spec
+- endpoint mismatch hints
+- stale or missing eval result hints for agentic specs
+
+Use `/spec-audit` for the full comparison workflow.
+
 ## Detection Methods
 
 ### 1. File Existence Check
@@ -42,8 +49,11 @@ Compare against code data models, ORMs, or schema files.
 
 ### 4. ADR Coverage Check
 For every CRITICAL or HIGH item:
-- Search `.specify/adr/ADR-INDEX.md` for an ADR whose `governs:` matches the spec path
-- No governing ADR found → flag for ADR creation (see Drift→ADR Pipeline)
+- Derive a stable drift key: `drift:<spec-slug>:<type>:<identifier>`
+- Search `.specify/adr/ADR-INDEX.md` and ADR files for both:
+  - `governs:` matches the spec path
+  - `covers:` contains that exact drift key
+- No matching ADR found → flag for ADR creation (see Drift→ADR Pipeline)
 
 ## Alert Levels
 
@@ -56,12 +66,13 @@ For every CRITICAL or HIGH item:
 
 ## Drift→ADR Pipeline
 
-When CRITICAL or HIGH drift detected without a governing ADR:
+When CRITICAL or HIGH drift detected without a matching ADR:
 1. Report drift item with severity and location
-2. Prompt: "Create ADR to document this decision? (yes/no)"
-3. If yes → invoke `adr-manager` skill with Context pre-filled from drift details
-4. Link created ADR number back to drift report line
-5. Update spec with `## Related ADRs` entry or add inline comment
+2. Derive and print the drift key
+3. Prompt: "Create ADR to document this decision? (yes/no)"
+4. If yes → invoke `adr-manager` skill with Context pre-filled from drift details and `covers:` set to the drift key
+5. Link created ADR number back to drift report line
+6. Update spec with `## Related ADRs` entry or add inline comment
 
 ## Output Format
 

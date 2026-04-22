@@ -3,6 +3,8 @@ governs: specs/[SPEC-NUMBER]-[spec-name]
 supersedes: ~
 status: Proposed
 date: YYYY-MM-DD
+covers:
+  - decision:[SPEC-NUMBER]-[spec-name]:[decision-or-drift-key]
 ---
 
 # ADR-NNNN: [Title]

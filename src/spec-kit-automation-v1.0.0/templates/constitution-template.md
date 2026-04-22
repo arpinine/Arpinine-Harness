@@ -6,3 +6,5 @@
 3. Tests before code
 4. Measurable acceptance criteria
 5. Security by default
+6. Modular boundaries before implementation
+7. Business rules isolated from framework and infrastructure concerns

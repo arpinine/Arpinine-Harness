@@ -20,10 +20,15 @@ RED → GREEN → REFACTOR → VERIFY → COMMIT
 ## During Implementation
 If user writes code before test:
 1. Interrupt: "TDD requires test first"
-2. Write failing test automatically
+2. Write or request a failing test before any production edit continues
 3. Only then proceed to implementation
 
 ## Coverage Requirements
 - Critical paths (auth, payments): 100%
 - Business logic: 90%
 - Utilities: 80%
+
+## Output
+- Name the failing test that should exist next
+- Name the production file it unlocks
+- Refuse to treat an ADR as implemented unless the governing tests exist

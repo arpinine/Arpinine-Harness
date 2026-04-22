@@ -1,10 +1,10 @@
 {
   "name": "spec-kit-automation",
   "version": "1.0.0",
-  "description": "ADR tracking and drift detection on top of spec-kit",
+  "description": "Shared product-engineering workflow with ADRs, drift detection, and framework-agnostic evaluation",
   "author": {
     "name": "Arpinine"
   },
   "license": "MIT",
-  "keywords": ["speckit", "adr", "drift-detection", "spec-management"]
+  "keywords": ["speckit", "adr", "drift-detection", "spec-management", "evaluation", "agent-quality"]
 }

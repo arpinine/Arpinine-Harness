@@ -1,81 +1,115 @@
-# Spec-Kit Automation Plugin
+# AgentAlign
 
-Bridges product requirements and AI-driven development by layering ADR tracking and drift detection on top of spec-kit's native specification workflow.
+AgentAlign is a Claude plugin for teams that want a common way of working across product, engineering, architecture, and AI-assisted execution.
 
-## What It Does
+It standardizes how work moves from idea to specification, from specification to evaluation and execution, and from execution back into refinement when reality diverges from intent.
 
-| Concern | Owner |
-|---------|-------|
-| Spec creation, plan, tasks, constitution | **spec-kit** (native) |
-| Architecture Decision Records | **This plugin** |
-| Spec-code drift detection | **This plugin** |
-| ADR-linkage enforcement | **This plugin** |
+## Team Workflow
+
+The plugin is built around a shared delivery loop:
+
+1. Define: capture product intent in `spec.md`
+2. Refine: review and tighten requirements before implementation
+3. Plan: turn approved intent into an engineering plan and tasks
+4. Architect: define module boundaries, dependency rules, and clean separation of concerns
+5. Decide: record consequential architecture and implementation choices in ADRs
+6. Evaluate: define how the team will measure quality and readiness
+7. Execute: implement with test-first discipline
+8. Realign: audit drift between spec, decisions, code, and evaluation results
+9. Refine again: update the spec, plan, ADRs, or eval plan when learning changes the work
+
+This is the core value of the plugin: not just generating files, but giving the team a stable operating model.
+
+## Team Contract
+
+| Role | Responsibility |
+|------|----------------|
+| Product | Owns the problem, user value, scope, and acceptance criteria in `spec.md` |
+| Engineering | Owns `plan.md`, task breakdown, and implementation approach |
+| Engineering | Owns module boundaries, dependency rules, and testability by boundary |
+| Engineering | Owns evaluation strategy and release thresholds for agentic systems |
+| Tech Leads | Own consequential decisions and approve ADRs when needed |
+| AI Agents | Help execute within the rules set by the spec, plan, and ADRs |
+
+## Shared Artifacts
+
+| Artifact | Purpose |
+|----------|---------|
+| `spec.md` | Product intent: what problem is being solved, for whom, and how success is measured |
+| `plan.md` | Engineering approach: how the team intends to implement the work |
+| `module boundaries` | Architectural contract for responsibilities, dependency direction, and replaceable seams |
+| `eval-plan.md` | Quality gate: how the team measures readiness, regressions, and release fitness |
+| `ADR-*.md` | Decision record for choices that affect architecture, operations, security, or long-term maintainability |
+| `ADR-INDEX.md` | Global index of decisions and drift coverage |
 
 ## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `/spec-init` | Initialize spec-kit + ADR directory structure |
-| `/spec-new` | Create spec (delegates to spec-kit, validates constitution) |
-| `/spec-plan` | Generate plan and tasks (delegates to spec-kit) |
-| `/spec-implement` | Execute with TDD enforcement (delegates to spec-kit) |
-| `/spec-adr` | Create and manage Architecture Decision Records |
-| `/spec-audit` | Detect spec-code drift; drive ADR resolution |
-| `/spec-review` | Validate spec against constitution |
+| Command | Stage | Purpose |
+|---------|-------|---------|
+| `/spec-init` | Setup | Initialize the shared workflow and ADR structure |
+| `/spec-new` | Define | Create a new specification from a product request |
+| `/spec-review` | Refine | Improve clarity, measurability, and alignment before execution |
+| `/spec-plan` | Plan | Produce plan and tasks from an approved spec |
+| `/spec-adr` | Decide | Create and manage Architecture Decision Records |
+| `/spec-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/spec-implement` | Execute | Implement the plan with TDD and security review |
+| `/spec-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
 
-## Quick Example
+## Example Flow
 
 ```bash
-# Initialize
+# Initialize team workflow
 /spec-init
 
-# Product creates spec (spec-kit handles quality checks)
+# Define product intent
 /spec-new "User login with email and password"
 
-# Engineer creates plan; plugin suggests ADRs for each tech decision
+# Refine before engineering starts
+/spec-review .specify/specs/001-user-login/spec.md
+
+# Create implementation plan
 /spec-plan .specify/specs/001-user-login/
 
-# Create ADR for an architectural decision
-/spec-adr new "Use PostgreSQL for session storage"
+# Record important decision if needed
+/spec-adr new "Session storage strategy"
 
-# Implement with TDD (spec-kit enforces test-first)
+# Define or run evaluation
+/spec-eval plan .specify/specs/001-user-login/
+
+# Execute with test-first discipline
 /spec-implement .specify/specs/001-user-login/
 
-# Detect drift — plugin links findings to ADRs
+# Realign when implementation and intent diverge
 /spec-audit .specify/specs/001-user-login/
-# CRITICAL  src/auth/login.py — rate limiting in code, absent from spec
-# → Prompt: "Create ADR to document this decision? (yes/no)"
 ```
 
-## How It Works
+## How Alignment Works
 
-```
-spec-kit: Product writes spec → Constitution validates → Engineer creates plan → AI implements (TDD)
-Plugin:                                                  ↗ ADR tracks WHY    ↗ Drift detects gaps
-```
+- `spec.md` stays product-facing and measurable
+- `plan.md` captures implementation detail and delivery steps
+- architecture rules enforce modularity and clean separation of concerns before coding starts
+- eval plans define metrics, thresholds, scenarios, and execution commands
+- ADRs explain why key decisions were made
+- hooks catch obvious violations and lightweight spec drift during editing
+- audit catches drift when code, specs, and evaluation evidence stop matching
+- refinement happens continuously, not only at the beginning
 
 Automatic hooks fire on every file write:
-- **PreToolUse**: `check-constitution.sh` blocks tech details in spec.md and hardcoded secrets
-- **PostToolUse**: `quick-drift-check.sh` flags spec references missing from disk
+- **PreToolUse**: `check-constitution.sh` validates pending edits for tech leakage in `spec.md` and hardcoded secrets
+- **PreToolUse**: `check-architecture-readiness.sh` blocks implementation edits until the governing plan defines module boundaries, dependency rules, and testability by boundary
+- **PostToolUse**: `quick-drift-check.sh` performs a lightweight spec-alignment pass for missing file references, endpoint mismatch hints, and stale eval results
 
 ## ADR Lifecycle
 
+```text
+Proposed -> Accepted -> Implemented -> Superseded
+                    -> Rejected
 ```
-Proposed → Accepted → Implemented → Superseded
-                    ↘ Rejected
-```
 
-All ADRs live in `.specify/adr/` with a master `ADR-INDEX.md`.
-Each ADR has a `governs:` field linking it to its spec.
-
-## Who This Is For
-
-| Role | Benefit |
-|------|---------|
-| Product Managers | Requirements tied to explicit decisions |
-| Engineers | Documented WHY behind every tech choice |
-| Tech Leads | Enforced ADR coverage for all critical drift |
-| AI Agents | Structured specs + decisions to follow |
+All ADRs live in `.specify/adr/`.
+Each ADR has:
+- `governs:` to link it to a spec
+- `covers:` to link it to a concrete decision key or drift key
 
 ## Installation
 
@@ -83,10 +117,13 @@ Each ADR has a `governs:` field linking it to its spec.
 # 1. Install spec-kit
 uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai claude
 
-# 2. Install plugin
-/plugin install spec-kit-automation-v1.0.0.zip
+# 2. Build this plugin
+make build
 
-# 3. Initialize
+# 3. Install plugin in Claude
+/plugin install dist/spec-kit-automation-v1.0.0.zip
+
+# 4. Initialize the workflow
 /spec-init
 ```
 

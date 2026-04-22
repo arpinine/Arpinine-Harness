@@ -1,10 +1,10 @@
 ---
-description: Detect drift between specs and code. Reports CRITICAL/HIGH/MEDIUM issues and prompts ADR creation for any unresolved divergence.
+description: Detect drift between specs and code, then send the work back into refinement or ADR creation so the team realigns on a shared source of truth.
 ---
 
 # /spec-audit
 
-Detect spec-code drift and drive resolution via ADR creation.
+Detect drift and drive realignment.
 
 ## Usage
 `/spec-audit [spec-path]`
@@ -24,7 +24,9 @@ For each spec:
 - File existence check
 - API/endpoint comparison
 - Data model comparison
-- ADR coverage check (search ADR-INDEX.md for matching `governs:`)
+- ADR coverage check using both:
+  - `governs:` matches the spec path
+  - `covers:` contains the exact drift key for the finding
 
 ### 3. Report findings
 Print report in format:
@@ -40,8 +42,14 @@ MEDIUM    Spec mentions email verification, not implemented
 
 ### 4. Drift→ADR resolution (for each CRITICAL and HIGH item)
 For each unresolved CRITICAL or HIGH drift:
-1. Check if ADR-INDEX.md has a governing ADR for this spec
-2. If no governing ADR:
+1. Derive a stable drift key from the finding, e.g.:
+   - `drift:001-user-login:file:src/auth/login.py`
+   - `drift:001-user-login:route:GET-/api/users/profile`
+   - `drift:001-user-login:model:user.email`
+2. Check ADR files for both:
+   - matching `governs: specs/001-user-login`
+   - matching entry in `covers:`
+3. If no matching ADR exists:
    - Show: "No ADR covers: [drift description]"
    - Prompt: "Create ADR to document this decision? (yes/no)"
    - If yes: invoke `adr-manager` skill with Context pre-filled from drift details
@@ -53,7 +61,19 @@ Summary: 3 drift items found, 1 ADR created (ADR-0003).
 Remaining: 1 CRITICAL unresolved — implementation blocked.
 ```
 
-If any CRITICAL item remains without ADR: remind that `constitution-enforcer` blocks implementation.
+If any CRITICAL item remains without a matching ADR `covers:` entry: remind that `constitution-enforcer` blocks implementation.
+
+### 6. Realignment actions
+For each confirmed drift item, choose the right correction path:
+- spec was wrong or incomplete -> refine `spec.md`
+- engineering approach changed -> update `plan.md`
+- consequential decision changed -> create or update ADR
+- implementation is incorrect -> fix code to match the agreed artifacts
+
+### 7. Evaluation regression check
+- Compare the latest evaluation results against the eval plan thresholds
+- If quality regressed without a corresponding spec or ADR update, mark as realignment required
+- If the evaluated system changed and evals were not rerun, report a HIGH issue
 
 ## Error Conditions
 - `.specify/specs/` not found → "Run `/spec-init` first"
