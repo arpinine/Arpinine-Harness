@@ -7,10 +7,20 @@
 - `## Harness Strategy` section in the plan template for harness choice, abstraction boundary, tool access, memory, permissions, and swap strategy
 - `examples/example-harness-strategy.md` showing a vendor-neutral adapter-based harness pattern
 - `examples/example-harness-strategy-openharness.md` showing the recommended OpenHarness adapter pattern
+- `/spec-observe` command for recording and reviewing runtime observation artifacts
+- `templates/observation-template.md` and `templates/schemas/observation-schema.yaml`
+- example observation artifacts: `example-observation.md` and `example-observation-trace.json`
+- `examples/rules/harness/harness-001.md` as an example harness governance rule
+- `example-observation-trace-openharness.json` showing OpenHarness-specific observation events
 
 ### Changed
 - planning and implementation guidance now enforce harness design documentation before building product features on top of an agent runtime
 - `harness-governor` now includes OpenHarness-specific checks for adapter isolation, approval flow, and session handling when OpenHarness is selected
+- audit and governance rules now incorporate observation-driven drift checks for tool, permission, memory, and eval-coverage mismatches
+- `check-architecture-readiness.sh` now blocks harness-based implementation work when `## Harness Strategy` is missing or still a placeholder
+- `spec-status` now reports harness strategy and observation state
+- `spec-retro` now asks harness-focused retrospective questions and produces harness-category rules
+- `spec-observe record` now captures raw data only; drift analysis happens in `review`
 
 ## [1.4.0] - 2026-04-22
 

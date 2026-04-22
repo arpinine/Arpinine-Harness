@@ -53,6 +53,15 @@ When the plan selects OpenHarness explicitly:
 - require the plan to describe session/message state handling and reset behavior
 - require evaluation to cover tool permission failures, approval flow correctness, and runtime recovery paths
 
+## Observation Integration
+
+Observation artifacts can validate whether actual runtime behavior matches the documented harness strategy.
+Use them to check:
+- observed tool calls vs tool allowlist
+- observed approval events vs permission model
+- observed memory writes vs memory model
+- observed failures and retries vs evaluation coverage
+
 ## Enforcement Rules
 
 | Rule | Severity | Action |
@@ -66,6 +75,7 @@ When the plan selects OpenHarness explicitly:
 | OpenHarness is selected but adapter-layer isolation is not defined | HIGH | Block implementation |
 | OpenHarness is selected but approval callback or permission flow is undocumented | HIGH | Block implementation |
 | OpenHarness is selected but session or state handling is undocumented | HIGH | Block implementation |
+| Observation artifacts show tool, permission, or memory behavior that contradicts the harness strategy | CRITICAL | Block completion |
 
 ## Review Questions
 

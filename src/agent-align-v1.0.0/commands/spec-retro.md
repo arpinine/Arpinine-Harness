@@ -1,5 +1,5 @@
 ---
-description: "Run a delivery retrospective after a feature ships. Extracts lessons as rule candidates, adds them to rules/, and updates ADR-INDEX. Turns completed work into compounding team knowledge."
+description: "Run a delivery retrospective after a feature ships. Extract lessons as rule candidates, add them to rules/, and update ADR-INDEX. Turns completed work into compounding team knowledge."
 ---
 
 # /spec-retro
@@ -28,7 +28,8 @@ Gather:
 - `plan.md` — engineering approach
 - `ADR-*.md` files with `governs:` matching this spec
 - `eval-plan.md` and `latest-results.md` (if present)
-- Drift findings from the last `/spec-audit` run (check `.specify/specs/<slug>/drift-report.md` if it exists)
+- observation artifacts under `.specify/observations/<slug>/` (if present)
+- drift findings from the last `/spec-audit` run (check `.specify/specs/<slug>/drift-report.md` if it exists)
 
 ### 3. Ask structured retro questions
 
@@ -47,6 +48,11 @@ Work through each question. Record answers:
 - Were any module boundaries crossed or bypassed?
 - Were there dependencies that violated the direction rules in `plan.md`?
 
+**Harness observations**
+- Were any harness tool calls observed that were outside the documented tool model?
+- Were any approval events that contradicted the permission model?
+- Does the harness strategy need an ADR that does not exist yet?
+
 **Rule candidates**
 - For each "yes" above: is this a pattern the team should prevent in future specs?
 - Would a rule have caught this earlier in the workflow (at PreToolUse, at audit, at planning)?
@@ -55,14 +61,14 @@ Work through each question. Record answers:
 
 For each lesson surfaced:
 
-```
+```text
 LESSON [N]:
   Observation: [What happened]
   Root cause: [Why it happened — spec gap, process skip, implementation choice]
   Attribution: PRECONDITION FAILURE (spec/plan was unclear) | POSTCONDITION FAILURE (deviated from clear spec)
   Rule candidate? YES | NO
   Proposed rule: [One sentence: "When X, require Y to prevent Z"]
-  Category: security | architecture | spec-quality | evaluation | process
+  Category: security | architecture | harness | spec-quality | evaluation | process
   Severity: CRITICAL | HIGH | MEDIUM | LOW
 ```
 
@@ -81,12 +87,12 @@ If any ADR was used reactively (created during audit or after implementation):
 
 ### 7. Retro summary
 
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RETRO: .specify/specs/001-user-login/spec.md
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Lessons surfaced: 4
-Rules added:      2 (arch-001, sec-001)
+Rules added:      2 (arch-001, harness-001)
 Rules declined:   2 (one-off, not generalizable)
 ADR gaps:         1 (ADR-0003 was reactive — add planning trigger rule)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

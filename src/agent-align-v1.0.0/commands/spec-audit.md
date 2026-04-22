@@ -108,6 +108,18 @@ For each confirmed drift item, choose the right correction path based on attribu
 - If quality regressed without a corresponding spec or ADR update, mark as realignment required
 - If the evaluated system changed and evals were not rerun, report a HIGH issue
 
+### 9. Observation drift check
+- If `.specify/observations/<spec-slug>/trace.json` exists, compare observed behavior against `## Harness Strategy`
+- Report additional drift classes when found:
+  - `TOOL_DRIFT`: observed tool use is outside the documented tool model
+  - `PERMISSION_DRIFT`: observed approvals or denied actions contradict the documented permission model
+  - `MEMORY_DRIFT`: observed state or memory behavior contradicts the documented memory model
+  - `EVAL_COVERAGE_DRIFT`: observed scenario or failure path is not covered by the eval plan
+  - `RUNTIME_BEHAVIOR_DRIFT`: observed runtime behavior contradicts the documented runtime or adapter assumptions
+- Use observation evidence to refine attribution:
+  - missing contract in spec/plan/harness strategy -> PRECONDITION FAILURE
+  - clear contract violated by runtime or implementation -> POSTCONDITION FAILURE
+
 ## Error Conditions
 - `.specify/specs/` not found → "Run `/spec-init` first"
 - Spec not readable → report file path and skip

@@ -18,6 +18,7 @@ import sys
 CODE_PREFIXES = ("src/", "lib/", "app/", "packages/", "services/", "internal/", "cmd/")
 SECTION_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
 PLACEHOLDER_RE = re.compile(r"\[(module|choice|quality dimension|risk|feature name|spec-number|name|single clear concern|allowed dependencies|api / port / adapter|unit / contract / integration|mock adapter / in-memory fake / fixture)\]", re.IGNORECASE)
+HARNESS_HINT_RE = re.compile(r"(harness|agent runtime|openharness)", re.IGNORECASE)
 
 try:
     payload = json.load(sys.stdin)
@@ -99,6 +100,19 @@ for spec in candidate_specs:
         ).strip()
         if not cleaned or PLACEHOLDER_RE.search(cleaned):
             violations.append(f"{spec.parent.name}: section `{section}` is still a placeholder")
+
+    harness_needed = HARNESS_HINT_RE.search(file_path) is not None or HARNESS_HINT_RE.search(plan_text) is not None
+    if harness_needed:
+        body = section_body(plan_text, "Harness Strategy")
+        if not body:
+            violations.append(f"{spec.parent.name}: missing section `Harness Strategy`")
+        else:
+            cleaned = "\n".join(
+                line for line in body.splitlines()
+                if line.strip() and not set(line.strip()) <= {"|", "-", " "}
+            ).strip()
+            if not cleaned or PLACEHOLDER_RE.search(cleaned):
+                violations.append(f"{spec.parent.name}: section `Harness Strategy` is still a placeholder")
 
 if violations:
     print("VIOLATION: architecture requirements must be defined before implementation")

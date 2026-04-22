@@ -61,6 +61,20 @@ For every CRITICAL or HIGH item not already covered by a rule:
   - `covers:` contains that exact drift key
 - No matching ADR found → flag for ADR creation (see Drift→ADR Pipeline)
 
+### 6. Observation Check
+If observation artifacts exist for the spec:
+- compare observed tool calls against the harness strategy tool model
+- compare observed approval events against the permission model
+- compare observed memory events against the memory/state model
+- compare observed scenarios and failures against the eval plan
+
+Map observation mismatches to:
+- `TOOL_DRIFT`
+- `PERMISSION_DRIFT`
+- `MEMORY_DRIFT`
+- `EVAL_COVERAGE_DRIFT`
+- `RUNTIME_BEHAVIOR_DRIFT`
+
 ## Alert Levels
 
 | Severity | Condition | Action |

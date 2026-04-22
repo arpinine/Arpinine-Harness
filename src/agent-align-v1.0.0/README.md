@@ -28,6 +28,7 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 | `/spec-plan` | Plan | Generate plan and tasks from the spec |
 | `/spec-adr` | Decide | Create and manage decision records |
 | `/spec-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/spec-observe` | Evaluate | Record and review observed runtime behavior |
 | `/spec-implement` | Execute | Implement with TDD and security review |
 | `/spec-audit` | Realign | Detect drift, attribute failures, trigger refinement |
 | `/spec-retro` | Learn | Extract lessons as compounding rules |
@@ -50,6 +51,7 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 - clean architecture and modularity are enforced through plan boundaries, dependency rules, and ADRs
 - harness-based product features must define harness choice, abstraction boundary, tool model, memory model, and permission model
 - eval plans are for quality gates, metrics, thresholds, and results
+- observations capture actual runtime behavior for later drift analysis
 - ADRs capture the why behind major choices
 - hooks provide lightweight drift hints after edits
 - implementation edits are blocked until required architecture sections exist
@@ -67,6 +69,10 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
       plan.md
       eval-plan.md
       latest-results.md
+  observations/
+    001-<slug>/
+      latest-observation.md
+      trace.json
   adr/
     ADR-INDEX.md
     ADR-0001-<title>.md
@@ -81,6 +87,12 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 Each ADR links to:
 - its governing spec via `governs:`
 - a specific decision or drift item via `covers:`
+
+Observation artifacts can be used to compare:
+- documented harness strategy vs actual tool use
+- documented permission model vs actual approval events
+- documented memory model vs actual state behavior
+- evaluation plan vs observed runtime paths
 
 Each rule documents:
 - what pattern triggers it (`triggers:`)

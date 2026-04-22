@@ -1,0 +1,30 @@
+{
+  "spec": "specs/001-user-login",
+  "runtime_class": "embedded-agent-runtime",
+  "runtime_implementation": "harness-adapter",
+  "scenario_id": "login-lockout-001",
+  "timestamp": "2026-04-22T14:00:00Z",
+  "final_outcome": "resolved",
+  "events": [
+    {
+      "type": "tool_call",
+      "tool": "search_knowledge_base",
+      "approved": true
+    },
+    {
+      "type": "permission_check",
+      "action": "create_support_ticket",
+      "result": "approved"
+    },
+    {
+      "type": "memory_write",
+      "scope": "session",
+      "key": "ticket_summary"
+    },
+    {
+      "type": "failure",
+      "category": "tool_error",
+      "detail": "knowledge base timeout on first attempt"
+    }
+  ]
+}

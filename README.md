@@ -40,6 +40,7 @@ This is the core value of the plugin: not just generating files, but giving the 
 | `harness strategy` | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
 | `module boundaries` | Architectural contract for responsibilities, dependency direction, and replaceable seams |
 | `eval-plan.md` | Quality gate: how the team measures readiness, regressions, and release fitness |
+| `observation artifacts` | Runtime evidence: how the system actually behaved under real or simulated execution |
 | `ADR-*.md` | Decision record for choices that affect architecture, operations, security, or long-term maintainability |
 | `ADR-INDEX.md` | Global index of decisions and drift coverage |
 
@@ -53,6 +54,7 @@ This is the core value of the plugin: not just generating files, but giving the 
 | `/spec-plan` | Plan | Produce plan and tasks from an approved spec |
 | `/spec-adr` | Decide | Create and manage Architecture Decision Records |
 | `/spec-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/spec-observe` | Evaluate | Record and review runtime observations |
 | `/spec-implement` | Execute | Implement the plan with TDD and security review |
 | `/spec-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
 
@@ -77,6 +79,9 @@ This is the core value of the plugin: not just generating files, but giving the 
 # Define or run evaluation
 /spec-eval plan .specify/specs/001-user-login/
 
+# Record observed runtime behavior
+/spec-observe record .specify/specs/001-user-login/
+
 # Execute with test-first discipline
 /spec-implement .specify/specs/001-user-login/
 
@@ -91,6 +96,7 @@ This is the core value of the plugin: not just generating files, but giving the 
 - architecture rules enforce modularity and clean separation of concerns before coding starts
 - harness rules enforce how product applications depend on agent runtimes and how those runtimes are isolated
 - eval plans define metrics, thresholds, scenarios, and execution commands
+- observation artifacts show whether actual runtime behavior matches the planned harness model
 - ADRs explain why key decisions were made
 - hooks catch obvious violations and lightweight spec drift during editing
 - audit catches drift when code, specs, and evaluation evidence stop matching

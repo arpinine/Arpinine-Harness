@@ -1,0 +1,46 @@
+$schema: "https://agentk.io/schemas/observation/v1"
+type: object
+required:
+  - spec
+  - runtime_class
+  - scenario_id
+  - timestamp
+  - events
+properties:
+  spec:
+    type: string
+  runtime_class:
+    type: string
+  runtime_implementation:
+    type: string
+  scenario_id:
+    type: string
+  timestamp:
+    type: string
+  final_outcome:
+    type: string
+  events:
+    type: array
+    items:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+        tool:
+          type: string
+        approved:
+          type: boolean
+        action:
+          type: string
+        result:
+          type: string
+        scope:
+          type: string
+        key:
+          type: string
+        category:
+          type: string
+        detail:
+          type: string
