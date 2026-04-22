@@ -86,3 +86,30 @@ Each rule documents:
 - what pattern triggers it (`triggers:`)
 - what failure it prevents (`prevents:`)
 - which retro or ADR it was sourced from (`source-adr:`, `evidence-project:`)
+
+## Recommended AgentAlign + OpenHarness Architecture
+
+When a team chooses OpenHarness as the harness implementation, the recommended structure is:
+
+```text
+product feature / application service
+        |
+        v
+internal runtime interface
+        |
+        v
+OpenHarness adapter
+        |
+        v
+OpenHarness agent, tools, permissions, sessions
+```
+
+Recommended rules:
+- product code depends on an internal runtime interface, not directly on `@openharness/*`
+- OpenHarness code lives in the adapter or infrastructure layer
+- tool registration is explicit and narrow
+- approval callbacks are documented for any sensitive action
+- session and state handling are defined up front
+- evaluation covers task quality plus harness-specific failure modes
+
+This keeps the broader AgentAlign workflow generic while giving teams a concrete implementation pattern for OpenHarness.

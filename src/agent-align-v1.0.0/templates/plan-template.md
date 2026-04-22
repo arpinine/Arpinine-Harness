@@ -32,7 +32,7 @@ Use this section when the product feature depends on an agent harness or agent r
 | Concern | Decision |
 |---------|----------|
 | Why harness is needed | [reason] |
-| Harness/runtime | [OpenHarness / Claude Code / custom / other] |
+| Harness/runtime class | [hosted coding agent / embedded agent runtime / custom orchestration layer / other] |
 | Product abstraction boundary | [internal service / adapter / port] |
 | Tool access model | [which tools are allowed and why] |
 | Memory/state model | [session / persistent / none / bounded context] |

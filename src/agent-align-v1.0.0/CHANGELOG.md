@@ -5,9 +5,12 @@
 ### Added
 - `harness-governor` skill to enforce harness strategy for product-facing agent systems
 - `## Harness Strategy` section in the plan template for harness choice, abstraction boundary, tool access, memory, permissions, and swap strategy
+- `examples/example-harness-strategy.md` showing a vendor-neutral adapter-based harness pattern
+- `examples/example-harness-strategy-openharness.md` showing the recommended OpenHarness adapter pattern
 
 ### Changed
 - planning and implementation guidance now enforce harness design documentation before building product features on top of an agent runtime
+- `harness-governor` now includes OpenHarness-specific checks for adapter isolation, approval flow, and session handling when OpenHarness is selected
 
 ## [1.4.0] - 2026-04-22
 

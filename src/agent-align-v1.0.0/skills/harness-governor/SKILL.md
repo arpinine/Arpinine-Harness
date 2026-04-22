@@ -20,12 +20,13 @@ It requires teams to document why a harness is needed, how it is isolated, and h
 
 For harness-based features, the plan must define:
 - why a harness is needed
-- which harness/runtime is selected
+- which runtime class is selected
 - what abstraction boundary isolates the application from the harness
 - what tools the harness can access
 - what memory/state model is allowed
 - how permissions and safety checks are handled
 - how the harness is evaluated and monitored
+- how the harness could be replaced later with bounded application change
 
 ## Good Signs
 
@@ -43,15 +44,28 @@ For harness-based features, the plan must define:
 - agent behavior cannot be reproduced or tested outside a full runtime
 - evaluation ignores harness-specific risks like tool misuse or uncontrolled autonomy
 
+## OpenHarness-Specific Checks
+
+When the plan selects OpenHarness explicitly:
+- require a product-facing abstraction boundary such as an internal runtime interface or adapter
+- require OpenHarness-specific code to stay in the adapter or infrastructure layer
+- require the plan to describe tool registration and approval callback behavior
+- require the plan to describe session/message state handling and reset behavior
+- require evaluation to cover tool permission failures, approval flow correctness, and runtime recovery paths
+
 ## Enforcement Rules
 
 | Rule | Severity | Action |
 |------|----------|--------|
 | Harness-based feature missing `## Harness Strategy` | HIGH | Block implementation |
 | Plan does not define abstraction boundary around the harness | HIGH | Block implementation |
-| Tool, memory, or permission model is undocumented | HIGH | Block implementation |
+| Tool, memory, permission, or swap strategy is undocumented | HIGH | Block implementation |
+| Product code is expected to call the harness directly rather than through an internal boundary | HIGH | Block implementation |
 | Harness choice has long-term impact but no ADR exists | MEDIUM | Suggest ADR creation |
 | Evaluation plan ignores harness-specific behavior | MEDIUM | Require plan improvement |
+| OpenHarness is selected but adapter-layer isolation is not defined | HIGH | Block implementation |
+| OpenHarness is selected but approval callback or permission flow is undocumented | HIGH | Block implementation |
+| OpenHarness is selected but session or state handling is undocumented | HIGH | Block implementation |
 
 ## Review Questions
 
@@ -60,3 +74,5 @@ For harness-based features, the plan must define:
 3. Which tools and permissions does the harness require?
 4. How is state or memory persisted, scoped, and reset?
 5. How would the team replace the harness later with minimal product change?
+6. If OpenHarness is used, which adapter owns the OpenHarness dependency?
+7. If OpenHarness is used, how are tool approvals and session lifecycle controlled?

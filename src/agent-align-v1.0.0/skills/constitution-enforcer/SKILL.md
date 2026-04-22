@@ -24,7 +24,7 @@ This skill enforces ADR, drift, evaluation, and architecture-specific rules that
 | Plan missing `## Module Boundaries` for non-trivial work | HIGH | Block implementation |
 | Plan missing `## Dependency Rules` or `## Testability By Boundary` | HIGH | Block implementation |
 | Harness-based feature missing `## Harness Strategy` | HIGH | Block implementation |
-| Harness boundary, tool model, or memory model is undocumented | HIGH | Block implementation |
+| Harness boundary, tool model, memory model, permission model, or swap strategy is undocumented | HIGH | Block implementation |
 | Architecture decision with long-term impact is not documented in plan or ADR | MEDIUM | Require clarification |
 | ADR status still Proposed when implementation starts | HIGH | Warn; require Accepted |
 | ADR `supersedes:` missing when status = Superseded | HIGH | Block status update |
