@@ -1,6 +1,6 @@
 # AgentAlign Plugin
 
-AgentAlign gives teams a common way of working across specification, refinement, planning, architecture governance, evaluation, execution, and realignment.
+AgentAlign gives teams a common way of working across specification, refinement, planning, harness and architecture governance, evaluation, execution, and realignment.
 
 It builds on spec-kit, but the primary goal is not just artifact generation. The goal is a repeatable team workflow that keeps product intent, engineering execution, and AI assistance aligned.
 
@@ -11,7 +11,7 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 | Define | `spec.md` |
 | Refine | reviewed and clarified spec |
 | Plan | `plan.md` and tasks |
-| Architect | module boundaries, dependency rules, ADRs |
+| Architect | module boundaries, dependency rules, harness strategy, ADRs |
 | Decide | ADRs for consequential choices |
 | Evaluate | eval plan and results |
 | Execute | tested implementation |
@@ -38,6 +38,7 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 - Product owns intent, value, scope, and acceptance criteria in `spec.md`
 - Engineering owns the delivery approach in `plan.md`
 - Engineering must define modular boundaries and dependency rules before implementation
+- Engineering must define harness strategy when product features depend on an agent runtime
 - Engineering also owns the evaluation strategy for agentic systems
 - ADRs record decisions that materially shape implementation
 - Audit identifies when the spec, decisions, and code no longer match
@@ -47,6 +48,7 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 - `spec.md` is for product intent, not implementation detail
 - `plan.md` is for engineering detail and execution order
 - clean architecture and modularity are enforced through plan boundaries, dependency rules, and ADRs
+- harness-based product features must define harness choice, abstraction boundary, tool model, memory model, and permission model
 - eval plans are for quality gates, metrics, thresholds, and results
 - ADRs capture the why behind major choices
 - hooks provide lightweight drift hints after edits

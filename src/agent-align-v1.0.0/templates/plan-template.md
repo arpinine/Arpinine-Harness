@@ -26,6 +26,19 @@
 |----------|-----------|--------------------|
 | [module] | [unit / contract / integration] | [mock adapter / in-memory fake / fixture] |
 
+## Harness Strategy
+Use this section when the product feature depends on an agent harness or agent runtime.
+
+| Concern | Decision |
+|---------|----------|
+| Why harness is needed | [reason] |
+| Harness/runtime | [OpenHarness / Claude Code / custom / other] |
+| Product abstraction boundary | [internal service / adapter / port] |
+| Tool access model | [which tools are allowed and why] |
+| Memory/state model | [session / persistent / none / bounded context] |
+| Permission and safety model | [approval flow / policy / limits] |
+| Swap strategy | [how to replace the harness later] |
+
 ## Tasks
 - [ ] TASK-001: Write failing tests for [module]
 - [ ] TASK-002: Implement [module]

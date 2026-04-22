@@ -15,9 +15,10 @@ Refine and realign the specification.
 4. Check that `## Related ADRs` exists.
 5. Check whether the spec is ready for planning or needs another refinement pass.
 6. Check whether the spec includes architectural quality expectations when the feature implies modular boundaries, integration seams, or long-lived domain logic.
-7. If the spec describes agentic behavior, ensure the evaluation expectations are measurable enough to support an eval plan.
-8. If the spec references a decision already implemented in code, ensure the relevant ADR is linked.
-9. Report issues as:
+7. If the product feature implies a harness-based agent workflow, ensure the spec makes that operational need explicit enough to drive a later harness strategy.
+8. If the spec describes agentic behavior, ensure the evaluation expectations are measurable enough to support an eval plan.
+9. If the spec references a decision already implemented in code, ensure the relevant ADR is linked.
+10. Report issues as:
    - `CRITICAL`: contradicts implementation or missing governing ADR for a known drift item
    - `HIGH`: ambiguous or untestable requirement
    - `MEDIUM`: missing structure section or weak wording

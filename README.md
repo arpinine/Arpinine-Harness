@@ -1,6 +1,6 @@
 # AgentAlign
 
-AgentAlign is a Claude plugin for teams that want a common way of working across product, engineering, architecture, and AI-assisted execution.
+AgentAlign is a Claude plugin for teams that want a common way of working across product, engineering, harness-based application design, architecture, and AI-assisted execution.
 
 It standardizes how work moves from idea to specification, from specification to evaluation and execution, and from execution back into refinement when reality diverges from intent.
 
@@ -11,7 +11,7 @@ The plugin is built around a shared delivery loop:
 1. Define: capture product intent in `spec.md`
 2. Refine: review and tighten requirements before implementation
 3. Plan: turn approved intent into an engineering plan and tasks
-4. Architect: define module boundaries, dependency rules, and clean separation of concerns
+4. Architect: define module boundaries, dependency rules, harness strategy, and clean separation of concerns
 5. Decide: record consequential architecture and implementation choices in ADRs
 6. Evaluate: define how the team will measure quality and readiness
 7. Execute: implement with test-first discipline
@@ -37,6 +37,7 @@ This is the core value of the plugin: not just generating files, but giving the 
 |----------|---------|
 | `spec.md` | Product intent: what problem is being solved, for whom, and how success is measured |
 | `plan.md` | Engineering approach: how the team intends to implement the work |
+| `harness strategy` | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
 | `module boundaries` | Architectural contract for responsibilities, dependency direction, and replaceable seams |
 | `eval-plan.md` | Quality gate: how the team measures readiness, regressions, and release fitness |
 | `ADR-*.md` | Decision record for choices that affect architecture, operations, security, or long-term maintainability |
@@ -88,6 +89,7 @@ This is the core value of the plugin: not just generating files, but giving the 
 - `spec.md` stays product-facing and measurable
 - `plan.md` captures implementation detail and delivery steps
 - architecture rules enforce modularity and clean separation of concerns before coding starts
+- harness rules enforce how product applications depend on agent runtimes and how those runtimes are isolated
 - eval plans define metrics, thresholds, scenarios, and execution commands
 - ADRs explain why key decisions were made
 - hooks catch obvious violations and lightweight spec drift during editing

@@ -27,6 +27,7 @@ Initialize the shared team workflow.
    - `spec.md` captures product intent only
    - `plan.md` captures implementation details
    - `plan.md` must define module boundaries and dependency rules before implementation
+   - harness-based product features must document harness strategy before implementation
    - ADRs capture architectural decisions and drift resolutions
    - eval plans define metrics, thresholds, scenarios, and execution commands
    - rules compound across projects — lessons from retros live in `.specify/rules/`

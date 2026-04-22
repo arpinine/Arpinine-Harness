@@ -23,6 +23,8 @@ This skill enforces ADR, drift, evaluation, and architecture-specific rules that
 | Plan missing `## Evaluation Strategy` for agentic work | MEDIUM | Suggest adding section |
 | Plan missing `## Module Boundaries` for non-trivial work | HIGH | Block implementation |
 | Plan missing `## Dependency Rules` or `## Testability By Boundary` | HIGH | Block implementation |
+| Harness-based feature missing `## Harness Strategy` | HIGH | Block implementation |
+| Harness boundary, tool model, or memory model is undocumented | HIGH | Block implementation |
 | Architecture decision with long-term impact is not documented in plan or ADR | MEDIUM | Require clarification |
 | ADR status still Proposed when implementation starts | HIGH | Warn; require Accepted |
 | ADR `supersedes:` missing when status = Superseded | HIGH | Block status update |
@@ -38,4 +40,5 @@ This skill enforces ADR, drift, evaluation, and architecture-specific rules that
 - Post-drift-detection: check ADR coverage for CRITICAL/HIGH items
 - Pre-completion: check evaluation plan, thresholds, and latest results for agentic work
 - Pre-implementation: check architecture sections and module/test boundary clarity
+- Pre-implementation: check harness strategy for harness-based application flows
 - On `/spec-adr status` update: check Superseded invariants

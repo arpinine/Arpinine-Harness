@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `harness-governor` skill to enforce harness strategy for product-facing agent systems
+- `## Harness Strategy` section in the plan template for harness choice, abstraction boundary, tool access, memory, permissions, and swap strategy
+
+### Changed
+- planning and implementation guidance now enforce harness design documentation before building product features on top of an agent runtime
+
 ## [1.4.0] - 2026-04-22
 
 ### Added
@@ -100,4 +109,3 @@
   - constitution
 - hook wiring for pre-write constitution validation and post-write drift checks
 - ADR lifecycle management with `governs:` linkage and index maintenance
-
