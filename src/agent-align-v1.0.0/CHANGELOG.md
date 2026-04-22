@@ -21,6 +21,7 @@
 - `spec-status` now reports harness strategy and observation state
 - `spec-retro` now asks harness-focused retrospective questions and produces harness-category rules
 - `spec-observe record` now captures raw data only; drift analysis happens in `review`
+- dependency validation is now explicit during setup; AgentAlign validates `spec-kit`, harness, and eval tools instead of trying to install them during plugin installation
 
 ## [1.4.0] - 2026-04-22
 

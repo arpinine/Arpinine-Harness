@@ -135,6 +135,17 @@ make build
 /spec-init
 ```
 
+## Dependency Handling
+
+AgentAlign does not try to install `spec-kit`, harness runtimes, or eval frameworks during plugin installation.
+Instead, it validates them during setup and before the relevant workflow stage:
+
+- `spec-kit` is required for automated generation and planning
+- harness runtimes are required only when a harness strategy selects them
+- eval tools are required only when `eval-plan.md` selects them
+
+Use `src/agent-align-v1.0.0/scripts/check-dependencies.sh` to validate local readiness.
+
 ## License
 
 MIT

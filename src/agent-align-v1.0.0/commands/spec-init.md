@@ -8,14 +8,16 @@ Initialize the shared team workflow.
 
 ## Workflow
 
-1. Run `/speckit.constitution`.
-2. Ensure these paths exist:
+1. Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-dependencies.sh` or equivalent environment validation.
+2. If `spec-kit` is missing, stop and install it before relying on automated `/spec-*` generation flows.
+3. Run `/speckit.constitution`.
+4. Ensure these paths exist:
    - `.specify/adr/`
    - `.specify/adr/ADR-INDEX.md`
    - `.specify/evals/`
    - `.specify/observations/`
    - `.specify/rules/`
-3. If `ADR-INDEX.md` does not exist, create it with:
+5. If `ADR-INDEX.md` does not exist, create it with:
 
 ```md
 # ADR Index
@@ -24,7 +26,7 @@ Initialize the shared team workflow.
 |--------|-------|--------|---------|--------|
 ```
 
-4. Confirm the plugin conventions in the repo:
+6. Confirm the plugin conventions in the repo:
    - `spec.md` captures product intent only
    - `plan.md` captures implementation details
    - `plan.md` must define module boundaries and dependency rules before implementation
@@ -34,4 +36,8 @@ Initialize the shared team workflow.
    - observations capture actual runtime behavior for later drift analysis
    - rules compound across projects — lessons from retros live in `.specify/rules/`
    - refinement happens before implementation and after drift is found
-5. Tell the user which files were created or verified.
+7. Tell the user which files were created or verified.
+8. Report dependency status clearly:
+   - `spec-kit` required for automated generation and planning
+   - harness runtime required only when selected in `## Harness Strategy`
+   - eval tool required only when selected in `eval-plan.md`

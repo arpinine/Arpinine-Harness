@@ -125,3 +125,15 @@ Recommended rules:
 - evaluation covers task quality plus harness-specific failure modes
 
 This keeps the broader AgentAlign workflow generic while giving teams a concrete implementation pattern for OpenHarness.
+
+## Dependency Model
+
+AgentAlign does not install external dependencies during plugin installation.
+Instead, it validates them during setup and before relevant workflow stages.
+
+Recommended interpretation:
+- `spec-kit` is required for automated spec generation and planning flows
+- harness runtimes are required only when selected in `## Harness Strategy`
+- eval tools are required only when selected in `eval-plan.md`
+
+Use `scripts/check-dependencies.sh` to validate local readiness and report missing tools explicitly.

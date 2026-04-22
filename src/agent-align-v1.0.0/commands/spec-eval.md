@@ -36,15 +36,17 @@ Define or run evaluation for the current spec.
 ## Workflow: `run`
 
 1. Read `.specify/evals/<spec-slug>/eval-plan.md`.
-2. Run the framework command defined there.
-3. Save results to `.specify/evals/<spec-slug>/latest-results.md`.
-4. Summarize:
+2. Validate that the framework command exists in the current environment.
+3. If the command is unavailable, stop and report the missing dependency instead of attempting installation.
+4. Run the framework command defined there.
+5. Save results to `.specify/evals/<spec-slug>/latest-results.md`.
+6. Summarize:
    - framework used
    - datasets or scenarios covered
    - metric scores
    - thresholds
    - pass/fail result
-5. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
+7. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
 
 ## Workflow: `review`
 
@@ -64,4 +66,5 @@ Define or run evaluation for the current spec.
 
 - Eval plan missing → "Run `/spec-eval plan` first"
 - Framework command missing → "Add an execution command to eval-plan.md"
+- Framework dependency unavailable → "Install the tool declared in eval-plan.md before running `/spec-eval run`"
 - Results missing thresholds → "Define thresholds before evaluation can pass"
