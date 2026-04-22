@@ -1,4 +1,4 @@
-PLUGIN_NAME := spec-kit-automation
+PLUGIN_NAME := agent-align
 VERSION     := 1.0.0
 SRC_DIR     := src/$(PLUGIN_NAME)-v$(VERSION)
 DIST_DIR    := dist

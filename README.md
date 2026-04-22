@@ -121,7 +121,7 @@ uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai c
 make build
 
 # 3. Install plugin in Claude
-/plugin install dist/spec-kit-automation-v1.0.0.zip
+/plugin install dist/agent-align-v1.0.0.zip
 
 # 4. Initialize the workflow
 /spec-init
