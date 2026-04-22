@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0] - 2026-04-22
+
+### Changed
+- renamed project identity to `AgentAlign`
+- renamed plugin/package to `agent-align`
+- renamed source directory from `src/spec-kit-automation-v1.0.0` to `src/agent-align-v1.0.0`
+- updated build and installation paths to produce `dist/agent-align-v1.2.0.zip`
+
 ## [1.2.0] - 2026-04-22
 
 ### Added
@@ -75,11 +83,3 @@
 - hook wiring for pre-write constitution validation and post-write drift checks
 - ADR lifecycle management with `governs:` linkage and index maintenance
 
-## [Unreleased]
-
-### Changed
-- renamed the repository-facing project identity to `AgentAlign`
-- renamed the plugin/package identity to `agent-align`
-- renamed the source package directory from `src/spec-kit-automation-v1.0.0` to `src/agent-align-v1.0.0`
-- updated build and installation paths to produce `dist/agent-align-v1.0.0.zip`
-- aligned manifest naming and documentation with the new project and plugin names
