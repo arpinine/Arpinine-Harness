@@ -1,0 +1,10 @@
+{
+  "name": "spec-kit-automation",
+  "version": "1.0.0",
+  "description": "ADR tracking and drift detection on top of spec-kit",
+  "author": {
+    "name": "Arpinine"
+  },
+  "license": "MIT",
+  "keywords": ["speckit", "adr", "drift-detection", "spec-management"]
+}
