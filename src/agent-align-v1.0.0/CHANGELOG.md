@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.4.0] - 2026-04-22
+
+### Added
+- `rule-manager` skill to manage compounding machine-readable rules in `.specify/rules/`
+- `rules/<category>/<rule-id>.md` format with frontmatter: `triggers`, `prevents`, `source-adr`, `evidence-project`, `severity`, `active`
+- `/spec-retro` command to extract lessons from completed work and persist them as rules
+- `/spec-status` command for project-wide governance overview and new team member onboarding (`--onboard` flag)
+- `rules/` directory initialized by `/spec-init`
+- Example rules: `examples/rules/security/auth-001.md`, `examples/rules/architecture/arch-001.md`
+- Machine-readable schemas: `templates/schemas/spec-schema.yaml`, `templates/schemas/adr-schema.yaml`
+- AIN (AI-Nativeness) assessment section in `spec-template.md` with AIN target level, agent-callable operations, human-in-the-loop gates, and feedback channels
+
+### Changed
+- `/spec-audit` now attributes each drift finding as PRECONDITION FAILURE (spec unclear) or POSTCONDITION FAILURE (implementation deviated from clear spec) before triggering ADR creation
+- `/spec-audit` now checks active rules via `rule-manager` before creating ADRs — known patterns reported as rule violations instead
+- `drift-detector` skill now invokes `rule-manager` before ADR coverage check
+- `spec-audit` summary now includes attribution counts and rule violation count
+
 ## [1.3.0] - 2026-04-22
 
 ### Changed

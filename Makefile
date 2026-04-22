@@ -1,5 +1,5 @@
 PLUGIN_NAME := agent-align
-VERSION     := 1.3.0
+VERSION     := 1.4.0
 SRC_DIR     := src/$(PLUGIN_NAME)-v1.0.0
 DIST_DIR    := dist
 ZIP_NAME    := $(PLUGIN_NAME)-v$(VERSION).zip

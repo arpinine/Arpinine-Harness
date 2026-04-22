@@ -13,6 +13,7 @@ Initialize the shared team workflow.
    - `.specify/adr/`
    - `.specify/adr/ADR-INDEX.md`
    - `.specify/evals/`
+   - `.specify/rules/`
 3. If `ADR-INDEX.md` does not exist, create it with:
 
 ```md
@@ -28,5 +29,6 @@ Initialize the shared team workflow.
    - `plan.md` must define module boundaries and dependency rules before implementation
    - ADRs capture architectural decisions and drift resolutions
    - eval plans define metrics, thresholds, scenarios, and execution commands
+   - rules compound across projects — lessons from retros live in `.specify/rules/`
    - refinement happens before implementation and after drift is found
 5. Tell the user which files were created or verified.

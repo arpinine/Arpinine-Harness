@@ -47,8 +47,14 @@ Compare against code data models, ORMs, or schema files.
 | Field in code, missing in spec | HIGH |
 | Type mismatch | CRITICAL |
 
-### 4. ADR Coverage Check
-For every CRITICAL or HIGH item:
+### 4. Rule Check
+Before any ADR creation, invoke `rule-manager` skill → `check-rules(file_path, content)`:
+- If an active rule's `triggers` match the finding → report as **RULE VIOLATION** with the rule-id and `prevents` value
+- Rule violations escalate to at least the rule's severity
+- Rule violations do NOT need a new ADR — they need the code or spec fixed to comply with the existing rule
+
+### 5. ADR Coverage Check
+For every CRITICAL or HIGH item not already covered by a rule:
 - Derive a stable drift key: `drift:<spec-slug>:<type>:<identifier>`
 - Search `.specify/adr/ADR-INDEX.md` and ADR files for both:
   - `governs:` matches the spec path

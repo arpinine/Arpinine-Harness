@@ -1,7 +1,7 @@
 {
   "name": "agent-align",
-  "version": "1.2.0",
-  "description": "Shared product-engineering workflow with ADRs, drift detection, and framework-agnostic evaluation",
+  "version": "1.4.0",
+  "description": "Shared product-engineering workflow with ADRs, drift detection, evaluation, and compounding rule learning",
   "author": {
     "name": "Arpinine"
   },

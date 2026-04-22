@@ -1,0 +1,96 @@
+# Spec artifact schema
+# Describes the expected structure of a spec.md file for machine validation.
+# Tools can load this schema to check completeness and surface missing sections.
+
+$schema: "https://agentk.io/schemas/spec/v1"
+type: object
+
+required:
+  - user_stories
+  - requirements
+  - acceptance_criteria
+  - out_of_scope
+
+properties:
+  user_stories:
+    description: "As a [persona], I want [action], so that [value]."
+    type: array
+    minItems: 1
+    items:
+      type: string
+      pattern: "^As a .+, I want .+, so that .+\\.$"
+
+  requirements:
+    description: "Functional requirements. Each item: FR-NNN: The system SHALL [measurable action]."
+    type: array
+    minItems: 1
+    items:
+      type: string
+      pattern: "^FR-\\d{3}: "
+
+  non_functional_requirements:
+    description: "NFR-NNN: [category] requirement with metric."
+    type: array
+    items:
+      type: string
+      pattern: "^NFR-\\d{3}: "
+
+  acceptance_criteria:
+    description: "Measurable criteria. Each item: AC-NNN: [measurable outcome]."
+    type: array
+    minItems: 1
+    items:
+      type: string
+      pattern: "^AC-\\d{3}: "
+
+  out_of_scope:
+    description: "Explicitly excluded items to prevent scope creep."
+    type: array
+    minItems: 1
+
+  ain_assessment:
+    description: "AI-Nativeness assessment. Required if any agent operations are planned."
+    type: object
+    properties:
+      ain_target_level:
+        type: integer
+        minimum: 1
+        maximum: 4
+        description: "1=no AI, 2=AI-assisted internal, 3=AI in workflow, 4=AI-native product"
+      agent_callable_operations:
+        type: array
+        description: "Operations AI agents can invoke directly"
+        items:
+          type: object
+          required: [name, input, output]
+          properties:
+            name:
+              type: string
+            input:
+              type: string
+            output:
+              type: string
+            failure_modes:
+              type: array
+              items:
+                type: string
+      human_in_the_loop_gates:
+        type: array
+        description: "Decisions requiring human approval before agent proceeds"
+        items:
+          type: string
+      feedback_channels:
+        type: array
+        description: "How the system captures signal about agent quality"
+        items:
+          type: string
+      evaluation_required:
+        type: boolean
+        description: "If true, an eval-plan.md must exist before implementation can begin"
+
+  related_adrs:
+    description: "ADRs governing this spec."
+    type: array
+    items:
+      type: string
+      pattern: "^ADR-\\d{4}: "

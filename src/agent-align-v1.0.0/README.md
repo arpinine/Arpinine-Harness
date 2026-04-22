@@ -16,19 +16,22 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 | Evaluate | eval plan and results |
 | Execute | tested implementation |
 | Realign | drift findings, spec updates, ADR updates |
+| Learn | retro lessons persisted as rules in `.specify/rules/` |
 
 ## Commands
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
-| `/spec-init` | Setup | Initialize the workflow and ADR structure |
+| `/spec-init` | Setup | Initialize the workflow, ADR structure, and rules directory |
 | `/spec-new` | Define | Create a specification from a feature request |
 | `/spec-review` | Refine | Tighten clarity, scope, and measurability |
 | `/spec-plan` | Plan | Generate plan and tasks from the spec |
 | `/spec-adr` | Decide | Create and manage decision records |
 | `/spec-eval` | Evaluate | Define and run framework-agnostic evaluation |
 | `/spec-implement` | Execute | Implement with TDD and security review |
-| `/spec-audit` | Realign | Detect drift and trigger refinement |
+| `/spec-audit` | Realign | Detect drift, attribute failures, trigger refinement |
+| `/spec-retro` | Learn | Extract lessons as compounding rules |
+| `/spec-status` | Govern | Project-wide governance overview and onboarding brief |
 
 ## Team Responsibilities
 
@@ -48,17 +51,36 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 - ADRs capture the why behind major choices
 - hooks provide lightweight drift hints after edits
 - implementation edits are blocked until required architecture sections exist
+- drift findings are attributed as precondition failures (spec unclear) or postcondition failures (deviated from clear spec)
+- rules compound — each retro lesson becomes a permanent constraint that fires on future specs
 - refinement is continuous and happens before and after implementation
 
-## ADR Storage
+## Artifact Storage
 
 ```text
 .specify/
+  specs/
+    001-<slug>/
+      spec.md
+      plan.md
+      eval-plan.md
+      latest-results.md
   adr/
     ADR-INDEX.md
     ADR-0001-<title>.md
+  evals/
+  rules/
+    security/
+      auth-001.md
+    architecture/
+      arch-001.md
 ```
 
 Each ADR links to:
 - its governing spec via `governs:`
 - a specific decision or drift item via `covers:`
+
+Each rule documents:
+- what pattern triggers it (`triggers:`)
+- what failure it prevents (`prevents:`)
+- which retro or ADR it was sourced from (`source-adr:`, `evidence-project:`)
