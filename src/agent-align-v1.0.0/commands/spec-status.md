@@ -19,12 +19,14 @@ Single-command governance overview. Designed to answer: "What does a new enginee
 
 ### 1. Collect all artifacts
 
+Run `spec_status.py` from the plugin scripts directory when available. Treat its output as the baseline report, then add narrative explanation where needed.
+
 Scan `.specify/`:
 - `specs/*/spec.md` → all specs
 - `specs/*/plan.md` → plans
 - `specs/*/eval-plan.md` and `latest-results.md` → eval state
 - `observations/*/latest-observation.md` and `trace.json` → runtime evidence
-- dependency state from a local `check-dependencies.sh` run or equivalent shell checks
+- dependency state from `check-dependencies.sh --json` or equivalent shell checks
 - `adr/*.md` → ADR index
 - `rules/**/*.md` → active rules
 - `adr/ADR-INDEX.md` → global decision coverage
@@ -79,7 +81,7 @@ Source: 3 from retro, 1 from drift ADR
 
 ### 5. Blocked work (if any)
 
-List any specs where work cannot proceed due to:
+Use the script output as the initial blocked-work list, then explain any additional context. List any specs where work cannot proceed due to:
 - CRITICAL unresolved drift without ADR
 - Missing `spec-kit` for automated generation/planning flows
 - Missing eval plan on agentic spec
@@ -122,7 +124,7 @@ HARNESS AND OBSERVATION STATE
 [which specs have a defined harness strategy and which have runtime evidence recorded]
 
 DEPENDENCY STATE
-[summarize results from a recent `check-dependencies.sh` run when available]
+[summarize results from a recent `check-dependencies.sh --json` run when available]
 
 OPEN ITEMS
 [anything requiring a decision or unblocking action]

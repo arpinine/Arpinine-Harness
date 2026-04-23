@@ -12,6 +12,8 @@
 - example observation artifacts: `example-observation.md` and `example-observation-trace.json`
 - `examples/rules/harness/harness-001.md` as an example harness governance rule
 - `example-observation-trace-openharness.json` showing OpenHarness-specific observation events
+- `scripts/check_dependencies.py` for machine-readable dependency validation
+- `scripts/spec_status.py` for executable project-wide governance reports
 
 ### Changed
 - planning and implementation guidance now enforce harness design documentation before building product features on top of an agent runtime
@@ -22,6 +24,10 @@
 - `spec-retro` now asks harness-focused retrospective questions and produces harness-category rules
 - `spec-observe record` now captures raw data only; drift analysis happens in `review`
 - dependency validation is now explicit during setup; AgentAlign validates `spec-kit`, harness, and eval tools instead of trying to install them during plugin installation
+- `check-dependencies.sh` now supports script-backed JSON output through `check_dependencies.py`
+- `quick_drift_check.py` now includes lightweight static conformance checks for harness import leakage and framework leakage into domain layers
+- `quick_drift_check.py` now parses declared `## Module Boundaries` from `plan.md` and flags imports that violate planned dependency direction
+- `spec-status` and `spec-audit` now start from script-backed outputs when those helpers are available
 
 ## [1.4.0] - 2026-04-22
 

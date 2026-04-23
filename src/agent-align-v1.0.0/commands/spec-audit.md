@@ -20,10 +20,16 @@ If no path given: scan all specs under `.specify/specs/`.
 - Without argument: `find .specify/specs -name "spec.md"` and process each
 
 ### 2. Run drift detection (invoke `drift-detector` skill)
+Run `quick_drift_check.py --spec <path>` from the plugin scripts directory when available and use those findings as the initial machine-generated hint set before invoking deeper review.
+
 For each spec:
 - File existence check
 - API/endpoint comparison
 - Data model comparison
+- static conformance checks for:
+  - declared module boundary violations from `## Module Boundaries`
+  - harness runtime imports outside adapter or infrastructure modules
+  - framework imports inside domain or business layers
 - ADR coverage check using both:
   - `governs:` matches the spec path
   - `covers:` contains the exact drift key for the finding

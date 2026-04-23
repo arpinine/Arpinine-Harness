@@ -137,3 +137,15 @@ Recommended interpretation:
 - eval tools are required only when selected in `eval-plan.md`
 
 Use `scripts/check-dependencies.sh` to validate local readiness and report missing tools explicitly.
+
+## Script-Backed Governance
+
+AgentAlign is stronger when commands can start from executable checks instead of prompt text alone.
+
+Available helpers:
+- `scripts/check-dependencies.sh --json` for machine-readable environment readiness
+- `scripts/spec_status.py [--spec <slug>] [--onboard]` for a project governance report
+- `scripts/quick_drift_check.py --spec .specify/specs/<slug>/spec.md` for lightweight drift and static conformance hints
+
+The post-write drift hook already uses `quick_drift_check.py`, so endpoint mismatches, stale eval runs, harness import leakage, and framework leakage into domain layers surface immediately after edits.
+It also uses declared `## Module Boundaries` from `plan.md` to flag imports that violate planned dependency direction.

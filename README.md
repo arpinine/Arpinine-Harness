@@ -144,7 +144,7 @@ Instead, it validates them during setup and before the relevant workflow stage:
 - harness runtimes are required only when a harness strategy selects them
 - eval tools are required only when `eval-plan.md` selects them
 
-Use `src/agent-align-v1.0.0/scripts/check-dependencies.sh` to validate local readiness.
+Use `src/agent-align-v1.0.0/scripts/check-dependencies.sh --json` for machine-readable readiness, or without flags for a text report.
 
 ## License
 
