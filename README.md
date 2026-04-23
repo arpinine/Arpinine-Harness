@@ -42,15 +42,26 @@ This is the core value of the plugin: not just generating files, but giving the 
 
 ## Team Contract
 
-| Role | Responsibility |
-|------|----------------|
-| Product | Owns the problem, user value, scope, and acceptance criteria in `spec.md` |
-| Product Owner Agent | Checks that plans, implementation, evaluation, and drift resolution preserve the business case in `spec.md` |
+| Team Role | Responsibility |
+|-----------|----------------|
+| Product | Owns the problem, user value, scope, business case, and acceptance criteria in `spec.md` |
 | Engineering | Owns `plan.md`, task breakdown, and implementation approach |
 | Engineering | Owns module boundaries, dependency rules, and testability by boundary |
-| Engineering | Owns evaluation strategy and release thresholds for agentic systems |
+| Engineering | Owns evaluation strategy, release thresholds, and runtime evidence expectations for agentic systems |
 | Tech Leads | Own consequential decisions and approve ADRs when needed |
-| AI Agents | Help execute within the rules set by the spec, plan, and ADRs |
+| AI Agents | Help execute within the rules set by the spec, plan, ADRs, eval plan, and observation evidence |
+
+Human ownership stays with the team. AgentAlign agents act as governed specialists inside that contract.
+
+## Agent Responsibilities
+
+| Agent | Responsibility In The Governed Codebase | Primary Skills Used |
+|-------|------------------------------------------|---------------------|
+| `product-owner` | Keeps the business case, scope, and acceptance criteria aligned from `spec.md` through planning, implementation, evaluation, and audit | `constitution-enforcer`, `evaluation-governor`, `drift-detector` |
+| `tech-architect` | Protects modular design, identifies consequential decisions, and pushes architecture changes into ADRs before they become accidental code structure | `architecture-governor`, `adr-manager` |
+| `tdd-guide` | Keeps implementation task-aligned and test-first so code changes stay traceable to planned work and verifiable by tests | `constitution-enforcer` |
+| `security-reviewer` | Reviews plans and implementation for security-sensitive gaps and blocks completion when risky behavior is undocumented or unsafe | `constitution-enforcer`, `rule-manager` |
+| Governance skills | Provide the codebase-wide enforcement layer for architecture, harness boundaries, evaluation, drift detection, ADR discipline, and compounding rules | `architecture-governor`, `harness-governor`, `evaluation-governor`, `drift-detector`, `adr-manager`, `rule-manager` |
 
 ## Shared Artifacts
 
