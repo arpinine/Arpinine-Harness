@@ -15,6 +15,7 @@
 - `scripts/check_dependencies.py` for machine-readable dependency validation
 - `scripts/spec_status.py` for executable project-wide governance reports
 - `product-owner` agent to keep business cases, acceptance criteria, plans, implementation, and drift resolution aligned with `spec.md`
+- end-to-end support triage demo under `examples/end-to-end/support-agent-demo`
 
 ### Changed
 - planning and implementation guidance now enforce harness design documentation before building product features on top of an agent runtime
@@ -30,6 +31,7 @@
 - `quick_drift_check.py` now parses declared `## Module Boundaries` from `plan.md` and flags imports that violate planned dependency direction
 - `spec-status` and `spec-audit` now start from script-backed outputs when those helpers are available
 - spec review, planning, implementation, and audit flows now invoke the `product-owner` agent for product-intent alignment checks
+- `spec_status.py` now treats `Result: PASS` as authoritative and avoids counting `ADR-INDEX.md` as an ADR
 
 ## [1.4.0] - 2026-04-22
 

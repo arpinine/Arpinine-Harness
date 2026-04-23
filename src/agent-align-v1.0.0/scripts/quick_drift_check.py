@@ -29,7 +29,7 @@ SPEC_ENDPOINT_RE = re.compile(r"\b(GET|POST|PUT|DELETE|PATCH)\s+(/[A-Za-z0-9_./{
 AGENTIC_HINT_RE = re.compile(r"\b(agent|assistant|prompt|llm|model|inference|eval|harness)\b", re.IGNORECASE)
 OPENHARNESS_HINT_RE = re.compile(r"openharness", re.IGNORECASE)
 OPENHARNESS_IMPORT_RE = re.compile(
-    r"(@openharness/|from\s+[\"'][^\"']*openharness[^\"']*[\"']|require\([\"'][^\"']*openharness[^\"']*[\"']\))",
+    r"(@openharness/|from\s+openharness\b|import\s+openharness\b|from\s+[\"'][^\"']*openharness[^\"']*[\"']|require\([\"'][^\"']*openharness[^\"']*[\"']\))",
     re.IGNORECASE,
 )
 FRAMEWORK_IMPORT_RE = re.compile(
@@ -41,7 +41,6 @@ ADAPTER_PATH_RE = re.compile(r"(^|/)(adapter|adapters|gateway|gateways|integrati
 CODE_ENDPOINT_PATTERNS = [
     re.compile(r"""@(get|post|put|delete|patch)\(\s*["']([^"']+)["']""", re.IGNORECASE),
     re.compile(r"""\b(?:app|router)\.(get|post|put|delete|patch)\(\s*["']([^"']+)["']""", re.IGNORECASE),
-    re.compile(r"""\b\w+\.(get|post|put|delete|patch)\(\s*["']([^"']+)["']""", re.IGNORECASE),
 ]
 SECTION_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
 IMPORT_PATTERNS = [
@@ -80,7 +79,8 @@ def endpoints_from_code(text: str) -> set[str]:
     for pattern in CODE_ENDPOINT_PATTERNS:
         for match in pattern.finditer(text):
             method, path = match.groups()
-            endpoints.add(f"{method.upper()} {path}")
+            if path.startswith("/"):
+                endpoints.add(f"{method.upper()} {path}")
     return endpoints
 
 

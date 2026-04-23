@@ -81,7 +81,13 @@ def eval_state(slug: str) -> str:
     if not latest.exists():
         return "PLANNED"
     text = read_text(latest)
-    if re.search(r"\b(fail|failed|threshold not met)\b", text, re.IGNORECASE):
+    if re.search(r"^Result:\s*FAIL\b", text, re.MULTILINE | re.IGNORECASE):
+        return "FAIL"
+    if re.search(r"^Result:\s*PASS\b", text, re.MULTILINE | re.IGNORECASE):
+        return "PASS"
+    if re.search(r"^-\s*Failed:\s*[1-9]\d*\b", text, re.MULTILINE | re.IGNORECASE):
+        return "FAIL"
+    if re.search(r"\bthreshold not met\b", text, re.IGNORECASE):
         return "FAIL"
     if re.search(r"\b(pass|passed|all thresholds met)\b", text, re.IGNORECASE):
         return "PASS"
@@ -124,6 +130,8 @@ def adr_count_for_spec(spec: pathlib.Path) -> int:
     target2 = f"governs: .specify/specs/{spec.parent.name}"
     count = 0
     for adr in sorted(ADR_ROOT.glob("*.md")):
+        if adr.name == "ADR-INDEX.md":
+            continue
         text = read_text(adr)
         if target1 in text or target2 in text:
             count += 1
@@ -145,6 +153,8 @@ def rule_summary() -> dict[str, object]:
 def adr_summary() -> dict[str, int]:
     summary = {"total": 0, "active": 0, "superseded": 0, "open": 0}
     for adr in sorted(ADR_ROOT.glob("*.md")):
+        if adr.name == "ADR-INDEX.md":
+            continue
         text = read_text(adr)
         summary["total"] += 1
         if re.search(r"^status:\s*(accepted|implemented)\s*$", text, re.MULTILINE | re.IGNORECASE):

@@ -110,6 +110,31 @@ This is the core value of the plugin: not just generating files, but giving the 
 /spec-audit .specify/specs/001-user-login/
 ```
 
+## End-to-End Demo
+
+The repository includes a complete runnable demo product:
+
+```text
+examples/end-to-end/support-agent-demo/
+```
+
+It shows the full AgentAlign loop on a small support triage agent:
+- product request and governed `spec.md`
+- `plan.md` with module boundaries, dependency rules, harness strategy, and eval strategy
+- fake harness adapter so no external runtime is required
+- runnable tests and evaluation script
+- observation trace
+- ADR and rule examples
+- intentional drift example for audit discussion
+
+Start with:
+
+```bash
+cd examples/end-to-end/support-agent-demo
+PYTHONPATH=app python3 -m unittest discover -s app/tests
+PYTHONPATH=app python3 app/eval/run_eval.py
+```
+
 ## How Alignment Works
 
 - `spec.md` stays product-facing and measurable

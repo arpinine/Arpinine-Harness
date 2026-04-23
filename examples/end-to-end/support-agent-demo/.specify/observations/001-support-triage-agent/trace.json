@@ -1,0 +1,25 @@
+{
+  "spec": ".specify/specs/001-support-triage-agent",
+  "runtime_class": "embedded-agent-runtime",
+  "runtime_impl": "fake-harness-adapter",
+  "scenario_id": "enterprise-outage",
+  "timestamp": "2026-04-23T12:00:00Z",
+  "outcome": "passed",
+  "events": [
+    {
+      "type": "tool_call",
+      "tool": "draft_support_reply",
+      "approved": true
+    },
+    {
+      "type": "permission_check",
+      "action": "create_support_case",
+      "result": "approved"
+    },
+    {
+      "type": "memory_write",
+      "scope": "session",
+      "key": "triage:E-002"
+    }
+  ]
+}
