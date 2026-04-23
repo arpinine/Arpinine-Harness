@@ -5,13 +5,9 @@
 ### Added
 - `harness-governor` skill to enforce harness strategy for product-facing agent systems
 - `## Harness Strategy` section in the plan template for harness choice, abstraction boundary, tool access, memory, permissions, and swap strategy
-- `examples/example-harness-strategy.md` showing a vendor-neutral adapter-based harness pattern
-- `examples/example-harness-strategy-openharness.md` showing the recommended OpenHarness adapter pattern
 - `/spec-observe` command for recording and reviewing runtime observation artifacts
 - `templates/observation-template.md` and `templates/schemas/observation-schema.yaml`
-- example observation artifacts: `example-observation.md` and `example-observation-trace.json`
 - `examples/rules/harness/harness-001.md` as an example harness governance rule
-- `example-observation-trace-openharness.json` showing OpenHarness-specific observation events
 - `scripts/check_dependencies.py` for machine-readable dependency validation
 - `scripts/spec_status.py` for executable project-wide governance reports
 - `product-owner` agent to keep business cases, acceptance criteria, plans, implementation, and drift resolution aligned with `spec.md`
@@ -82,7 +78,6 @@
 - `/spec-eval` command for framework-agnostic evaluation planning, execution, and review
 - `evaluation-governor` skill to enforce evaluation contracts for agentic systems
 - `templates/eval-plan-template.md` for metrics, thresholds, datasets, execution commands, and pass/fail policy
-- `examples/example-eval-plan.md` showing a DeepEval-backed example without coupling the plugin to a single framework
 
 ### Changed
 - the delivery workflow now includes an explicit evaluation stage
