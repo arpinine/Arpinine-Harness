@@ -2,7 +2,7 @@
 description: Execute an approved plan with TDD and security review, while keeping implementation aligned to the spec and ADRs.
 ---
 
-# /spec-implement
+# /at-implement
 
 Execute the agreed work without drifting from intent.
 
@@ -20,12 +20,12 @@ Execute the agreed work without drifting from intent.
    - refactor with tests still green
 8. Invoke the `product-owner` agent before completion to compare implementation evidence against the spec business case and acceptance criteria.
 9. Invoke the `security-reviewer` agent on the plan and code changes before concluding the task.
-10. Run `/spec-eval run <spec-path>` for any workflow whose plan declares required evaluation.
+10. Run `/at-eval run <spec-path>` for any workflow whose plan declares required evaluation.
 11. If evaluation fails required thresholds:
    - block completion
    - refine code, prompts, plan, or spec before retrying
 12. If a CRITICAL or HIGH drift item is discovered during implementation:
-   - stop and run `/spec-audit`
+   - stop and run `/at-audit`
    - require a matching ADR before proceeding
 13. If implementation breaks planned boundaries or introduces tight coupling, send the work back into planning or ADR refinement before completion.
 14. If harness behavior exceeds the documented tool, memory, or permission model, send the work back into planning or ADR refinement before completion.

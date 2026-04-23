@@ -1,6 +1,6 @@
 ---
 name: rule-manager
-description: Manages the growing rules/ directory. Loads, enforces, and extends machine-readable rules that compound across projects. Invoked by drift-detector and constitution-enforcer to apply learned constraints. Invoked by spec-retro to add new rules from completed work.
+description: Manages the growing rules/ directory. Loads, enforces, and extends machine-readable rules that compound across projects. Invoked by drift-detector and constitution-enforcer to apply learned constraints. Invoked by at-retro to add new rules from completed work.
 ---
 
 # rule-manager
@@ -97,8 +97,8 @@ spec-001    spec-quality   MEDIUM    Acceptance criteria not measurable
 
 - **drift-detector**: after drift findings, calls `check-rules` to detect known patterns before creating new ADRs
 - **constitution-enforcer**: calls `check-rules` on PreToolUse to block known violations
-- **spec-retro**: calls `add-rule` to persist lessons from completed work
-- **spec-status**: calls `list-rules` to report rule coverage in governance summary
+- **at-retro**: calls `add-rule` to persist lessons from completed work
+- **at-status**: calls `list-rules` to report rule coverage in governance summary
 
 ## Invariants
 

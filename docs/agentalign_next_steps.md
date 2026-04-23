@@ -23,7 +23,7 @@ The codebase and the two-axis framework are directionally aligned, but some fram
 - schemas exist, but are not yet used by an executable validator
 - rules exist as markdown, but are not yet evaluated by a deterministic rule engine
 - AIN fields exist in the spec template, but AIN level does not yet gate implementation readiness
-- `/spec-status` reports useful governance state, but not the full EP/AIN maturity view
+- `/at-status` reports useful governance state, but not the full EP/AIN maturity view
 - the governance scripts are useful, but do not yet have a test suite or CI guard
 
 These are the right gaps to close next because they turn AgentAlign from structured guidance into enforceable governance.
@@ -129,9 +129,9 @@ Initial EP scoring:
 |----------|----------|
 | 1 | `spec.md` exists |
 | 2 | `plan.md` exists with Module Boundaries, Dependency Rules, and Testability By Boundary |
-| 3 | at least one `/spec-audit` has been run and all CRITICAL/HIGH findings are covered by ADRs or marked resolved |
+| 3 | at least one `/at-audit` has been run and all CRITICAL/HIGH findings are covered by ADRs or marked resolved |
 | 4 | active rules exist under `.specify/rules/` |
-| 5 | eval coverage exists, observation is recorded, and `/spec-status --onboard` can be generated |
+| 5 | eval coverage exists, observation is recorded, and `/at-status --onboard` can be generated |
 
 This formula is intentionally pragmatic. It should be treated as a project-governance readiness score, not as a universal organisational maturity score.
 
@@ -179,7 +179,7 @@ Initial checks should be deterministic and lightweight:
 
 - malformed specs, ADRs, observations, and rules are reported clearly
 - direct writes to malformed ADRs are blocked or warned before completion
-- `/spec-status` can display validation state per spec
+- `/at-status` can display validation state per spec
 - validation can run locally or in CI without Claude
 - regression tests cover the validator and existing governance scripts
 
@@ -223,7 +223,7 @@ For AIN >= 4, additionally require:
 
 - AIN >= 3 specs cannot proceed without agent-callable operations and eval plan.
 - AIN >= 4 specs cannot proceed without feedback channel and observation strategy.
-- `/spec-status` shows AIN target and readiness state.
+- `/at-status` shows AIN target and readiness state.
 
 ## v1.7: Deterministic Rule Engine
 
@@ -249,7 +249,7 @@ Executable rule field schema and JSON output contract must be finalized before i
 
 - at least one example rule blocks or reports a real code violation
 - known recurring failures are detected without relying only on Claude prompt interpretation
-- `/spec-status` reports active rule count and recent rule violations
+- `/at-status` reports active rule count and recent rule violations
 - hooks and scripts consume the same rule violation JSON
 
 ## v1.8: Governance Health Report

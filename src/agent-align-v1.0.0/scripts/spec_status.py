@@ -257,7 +257,7 @@ def render_onboarding(rows: list[dict[str, object]], blocked: list[str], deps: d
         "TEAM ONBOARDING BRIEF",
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
         "WORKFLOW",
-        "/spec-init -> /spec-new -> /spec-review -> /spec-plan -> /spec-eval -> /spec-observe -> /spec-implement -> /spec-audit -> /spec-retro",
+        "/at-init -> /at-new -> /at-review -> /at-plan -> /at-eval -> /at-observe -> /at-implement -> /at-audit -> /at-retro",
         "",
         "ACTIVE SPECS",
     ]
@@ -290,12 +290,12 @@ def main(argv: list[str]) -> int:
         return 1
 
     if not SPEC_ROOT.exists():
-        print("Run /spec-init first")
+        print("Run /at-init first")
         return 1
 
     rows = spec_rows(args.spec)
     if not rows:
-        print("No specs yet. Run /spec-new to create the first one")
+        print("No specs yet. Run /at-new to create the first one")
         return 1
 
     deps = dependency_report()

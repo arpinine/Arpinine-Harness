@@ -69,45 +69,45 @@ This is the core value of the plugin: not just generating files, but giving the 
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
-| `/spec-init` | Setup | Initialize the shared workflow and ADR structure |
-| `/spec-new` | Define | Create a new specification from a product request |
-| `/spec-review` | Refine | Improve clarity, measurability, and alignment before execution |
-| `/spec-plan` | Plan | Produce plan and tasks from an approved spec |
-| `/spec-adr` | Decide | Create and manage Architecture Decision Records |
-| `/spec-eval` | Evaluate | Define and run framework-agnostic evaluation |
-| `/spec-observe` | Evaluate | Record and review runtime observations |
-| `/spec-implement` | Execute | Implement the plan with TDD and security review |
-| `/spec-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
+| `/at-init` | Setup | Initialize the shared workflow and ADR structure |
+| `/at-new` | Define | Create a new specification from a product request |
+| `/at-review` | Refine | Improve clarity, measurability, and alignment before execution |
+| `/at-plan` | Plan | Produce plan and tasks from an approved spec |
+| `/at-adr` | Decide | Create and manage Architecture Decision Records |
+| `/at-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/at-observe` | Evaluate | Record and review runtime observations |
+| `/at-implement` | Execute | Implement the plan with TDD and security review |
+| `/at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
 
 ## Example Flow
 
 ```bash
 # Initialize team workflow
-/spec-init
+/at-init
 
 # Define product intent
-/spec-new "User login with email and password"
+/at-new "User login with email and password"
 
 # Refine before engineering starts
-/spec-review .specify/specs/001-user-login/spec.md
+/at-review .specify/specs/001-user-login/spec.md
 
 # Create implementation plan
-/spec-plan .specify/specs/001-user-login/
+/at-plan .specify/specs/001-user-login/
 
 # Record important decision if needed
-/spec-adr new "Session storage strategy"
+/at-adr new "Session storage strategy"
 
 # Define or run evaluation
-/spec-eval plan .specify/specs/001-user-login/
+/at-eval plan .specify/specs/001-user-login/
 
 # Record observed runtime behavior
-/spec-observe record .specify/specs/001-user-login/
+/at-observe record .specify/specs/001-user-login/
 
 # Execute with test-first discipline
-/spec-implement .specify/specs/001-user-login/
+/at-implement .specify/specs/001-user-login/
 
 # Realign when implementation and intent diverge
-/spec-audit .specify/specs/001-user-login/
+/at-audit .specify/specs/001-user-login/
 ```
 
 ## End-to-End Demo
@@ -178,7 +178,7 @@ make build
 /plugin install dist/agent-align-v1.0.0.zip
 
 # 4. Initialize the workflow
-/spec-init
+/at-init
 ```
 
 ## Dependency Handling

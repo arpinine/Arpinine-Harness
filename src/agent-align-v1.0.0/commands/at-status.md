@@ -2,12 +2,12 @@
 description: "Show governance state of all specs: open drift, ADR coverage, active rules, eval readiness, harness strategy, observation state, and team onboarding summary. Designed for new team members and release readiness checks."
 ---
 
-# /spec-status
+# /at-status
 
 Single-command governance overview. Designed to answer: "What does a new engineer need to understand to work safely in this project?"
 
 ## Usage
-`/spec-status [--spec <slug>] [--onboard]`
+`/at-status [--spec <slug>] [--onboard]`
 
 - No flags: project-wide governance summary
 - `--spec <slug>`: deep status for one spec
@@ -102,9 +102,9 @@ TEAM ONBOARDING BRIEF
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 WORKFLOW
-This project uses /spec-init → /spec-new → /spec-review →
-/spec-plan → /spec-eval → /spec-observe → /spec-implement →
-/spec-audit → /spec-retro. Do not skip stages — hooks will
+This project uses /at-init → /at-new → /at-review →
+/at-plan → /at-eval → /at-observe → /at-implement →
+/at-audit → /at-retro. Do not skip stages — hooks will
 block you if constitution, architecture, or harness
 requirements are not met.
 
@@ -133,6 +133,6 @@ OPEN ITEMS
 
 ## Error Conditions
 
-- `.specify/` not found → "Run `/spec-init` first"
-- No specs found → "No specs yet. Run `/spec-new` to create the first one"
-- ADR-INDEX.md missing → note in output, suggest running `/spec-adr list`
+- `.specify/` not found → "Run `/at-init` first"
+- No specs found → "No specs yet. Run `/at-new` to create the first one"
+- ADR-INDEX.md missing → note in output, suggest running `/at-adr list`

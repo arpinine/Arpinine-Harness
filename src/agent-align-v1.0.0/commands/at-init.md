@@ -2,14 +2,14 @@
 description: Initialize the shared product-engineering workflow, including spec-kit conventions and ADR structure. Run once per project.
 ---
 
-# /spec-init
+# /at-init
 
 Initialize the shared team workflow.
 
 ## Workflow
 
 1. Run `check-dependencies.sh` from the plugin scripts directory, or perform equivalent environment validation and share the output.
-2. If `spec-kit` is missing, stop and install it before relying on automated `/spec-*` generation flows.
+2. If `spec-kit` is missing, stop and install it before relying on automated `/at-*` generation flows.
 3. Run `/speckit.constitution`.
 4. Ensure these paths exist:
    - `.specify/adr/`

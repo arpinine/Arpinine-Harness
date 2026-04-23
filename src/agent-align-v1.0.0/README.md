@@ -40,17 +40,17 @@ These agents do not replace team ownership. They help the team govern vibe-coded
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
-| `/spec-init` | Setup | Initialize the workflow, ADR structure, and rules directory |
-| `/spec-new` | Define | Create a specification from a feature request |
-| `/spec-review` | Refine | Tighten clarity, scope, and measurability |
-| `/spec-plan` | Plan | Generate plan and tasks from the spec |
-| `/spec-adr` | Decide | Create and manage decision records |
-| `/spec-eval` | Evaluate | Define and run framework-agnostic evaluation |
-| `/spec-observe` | Evaluate | Record and review observed runtime behavior |
-| `/spec-implement` | Execute | Implement with TDD and security review |
-| `/spec-audit` | Realign | Detect drift, attribute failures, trigger refinement |
-| `/spec-retro` | Learn | Extract lessons as compounding rules |
-| `/spec-status` | Govern | Project-wide governance overview and onboarding brief |
+| `/at-init` | Setup | Initialize the workflow, ADR structure, and rules directory |
+| `/at-new` | Define | Create a specification from a feature request |
+| `/at-review` | Refine | Tighten clarity, scope, and measurability |
+| `/at-plan` | Plan | Generate plan and tasks from the spec |
+| `/at-adr` | Decide | Create and manage decision records |
+| `/at-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/at-observe` | Evaluate | Record and review observed runtime behavior |
+| `/at-implement` | Execute | Implement with TDD and security review |
+| `/at-audit` | Realign | Detect drift, attribute failures, trigger refinement |
+| `/at-retro` | Learn | Extract lessons as compounding rules |
+| `/at-status` | Govern | Project-wide governance overview and onboarding brief |
 
 ## Team Responsibilities
 

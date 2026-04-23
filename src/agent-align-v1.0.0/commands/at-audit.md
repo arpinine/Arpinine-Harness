@@ -2,12 +2,12 @@
 description: Detect drift between specs and code, then send the work back into refinement or ADR creation so the team realigns on a shared source of truth.
 ---
 
-# /spec-audit
+# /at-audit
 
 Detect drift and drive realignment.
 
 ## Usage
-`/spec-audit [spec-path]`
+`/at-audit [spec-path]`
 
 If no path given: scan all specs under `.specify/specs/`.
 
@@ -129,6 +129,6 @@ For each confirmed drift item, choose the right correction path based on attribu
   - clear contract violated by runtime or implementation -> POSTCONDITION FAILURE
 
 ## Error Conditions
-- `.specify/specs/` not found → "Run `/spec-init` first"
+- `.specify/specs/` not found → "Run `/at-init` first"
 - Spec not readable → report file path and skip
 - No specs found at given path → list available specs

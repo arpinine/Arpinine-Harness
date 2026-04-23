@@ -17,7 +17,7 @@ Explain that the spec captures business case, user value, requirements, acceptan
 Run:
 
 ```text
-/spec-review .specify/specs/001-support-triage-agent/spec.md
+/at-review .specify/specs/001-support-triage-agent/spec.md
 ```
 
 Expected discussion:
@@ -30,7 +30,7 @@ Expected discussion:
 Run:
 
 ```text
-/spec-plan .specify/specs/001-support-triage-agent/
+/at-plan .specify/specs/001-support-triage-agent/
 ```
 
 Expected discussion:
@@ -44,7 +44,7 @@ Expected discussion:
 Run:
 
 ```text
-/spec-eval plan .specify/specs/001-support-triage-agent/
+/at-eval plan .specify/specs/001-support-triage-agent/
 ```
 
 Expected discussion:
@@ -92,7 +92,7 @@ Expected discussion:
 Run:
 
 ```text
-/spec-audit .specify/specs/001-support-triage-agent/spec.md
+/at-audit .specify/specs/001-support-triage-agent/spec.md
 ```
 
 Expected discussion:
@@ -104,7 +104,7 @@ Expected discussion:
 Run:
 
 ```text
-/spec-retro .specify/specs/001-support-triage-agent/spec.md
+/at-retro .specify/specs/001-support-triage-agent/spec.md
 ```
 
 Expected discussion:

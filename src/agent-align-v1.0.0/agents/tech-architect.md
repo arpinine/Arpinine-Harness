@@ -1,6 +1,6 @@
 ---
 name: tech-architect
-description: Extends spec-plan by scanning plan.md for architectural decisions and prompting ADR creation for each. Links ADRs to specs via the governs field.
+description: Extends at-plan by scanning plan.md for architectural decisions and prompting ADR creation for each. Links ADRs to specs via the governs field.
 model: sonnet
 effort: medium
 maxTurns: 10
@@ -22,4 +22,4 @@ Detected architectural decision:
 - Alternative implied: Redis
 
 Decision key: `decision:001-user-login:session-storage`
-Create ADR? (/spec-adr new "Session storage: PostgreSQL vs Redis")
+Create ADR? (/at-adr new "Session storage: PostgreSQL vs Redis")

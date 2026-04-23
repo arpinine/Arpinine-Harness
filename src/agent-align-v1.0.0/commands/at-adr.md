@@ -2,15 +2,15 @@
 description: "Create and manage Architecture Decision Records. Subcommands: new, list, show, status. Auto-numbers ADRs and maintains ADR-INDEX.md."
 ---
 
-# /spec-adr
+# /at-adr
 
 Manage Architecture Decision Records (ADRs).
 
 ## Usage
-- `/spec-adr new "title"` — create and index a new ADR
-- `/spec-adr list` — display all ADRs with status
-- `/spec-adr show <number>` — display ADR-NNNN full content
-- `/spec-adr status <number> <status>` — update lifecycle status
+- `/at-adr new "title"` — create and index a new ADR
+- `/at-adr list` — display all ADRs with status
+- `/at-adr show <number>` — display ADR-NNNN full content
+- `/at-adr status <number> <status>` — update lifecycle status
 
 ---
 
@@ -33,7 +33,7 @@ Manage Architecture Decision Records (ADRs).
 ## Steps: `list`
 
 Read `.specify/adr/ADR-INDEX.md` and display as table.
-If index missing: "No ADRs yet. Run `/spec-adr new` to create one."
+If index missing: "No ADRs yet. Run `/at-adr new` to create one."
 
 ## Steps: `show <number>`
 
@@ -51,6 +51,6 @@ Valid statuses: `Proposed`, `Accepted`, `Implemented`, `Superseded`, `Rejected`
 4. Update matching row in ADR-INDEX.md
 
 ## Error Conditions
-- `.specify/adr/` not found → "Run `/spec-init` first"
+- `.specify/adr/` not found → "Run `/at-init` first"
 - ADR number not found → show ADR-INDEX.md
 - Invalid status value → list valid statuses

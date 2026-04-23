@@ -44,7 +44,7 @@ Proposed → Accepted → Implemented → Superseded
 | Superseded | Replaced by a newer ADR | Must set `supersedes:` in the new ADR |
 | Rejected | Decision not taken | Tech lead |
 
-## Creating an ADR (`/spec-adr new "title"`)
+## Creating an ADR (`/at-adr new "title"`)
 1. Read ADR-INDEX.md → determine next number
 2. Convert title to kebab-case filename: `ADR-NNNN-use-postgresql.md`
 3. Copy `templates/adr-template.md` → fill `date:` with today
@@ -57,16 +57,16 @@ Proposed → Accepted → Implemented → Superseded
 8. Append row to ADR-INDEX.md
 9. Confirm: "ADR-NNNN created and indexed."
 
-## Updating Status (`/spec-adr status <number> <new-status>`)
+## Updating Status (`/at-adr status <number> <new-status>`)
 1. Find ADR file by number prefix in `.specify/adr/`
 2. Update `status:` frontmatter field
 3. If new status = `Superseded`: require `supersedes: ADR-XXXX` in the superseding ADR
 4. Update matching row in ADR-INDEX.md
 
-## Listing ADRs (`/spec-adr list`)
+## Listing ADRs (`/at-adr list`)
 Read ADR-INDEX.md and display as formatted table with status indicators.
 
-## Showing an ADR (`/spec-adr show <number>`)
+## Showing an ADR (`/at-adr show <number>`)
 Find and display full content of `ADR-NNNN-*.md`.
 
 ## Linking Convention

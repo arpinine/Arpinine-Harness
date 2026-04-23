@@ -2,7 +2,7 @@
 description: Create a new feature specification as the starting point for the team's shared workflow. Delegates to spec-kit, then validates the result against the constitution.
 ---
 
-# /spec-new
+# /at-new
 
 Create the first aligned version of a specification.
 

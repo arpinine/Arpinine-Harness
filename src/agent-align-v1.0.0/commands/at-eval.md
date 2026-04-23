@@ -2,14 +2,14 @@
 description: Define and run evaluation for a spec or agent using any suitable framework. Require explicit metrics, thresholds, datasets, and pass/fail outcomes before work is considered complete.
 ---
 
-# /spec-eval
+# /at-eval
 
 Define or run evaluation for the current spec.
 
 ## Usage
-- `/spec-eval plan <spec-path>` — create or update the evaluation plan
-- `/spec-eval run <spec-path>` — run the chosen evaluation framework and record results
-- `/spec-eval review <spec-path>` — review the latest evaluation results against thresholds
+- `/at-eval plan <spec-path>` — create or update the evaluation plan
+- `/at-eval run <spec-path>` — run the chosen evaluation framework and record results
+- `/at-eval review <spec-path>` — review the latest evaluation results against thresholds
 
 ## Principles
 
@@ -64,7 +64,7 @@ Define or run evaluation for the current spec.
 
 ## Error Conditions
 
-- Eval plan missing → "Run `/spec-eval plan` first"
+- Eval plan missing → "Run `/at-eval plan` first"
 - Framework command missing → "Add an execution command to eval-plan.md"
-- Framework dependency unavailable → "Install the tool declared in eval-plan.md before running `/spec-eval run`"
+- Framework dependency unavailable → "Install the tool declared in eval-plan.md before running `/at-eval run`"
 - Results missing thresholds → "Define thresholds before evaluation can pass"

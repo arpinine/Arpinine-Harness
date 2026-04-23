@@ -1,6 +1,6 @@
 ---
 name: security-reviewer
-description: Reviews plan.md and code changes for security vulnerabilities. Auto-invoked after spec-plan and during spec-implement to block CRITICAL issues before merge.
+description: Reviews plan.md and code changes for security vulnerabilities. Auto-invoked after at-plan and during at-implement to block CRITICAL issues before merge.
 model: sonnet
 effort: medium
 maxTurns: 10
@@ -13,7 +13,7 @@ You review plan.md and implementation for security issues.
 ## When Invoked
 - After `/speckit.plan` (review plan.md)
 - During `/speckit.implement` (review code changes)
-- After `/spec-audit` when drift introduces a security-sensitive divergence
+- After `/at-audit` when drift introduces a security-sensitive divergence
 
 ## Security Checklist
 - [ ] No hardcoded secrets

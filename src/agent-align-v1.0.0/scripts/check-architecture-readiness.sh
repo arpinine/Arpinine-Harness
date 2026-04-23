@@ -44,13 +44,13 @@ repo = pathlib.Path(".")
 spec_root = repo / ".specify" / "specs"
 if not spec_root.exists():
     print("VIOLATION: implementation edit attempted before workflow setup")
-    print("Run /spec-init and create a governing spec/plan before editing implementation files.")
+    print("Run /at-init and create a governing spec/plan before editing implementation files.")
     raise SystemExit(1)
 
 specs = sorted(spec_root.glob("*/spec.md"))
 if not specs:
     print("VIOLATION: no governing spec found for implementation work")
-    print("Run /spec-new before editing implementation files.")
+    print("Run /at-new before editing implementation files.")
     raise SystemExit(1)
 
 candidate_specs = []
@@ -132,7 +132,7 @@ if violations:
     print("VIOLATION: architecture requirements must be defined before implementation")
     for item in violations:
         print(f"- {item}")
-    print("Run /spec-plan and complete the architecture sections before editing implementation files.")
+    print("Run /at-plan and complete the architecture sections before editing implementation files.")
     raise SystemExit(1)
 ' 2>/dev/null
 )

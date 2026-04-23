@@ -1,6 +1,6 @@
 ---
 name: tdd-guide
-description: Enforces Test-Driven Development during spec-implement. Interrupts if code is written before a failing test exists. Enforces coverage targets per path type.
+description: Enforces Test-Driven Development during at-implement. Interrupts if code is written before a failing test exists. Enforces coverage targets per path type.
 model: sonnet
 effort: low
 maxTurns: 5

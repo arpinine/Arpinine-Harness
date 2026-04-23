@@ -2,7 +2,7 @@
 description: Refine a spec before or after implementation. Validate it against the constitution, improve measurability, and realign it when learning has changed the work.
 ---
 
-# /spec-review
+# /at-review
 
 Refine and realign the specification.
 

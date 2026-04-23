@@ -110,7 +110,7 @@ def build_report() -> dict[str, object]:
         "global": global_checks,
         "specs": [],
         "guidance": [
-            "spec-kit is required for automated /spec-* generation flows.",
+            "spec-kit is required for automated /at-* generation flows.",
             "Harness and eval dependencies are required only if selected in plan/eval artifacts.",
             "AgentAlign validates dependencies; it does not install them during plugin installation.",
         ],

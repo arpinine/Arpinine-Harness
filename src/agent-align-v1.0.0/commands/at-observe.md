@@ -2,13 +2,13 @@
 description: Record and review runtime observations so actual harness behavior can be compared against the spec, plan, harness strategy, and evaluation contract.
 ---
 
-# /spec-observe
+# /at-observe
 
 Record or review runtime observations.
 
 ## Usage
-- `/spec-observe record <spec-path>` — create or update observation artifacts for a scenario or trace
-- `/spec-observe review <spec-path>` — summarize observed runtime behavior and highlight drift signals
+- `/at-observe record <spec-path>` — create or update observation artifacts for a scenario or trace
+- `/at-observe review <spec-path>` — summarize observed runtime behavior and highlight drift signals
 
 ## Workflow: `record`
 
@@ -28,7 +28,7 @@ Record or review runtime observations.
    - final outcome
 4. Normalize the trace using `templates/schemas/observation-schema.yaml`.
 5. Record raw runtime evidence only. Do not classify drift in this step.
-6. Leave `## Drift Signals` empty or marked `pending review` until `/spec-observe review` runs.
+6. Leave `## Drift Signals` empty or marked `pending review` until `/at-observe review` runs.
 
 ## Workflow: `review`
 
@@ -59,5 +59,5 @@ Record or review runtime observations.
 
 ## Error Conditions
 
-- Observation artifacts missing → "Run `/spec-observe record` first"
+- Observation artifacts missing → "Run `/at-observe record` first"
 - Trace missing required event data → "Normalize trace against observation-schema.yaml"

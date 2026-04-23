@@ -2,7 +2,7 @@
 description: Generate a technical plan and task list for an approved spec. Delegates to spec-kit, then invokes the tech-architect agent to suggest ADRs for consequential decisions.
 ---
 
-# /spec-plan
+# /at-plan
 
 Turn an approved spec into an executable engineering plan.
 
@@ -17,7 +17,7 @@ Turn an approved spec into an executable engineering plan.
 7. Invoke the `tech-architect` agent on `plan.md` to identify architectural decisions that deserve ADRs.
 8. For each significant decision:
    - capture a concise decision key such as `decision:001-user-login:session-storage`
-   - either link an existing ADR or suggest `/spec-adr new "..."`
+   - either link an existing ADR or suggest `/at-adr new "..."`
 9. Ensure `plan.md` defines:
    - `## Module Boundaries`
    - `## Dependency Rules`

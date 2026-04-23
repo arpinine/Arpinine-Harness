@@ -2,12 +2,12 @@
 description: "Run a delivery retrospective after a feature ships. Extract lessons as rule candidates, add them to rules/, and update ADR-INDEX. Turns completed work into compounding team knowledge."
 ---
 
-# /spec-retro
+# /at-retro
 
 Extract lessons from completed work and persist them as rules.
 
 ## Usage
-`/spec-retro [spec-path]`
+`/at-retro [spec-path]`
 
 If no path: use most recently modified spec under `.specify/specs/`.
 
@@ -29,7 +29,7 @@ Gather:
 - `ADR-*.md` files with `governs:` matching this spec
 - `eval-plan.md` and `latest-results.md` (if present)
 - observation artifacts under `.specify/observations/<slug>/` (if present)
-- drift findings from the last `/spec-audit` run (check `.specify/specs/<slug>/drift-report.md` if it exists)
+- drift findings from the last `/at-audit` run (check `.specify/specs/<slug>/drift-report.md` if it exists)
 
 ### 3. Ask structured retro questions
 
@@ -101,6 +101,6 @@ Rules now compound into future specs automatically.
 
 ## Error Conditions
 
-- No `spec.md` found → "Run `/spec-new` to create a spec first"
-- Spec not marked complete → "This spec has open ACs. Run `/spec-audit` first to confirm delivery state"
+- No `spec.md` found → "Run `/at-new` to create a spec first"
+- Spec not marked complete → "This spec has open ACs. Run `/at-audit` first to confirm delivery state"
 - No `plan.md` or ADRs → still proceed, note missing artifacts in retro summary

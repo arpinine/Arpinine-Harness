@@ -276,7 +276,7 @@ def static_conformance_findings(spec: pathlib.Path, spec_text: str, edited_file:
     if len(findings) > 5:
         extra = len(findings) - 5
         findings = findings[:5]
-        findings.append(f"... and {extra} more conformance findings - run /spec-audit for full analysis")
+        findings.append(f"... and {extra} more conformance findings - run /at-audit for full analysis")
     return findings
 
 
@@ -323,7 +323,7 @@ def analyze_spec(spec: pathlib.Path, edited_file: str = "", edited_text: str = "
             else:
                 try:
                     if edited_path.stat().st_mtime > latest_results.stat().st_mtime:
-                        findings.append("MEDIUM code changed after latest eval results; rerun /spec-eval")
+                        findings.append("MEDIUM code changed after latest eval results; rerun /at-eval")
                 except Exception:
                     pass
 
@@ -338,7 +338,7 @@ def print_results(results: list[dict[str, object]]) -> int:
         if findings:
             outputs.append(f"Quick Drift Check ({result['slug']}):")
             outputs.extend(f"  - {finding}" for finding in findings)
-            outputs.append(f"  Run /spec-audit {result['spec']} for full analysis and ADR resolution.")
+            outputs.append(f"  Run /at-audit {result['spec']} for full analysis and ADR resolution.")
     if outputs:
         print("\n".join(outputs))
     return 0
