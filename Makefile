@@ -17,6 +17,7 @@ build: clean
 	@chmod +x $(DIST_DIR)/$(PLUGIN_NAME)-v$(VERSION)/scripts/*.sh
 	@find $(DIST_DIR)/$(PLUGIN_NAME)-v$(VERSION) -type d -name "__pycache__" -prune -exec rm -rf {} +
 	@find $(DIST_DIR)/$(PLUGIN_NAME)-v$(VERSION) -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete
+	@find $(DIST_DIR)/$(PLUGIN_NAME)-v$(VERSION) -depth -type d -empty -delete
 	@cd $(DIST_DIR) && zip -r $(ZIP_NAME) $(PLUGIN_NAME)-v$(VERSION)/ -x "*/.DS_Store" -x "*/__pycache__/*" -x "*.pyc" > /dev/null
 	@rm -rf $(DIST_DIR)/$(PLUGIN_NAME)-v$(VERSION)
 	@echo "✅ $(ZIP_PATH) ($$(du -h $(ZIP_PATH) | cut -f1))"
