@@ -17,8 +17,17 @@ import sys
 
 CODE_PREFIXES = ("src/", "lib/", "app/", "packages/", "services/", "internal/", "cmd/")
 SECTION_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
-PLACEHOLDER_RE = re.compile(r"\[(module|choice|quality dimension|risk|feature name|spec-number|name|single clear concern|allowed dependencies|api / port / adapter|unit / contract / integration|mock adapter / in-memory fake / fixture)\]", re.IGNORECASE)
+PLACEHOLDER_RE = re.compile(
+    r"\[(module|choice|quality dimension|risk|feature name|spec-number|name"
+    r"|single clear concern|allowed dependencies|api / port / adapter"
+    r"|unit / contract / integration|mock adapter / in-memory fake / fixture"
+    r"|reason|internal service / adapter / port"
+    r"|session / persistent / none / bounded context"
+    r"|approval flow / policy / limits)\]",
+    re.IGNORECASE,
+)
 HARNESS_HINT_RE = re.compile(r"(harness|agent runtime|openharness)", re.IGNORECASE)
+NOT_APPLICABLE_RE = re.compile(r"\b(n/?a|not applicable)\b", re.IGNORECASE)
 
 try:
     payload = json.load(sys.stdin)
@@ -111,8 +120,13 @@ for spec in candidate_specs:
                 line for line in body.splitlines()
                 if line.strip() and not set(line.strip()) <= {"|", "-", " "}
             ).strip()
-            if not cleaned or PLACEHOLDER_RE.search(cleaned):
-                violations.append(f"{spec.parent.name}: section `Harness Strategy` is still a placeholder")
+            if NOT_APPLICABLE_RE.search(cleaned):
+                pass
+            elif not cleaned or PLACEHOLDER_RE.search(cleaned):
+                violations.append(
+                    f"{spec.parent.name}: section `Harness Strategy` is still a placeholder "
+                    f"- fill it in or write 'N/A' if no harness is needed"
+                )
 
 if violations:
     print("VIOLATION: architecture requirements must be defined before implementation")

@@ -8,7 +8,7 @@ Initialize the shared team workflow.
 
 ## Workflow
 
-1. Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-dependencies.sh` or equivalent environment validation.
+1. Run `check-dependencies.sh` from the plugin scripts directory, or perform equivalent environment validation and share the output.
 2. If `spec-kit` is missing, stop and install it before relying on automated `/spec-*` generation flows.
 3. Run `/speckit.constitution`.
 4. Ensure these paths exist:

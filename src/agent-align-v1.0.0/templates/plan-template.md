@@ -28,6 +28,7 @@
 
 ## Harness Strategy
 Use this section when the product feature depends on an agent harness or agent runtime.
+Delete this section or replace the table with `N/A` if no harness is needed.
 
 | Concern | Decision |
 |---------|----------|

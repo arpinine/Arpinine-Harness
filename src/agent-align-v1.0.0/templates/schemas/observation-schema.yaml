@@ -28,6 +28,13 @@ properties:
       properties:
         type:
           type: string
+          enum:
+            - tool_call
+            - permission_check
+            - memory_write
+            - failure
+            - tool_registration
+            - session_lifecycle
         tool:
           type: string
         approved:

@@ -24,7 +24,7 @@ Scan `.specify/`:
 - `specs/*/plan.md` → plans
 - `specs/*/eval-plan.md` and `latest-results.md` → eval state
 - `observations/*/latest-observation.md` and `trace.json` → runtime evidence
-- dependency state from `${CLAUDE_PLUGIN_ROOT}/scripts/check-dependencies.sh` or equivalent shell checks
+- dependency state from a local `check-dependencies.sh` run or equivalent shell checks
 - `adr/*.md` → ADR index
 - `rules/**/*.md` → active rules
 - `adr/ADR-INDEX.md` → global decision coverage
@@ -120,6 +120,9 @@ EVAL STATE
 
 HARNESS AND OBSERVATION STATE
 [which specs have a defined harness strategy and which have runtime evidence recorded]
+
+DEPENDENCY STATE
+[summarize results from a recent `check-dependencies.sh` run when available]
 
 OPEN ITEMS
 [anything requiring a decision or unblocking action]
