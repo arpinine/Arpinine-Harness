@@ -48,6 +48,8 @@ MEDIUM    Spec mentions email verification, not implemented
 
 ### 4. Attribute each finding: precondition or postcondition failure
 
+Invoke the `product-owner` agent to check whether each finding changes the business case, user value, scope, or acceptance criteria in `spec.md`.
+
 Before creating ADRs, classify what kind of failure each drift item represents.
 
 **Precondition failure** — the spec or plan was unclear or incomplete:

@@ -1,8 +1,28 @@
 # AgentAlign
 
-AgentAlign is a Claude plugin for teams that want a common way of working across product, engineering, harness-based application design, architecture, and AI-assisted execution.
+AgentAlign is a Claude plugin for governed vibe coding.
+
+It creates an agent-assisted governance layer for product and engineering teams: specialized agents, workflow commands, hooks, and evidence checks that keep AI-assisted product development aligned with shared specifications, architecture rules, evaluations, and runtime observations.
+
+The goal is not to stop fast AI-assisted execution. The goal is to make it safe, repeatable, and team-aligned.
 
 It standardizes how work moves from idea to specification, from specification to evaluation and execution, and from execution back into refinement when reality diverges from intent.
+
+## Agent Team
+
+AgentAlign coordinates a small team of focused AI roles and governance skills:
+
+| Capability | Role |
+|------------|------|
+| Product alignment | `product-owner` keeps business cases, acceptance criteria, and execution aligned with `spec.md` |
+| Architecture | `tech-architect` and `architecture-governor` help define modular boundaries and consequential decisions |
+| Delivery | `tdd-guide` keeps implementation test-first and task-aligned |
+| Security | `security-reviewer` checks implementation risk before completion |
+| Evaluation | `evaluation-governor` enforces quality metrics, thresholds, and evidence |
+| Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries |
+| Realignment | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent |
+
+These agents do not replace team ownership. They help the team govern vibe-coded work through explicit artifacts and automated checks.
 
 ## Team Workflow
 
@@ -25,6 +45,7 @@ This is the core value of the plugin: not just generating files, but giving the 
 | Role | Responsibility |
 |------|----------------|
 | Product | Owns the problem, user value, scope, and acceptance criteria in `spec.md` |
+| Product Owner Agent | Checks that plans, implementation, evaluation, and drift resolution preserve the business case in `spec.md` |
 | Engineering | Owns `plan.md`, task breakdown, and implementation approach |
 | Engineering | Owns module boundaries, dependency rules, and testability by boundary |
 | Engineering | Owns evaluation strategy and release thresholds for agentic systems |

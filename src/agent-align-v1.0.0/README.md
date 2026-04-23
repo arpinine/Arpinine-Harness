@@ -1,8 +1,26 @@
 # AgentAlign Plugin
 
-AgentAlign gives teams a common way of working across specification, refinement, planning, harness and architecture governance, evaluation, execution, and realignment.
+AgentAlign is a Claude plugin for governed vibe coding.
 
-It builds on spec-kit, but the primary goal is not just artifact generation. The goal is a repeatable team workflow that keeps product intent, engineering execution, and AI assistance aligned.
+It creates an agent-assisted governance layer for product and engineering teams: specialized agents, workflow commands, hooks, and evidence checks that keep AI-assisted product development aligned with shared specifications, architecture rules, evaluations, and runtime observations.
+
+The goal is not to stop fast AI-assisted execution. The goal is to make it safe, repeatable, and team-aligned.
+
+The goal is a repeatable team workflow that keeps product intent, engineering execution, and AI assistance aligned.
+
+## Agent Team
+
+| Capability | Role |
+|------------|------|
+| Product alignment | `product-owner` keeps business cases, acceptance criteria, and execution aligned with `spec.md` |
+| Architecture | `tech-architect` and `architecture-governor` help define modular boundaries and consequential decisions |
+| Delivery | `tdd-guide` keeps implementation test-first and task-aligned |
+| Security | `security-reviewer` checks implementation risk before completion |
+| Evaluation | `evaluation-governor` enforces quality metrics, thresholds, and evidence |
+| Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries |
+| Realignment | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent |
+
+These agents do not replace team ownership. They help the team govern vibe-coded work through explicit artifacts and automated checks.
 
 ## Workflow
 
@@ -37,6 +55,7 @@ It builds on spec-kit, but the primary goal is not just artifact generation. The
 ## Team Responsibilities
 
 - Product owns intent, value, scope, and acceptance criteria in `spec.md`
+- The `product-owner` agent checks that plans, implementation, evaluation, and drift resolution preserve the business case in `spec.md`
 - Engineering owns the delivery approach in `plan.md`
 - Engineering must define modular boundaries and dependency rules before implementation
 - Engineering must define harness strategy when product features depend on an agent runtime
