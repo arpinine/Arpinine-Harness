@@ -1,0 +1,16 @@
+{
+  "name": "agent-align-local",
+  "owner": {
+    "name": "Arpinine"
+  },
+  "metadata": {
+    "description": "Local marketplace for installing the AgentAlign Claude Code plugin from this repository"
+  },
+  "plugins": [
+    {
+      "name": "agent-align",
+      "source": "./src/agent-align-v1.0.0",
+      "description": "Shared product-engineering workflow with ADRs, drift detection, evaluation, and compounding rule learning"
+    }
+  ]
+}

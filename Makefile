@@ -4,6 +4,7 @@ SRC_DIR     := src/$(PLUGIN_NAME)-v1.0.0
 DIST_DIR    := dist
 ZIP_NAME    := $(PLUGIN_NAME)-v$(VERSION).zip
 ZIP_PATH    := $(DIST_DIR)/$(ZIP_NAME)
+MARKETPLACE := agent-align-local
 
 .DEFAULT_GOAL := build
 
@@ -28,7 +29,8 @@ clean:
 
 ## Build + install plugin into Claude Code
 install: build
-	claude plugin install $(ZIP_PATH)
+	claude plugin marketplace add ./
+	claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE)
 
 ## Validate plugin structure (requires Claude Code CLI)
 validate:

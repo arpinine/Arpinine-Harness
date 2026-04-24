@@ -178,18 +178,33 @@ Each ADR has:
 
 ## Installation
 
+From the root of this repo:
+
 ```bash
 # 1. Install spec-kit
 uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai claude
 
-# 2. Build this plugin
-make build
+# 2. Build and install the plugin (runs build + marketplace add + plugin install)
+make install
 
-# 3. Install plugin in Claude
-/plugin install dist/agent-align-v1.0.0.zip
-
-# 4. Initialize the workflow
+# 3. Initialize the workflow (run inside a Claude Code session)
 /at-init
+```
+
+Or install manually step by step:
+
+```bash
+# Register this repo as a local marketplace
+claude plugin marketplace add ./
+
+# Install the plugin from that marketplace
+claude plugin install agent-align@agent-align-local
+```
+
+For a session-only load without installing (dev/testing):
+
+```bash
+claude --plugin-dir ./src/agent-align-v1.0.0
 ```
 
 ## Dependency Handling
@@ -198,8 +213,12 @@ AgentAlign does not try to install `spec-kit`, harness runtimes, or eval framewo
 Instead, it validates them during setup and before the relevant workflow stage:
 
 - `spec-kit` is required for automated generation and planning
-- harness runtimes are required only when a harness strategy selects them
+- harness runtimes are required only for features whose `## Harness Strategy` explicitly selects one
 - eval tools are required only when `eval-plan.md` selects them
+
+In practice:
+- if `## Harness Strategy` is `N/A`, the project does not need a harness runtime
+- if `## Harness Strategy` selects a runtime such as OpenHarness or an internal agent runtime, that runtime becomes a required dependency for that feature
 
 Use `src/agent-align-v1.0.0/scripts/check-dependencies.sh --json` for machine-readable readiness, or without flags for a text report.
 

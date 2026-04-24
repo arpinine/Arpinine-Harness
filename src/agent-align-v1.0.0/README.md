@@ -165,8 +165,12 @@ Instead, it validates them during setup and before relevant workflow stages.
 
 Recommended interpretation:
 - `spec-kit` is required for automated spec generation and planning flows
-- harness runtimes are required only when selected in `## Harness Strategy`
+- harness runtimes are required only for features whose `## Harness Strategy` explicitly selects one
 - eval tools are required only when selected in `eval-plan.md`
+
+In practice:
+- if `## Harness Strategy` is `N/A`, the project does not need a harness runtime
+- if `## Harness Strategy` selects a runtime such as OpenHarness or an internal agent runtime, that runtime becomes a required dependency for that feature
 
 Use `scripts/check-dependencies.sh` to validate local readiness and report missing tools explicitly.
 
