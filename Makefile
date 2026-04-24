@@ -8,7 +8,7 @@ MARKETPLACE := agent-align-local
 
 .DEFAULT_GOAL := build
 
-.PHONY: build clean install validate help
+.PHONY: build clean install uninstall validate help
 
 ## Build deployable plugin zip
 build: clean
@@ -32,6 +32,11 @@ install: build
 	claude plugin marketplace add ./
 	claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE)
 
+## Uninstall plugin and remove marketplace from Claude Code
+uninstall:
+	claude plugin uninstall $(PLUGIN_NAME)
+	claude plugin marketplace remove $(MARKETPLACE)
+
 ## Validate plugin structure (requires Claude Code CLI)
 validate:
 	claude plugin validate $(SRC_DIR)
@@ -40,4 +45,4 @@ validate:
 help:
 	@grep -E '^##' Makefile | sed 's/## //'
 	@echo ""
-	@echo "Targets: build (default), clean, install, validate"
+	@echo "Targets: build (default), clean, install, uninstall, validate"
