@@ -32,12 +32,12 @@ This feature gives the governed workflow a real coordination contract so one tea
 
 ## Acceptance Criteria
 
-- [ ] AC-001: Given a task tagged `[team: codex]`, Claude cannot claim it while Codex can.
-- [ ] AC-002: Given an actively leased shared task, a second team cannot claim it until the lease expires or is released.
-- [ ] AC-003: Given an expired lease, another eligible team can claim the task successfully.
-- [ ] AC-004: Given an implementation-path edit without an active claim, the shared pre-edit gate blocks the write with a clear ownership message.
-- [ ] AC-005: Given a claimed task, delivery reporting shows assigned team, active claimer, and lease state.
-- [ ] AC-006: Given Claude and Codex plugin sessions, runtime identity resolves consistently enough that claim, release, and edit-gating flows agree on task ownership.
+- [x] AC-001: Given a task tagged `[team: codex]`, Claude cannot claim it while Codex can.
+- [x] AC-002: Given an actively leased shared task, a second team cannot claim it until the lease expires or is released.
+- [x] AC-003: Given an expired lease, another eligible team can claim the task successfully.
+- [x] AC-004: Given an implementation-path edit without an active claim, the shared pre-edit gate blocks the write with a clear ownership message.
+- [x] AC-005: Given a claimed task, delivery reporting shows assigned team, active claimer, and lease state.
+- [x] AC-006: Given Claude and Codex plugin sessions, runtime identity resolves consistently enough that claim, release, and edit-gating flows agree on task ownership.
 
 ## Out of Scope
 
@@ -78,3 +78,4 @@ This feature gives the governed workflow a real coordination contract so one tea
 
 - ADR-0001: Separate shared core from assistant-specific implementations
 - ADR-0004: Specialized role-based agent team
+- ADR-0005: Shared file-based task coordination for multi-team execution

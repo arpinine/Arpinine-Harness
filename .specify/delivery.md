@@ -110,7 +110,7 @@ Plan: [specs/007-multi-team-task-coordination/plan.md](specs/007-multi-team-task
 | Task | Status | Assigned Team | Claimed By | Lease Until |
 |------|--------|---------------|------------|-------------|
 | [TASK-001](specs/007-multi-team-task-coordination/plan.md#L61) | full | - | - | - |
-| [TASK-002](specs/007-multi-team-task-coordination/plan.md#L62) | full | claude | - | - |
+| [TASK-002](specs/007-multi-team-task-coordination/plan.md#L62) | full | - | - | - |
 | [TASK-003](specs/007-multi-team-task-coordination/plan.md#L63) | full | - | - | - |
 | [TASK-004](specs/007-multi-team-task-coordination/plan.md#L64) | full | - | - | - |
 | [TASK-005](specs/007-multi-team-task-coordination/plan.md#L65) | full | - | - | - |
@@ -119,6 +119,6 @@ Plan: [specs/007-multi-team-task-coordination/plan.md](specs/007-multi-team-task
 | [TASK-008](specs/007-multi-team-task-coordination/plan.md#L68) | full | - | - | - |
 
 ---
-_Last updated: 2026-04-25 15:31_
+_Last updated: 2026-04-25 15:37_
 
 **Total tasks:** 63 &nbsp;|&nbsp; **Full:** 8 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 55

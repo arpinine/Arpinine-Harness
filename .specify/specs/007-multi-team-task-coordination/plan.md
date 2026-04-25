@@ -7,7 +7,7 @@
 
 | Decision | Rationale | ADR |
 |----------|-----------|-----|
-| Store task coordination in `.specify/coordination/<slug>.json` | Keeps ownership state in shared repo artifacts visible to both Claude and Codex | Consequence of ADR-0001 |
+| Store task coordination in `.specify/coordination/<slug>.json` | Keeps ownership state in shared repo artifacts visible to both Claude and Codex | ADR-0005 |
 | Keep `plan.md` as task intent and progress while the coordination registry owns leases | Separates human planning from machine-managed concurrency state | No separate ADR |
 | Enforce active claims through a shared PreToolUse gate | Prevents implementation edits from bypassing task ownership | No separate ADR |
 | Derive runtime identity from host environment with deterministic fallback instance ids | Reduces operator friction while keeping claims stable across hook and script paths | No separate ADR |
@@ -59,7 +59,7 @@ Not applicable. This feature coordinates governed repository work and hooks, not
 ## Tasks
 
 - [x] TASK-001: Define a shared coordination registry format under `.specify/coordination/`
-- [x] TASK-002: Extend shared task parsing to support optional `[team: claude]` and `[team: codex]` ownership hints
+- [x] TASK-002: Extend shared task parsing to support optional team ownership hints for Claude and Codex tasks
 - [x] TASK-003: Implement shared `claim_task.py` and `release_task.py` with deterministic file locking and lease semantics
 - [x] TASK-004: Extend `update_backlog.py` so delivery output shows assigned team, active claimer, and lease state
 - [x] TASK-005: Add a shared pre-edit claim gate that blocks implementation-path edits without an active claim
@@ -95,4 +95,4 @@ Evaluation plan:
 
 ## ADRs Created During Planning
 
-No new ADR required at planning time.
+- ADR-0005: Shared file-based task coordination for multi-team execution
