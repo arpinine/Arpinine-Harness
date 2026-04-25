@@ -185,10 +185,11 @@ src/
   agent-align-core/      # commands, agents, hooks, scripts, skills, templates
   implementations/
     claude/              # working Claude implementation
-    codex/               # Codex implementation placeholder and design notes
+    codex/               # Codex plugin implementation in progress
 ```
 
 Each implementation overlays the same shared core. Today, Claude is the only working implementation in this repository. The Codex side is intentionally a placeholder until its runtime contract is defined.
+Claude remains the reference implementation from `main`. Codex is now an in-progress plugin implementation with an initial local marketplace setup and a first skill-based workflow slice.
 
 ## Installation
 
@@ -226,6 +227,15 @@ Or build explicitly for an implementation:
 
 ```bash
 make build IMPLEMENTATION=claude
+make assemble IMPLEMENTATION=codex
+```
+
+To test the Codex implementation locally:
+
+```bash
+make assemble IMPLEMENTATION=codex
+codex plugin marketplace add ./
+# restart Codex, then install `agent-align` from marketplace `agent-align-local`
 ```
 
 ## Dependency Handling

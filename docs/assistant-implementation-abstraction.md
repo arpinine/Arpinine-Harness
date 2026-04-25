@@ -28,7 +28,7 @@ Separate AgentAlign into:
 ## Current Status
 
 - `claude/` contains the existing working implementation, including `.claude-plugin/plugin.json`
-- `codex/` is a placeholder to keep the abstraction seam explicit while the implementation contract is still unknown
+- `codex/` now contains the first real Codex plugin scaffold: `.codex-plugin/plugin.json`, a repo marketplace entry, and initial skill wrappers for the shared workflow
 
 ## Guardrails
 

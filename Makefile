@@ -39,19 +39,43 @@ clean:
 
 ## Build + install plugin into Claude Code
 install: build
-	@if [ "$(IMPLEMENTATION)" != "claude" ]; then echo "install target currently supports IMPLEMENTATION=claude only"; exit 1; fi
-	claude plugin marketplace add ./
-	claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE)
+	@if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+		claude plugin marketplace add ./; \
+		claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		$(MAKE) assemble IMPLEMENTATION=codex; \
+		codex plugin marketplace add ./; \
+		echo "Restart Codex and install $(PLUGIN_NAME) from marketplace '$(MARKETPLACE)'."; \
+	else \
+		echo "install target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
+		exit 1; \
+	fi
 
 ## Uninstall plugin and remove marketplace from Claude Code
 uninstall:
-	claude plugin uninstall $(PLUGIN_NAME)
-	claude plugin marketplace remove $(MARKETPLACE)
+	@if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+		claude plugin uninstall $(PLUGIN_NAME); \
+		claude plugin marketplace remove $(MARKETPLACE); \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		codex plugin marketplace remove $(MARKETPLACE); \
+	else \
+		echo "uninstall target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
+		exit 1; \
+	fi
 
 ## Validate plugin structure (requires Claude Code CLI)
 validate: assemble
-	@if [ "$(IMPLEMENTATION)" != "claude" ]; then echo "validate target currently supports IMPLEMENTATION=claude only"; rm -rf $(BUILD_DIR); exit 1; fi
-	claude plugin validate $(BUILD_DIR)
+	@if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+		claude plugin validate $(BUILD_DIR); \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		test -f $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Missing .codex-plugin/plugin.json" && rm -rf $(BUILD_DIR) && exit 1); \
+		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && rm -rf $(BUILD_DIR) && exit 1); \
+		echo "Codex plugin structure looks valid."; \
+	else \
+		echo "validate target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
+		rm -rf $(BUILD_DIR); \
+		exit 1; \
+	fi
 	@rm -rf $(BUILD_DIR)
 
 ## Show available targets

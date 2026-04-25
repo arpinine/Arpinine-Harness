@@ -1,0 +1,20 @@
+{
+  "name": "agent-align-local",
+  "interface": {
+    "displayName": "AgentAlign Local"
+  },
+  "plugins": [
+    {
+      "name": "agent-align",
+      "source": {
+        "source": "local",
+        "path": "./dist/agent-align-codex-v1.4.0"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

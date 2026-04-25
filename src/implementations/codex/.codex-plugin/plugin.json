@@ -1,0 +1,23 @@
+{
+  "name": "agent-align",
+  "version": "1.4.0",
+  "description": "Governed product-engineering workflow for Codex using shared AgentAlign artifacts",
+  "author": {
+    "name": "Arpinine"
+  },
+  "license": "MIT",
+  "keywords": ["codex", "governance", "workflow", "spec-kit", "adr", "evaluation"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AgentAlign",
+    "shortDescription": "Governed workflow for product and engineering delivery",
+    "longDescription": "Adds shared specification, planning, review, and governance workflows to Codex using the AgentAlign core.",
+    "developerName": "Arpinine",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write", "Execute"],
+    "defaultPrompt": [
+      "Use AgentAlign to initialize a governed delivery workflow for this repository.",
+      "Use AgentAlign to create or refine a spec before implementation starts."
+    ]
+  }
+}

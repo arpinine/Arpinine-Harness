@@ -5,6 +5,7 @@
 ### Added
 - shared `src/agent-align-core/` package plus `src/implementations/<assistant>/` overlays
 - `src/implementations/codex/README.md` placeholder to reserve the future Codex implementation seam
+- initial Codex plugin scaffold with `.codex-plugin/plugin.json`, repo marketplace metadata, and first workflow skills for `at-init`, `at-new`, `at-review`, and `at-plan`
 - `harness-governor` skill to enforce harness strategy for product-facing agent systems
 - `## Harness Strategy` section in the plan template for harness choice, abstraction boundary, tool access, memory, permissions, and swap strategy
 - `/at-observe` command for recording and reviewing runtime observation artifacts
