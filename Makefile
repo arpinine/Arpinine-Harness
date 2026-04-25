@@ -9,6 +9,7 @@ BUILD_DIR    := $(DIST_DIR)/$(BUILD_NAME)
 ZIP_NAME     := $(BUILD_NAME).zip
 ZIP_PATH     := $(DIST_DIR)/$(ZIP_NAME)
 MARKETPLACE  := agent-align-local
+CLAUDE_PLUGIN_DIR := plugins/agent-align-claude
 CODEX_PLUGIN_DIR := plugins/agent-align-codex
 CODEX_MARKETPLACE_FILE := .agents/plugins/marketplace.json
 
@@ -29,7 +30,11 @@ assemble: clean
 	find $(BUILD_DIR) -type d -name "__pycache__" -prune -exec rm -rf {} +; \
 	find $(BUILD_DIR) -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete; \
 	find $(BUILD_DIR) -depth -type d -empty -delete; \
-	if [ "$(IMPLEMENTATION)" = "codex" ]; then \
+	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+		mkdir -p plugins; \
+		rm -rf $(CLAUDE_PLUGIN_DIR); \
+		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
 		echo "Warning: Codex currently wires 4/11 workflows: at-init, at-new, at-review, at-plan."; \
 		mkdir -p .agents/plugins plugins; \
 		rm -rf $(CODEX_PLUGIN_DIR); \
@@ -46,13 +51,13 @@ build: assemble
 
 ## Remove dist/
 clean:
-	@rm -rf $(DIST_DIR) $(CODEX_PLUGIN_DIR)
+	@rm -rf $(DIST_DIR) $(CLAUDE_PLUGIN_DIR) $(CODEX_PLUGIN_DIR)
 
 ## Build + install plugin into Claude Code
 install:
 	@set -e; \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
-		$(MAKE) build IMPLEMENTATION=claude; \
+		$(MAKE) assemble IMPLEMENTATION=claude; \
 		claude plugin marketplace add ./; \
 		claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \

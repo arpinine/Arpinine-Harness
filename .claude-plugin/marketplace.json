@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "agent-align",
-      "source": "./src/agent-align-v1.0.0",
+      "source": "./plugins/agent-align-claude",
       "description": "Shared product-engineering workflow with ADRs, drift detection, evaluation, and compounding rule learning"
     }
   ]
