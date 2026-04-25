@@ -89,7 +89,7 @@ Add a real Codex implementation without changing the shared AgentAlign core cont
 2. `IMPLEMENTATION=codex` assembles successfully.
 3. Minimal command set works in Codex.
 4. Remaining commands and hooks are ported or explicitly marked unsupported.
-5. Docs and install flow are complete.
+5. Docs and registration flow are complete.
 5. Docs and registration flow are complete.
 
 ## Key Decisions
