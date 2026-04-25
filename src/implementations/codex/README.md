@@ -17,6 +17,7 @@ Implemented now:
 - `.codex-plugin/plugin.json` manifest for Codex
 - initial repo marketplace entry at `.agents/plugins/marketplace.json`
 - shared hook wiring through `hooks/hooks.json`, including automatic delivery-matrix refresh on `plan.md` writes
+- shared multi-team coordination inherited from the core, including task-claim enforcement and style-governance checks
 - real marketplace registration via `codex marketplace add ./`
 - first Codex skills that wrap the shared AgentAlign workflows:
   - `at-adr`
@@ -38,6 +39,13 @@ Not implemented yet:
 ## Goal
 
 Add a real Codex implementation without changing the shared AgentAlign core contract and without regressing the working Claude implementation.
+
+Codex is expected to participate in the same multi-team operating model as Claude:
+
+- shared governed artifacts under `.specify/`
+- shared task leases under `.specify/coordination/`
+- shared style standards under `tools/style/`
+- no Codex-specific fork of task-ownership or style-governance semantics
 
 ## Scope
 

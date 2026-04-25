@@ -27,6 +27,22 @@ When the vibe coder runs an AgentAlign command, the plugin should behave like a 
 
 The vibe coder should experience one conversation, but behind that conversation the plugin is expected to apply the right specialist posture for the current step.
 
+## You May Also Be Working Alongside Another Assistant Team
+
+AgentAlign supports multiple assistant teams sharing the same governed repository at the same time.
+
+Typical example:
+
+- one delivery lane runs in Claude
+- one delivery lane runs in Codex
+- both operate on the same spec, plan, ADR, evaluation, and delivery artifacts
+- implementation work is coordinated through task claims and optional team tags in `plan.md`
+
+So the operating model has two layers:
+
+- specialist roles inside one assistant session
+- multiple assistant teams coordinated through the same governed artifacts
+
 ## Operating Principle
 
 AgentAlign is not a prompt pack for "just build it".

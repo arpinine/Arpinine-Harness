@@ -8,6 +8,13 @@ The goal is not to stop fast AI-assisted execution. The goal is to make it safe,
 
 The goal is a repeatable team workflow that keeps product intent, engineering execution, and AI assistance aligned across different coding assistant implementations.
 
+The shared core now also owns the cross-team coordination model:
+
+- shared task ownership and leases under `.specify/coordination/`
+- shared claim and release scripts
+- shared pre-edit claim enforcement
+- shared style-governance hooks and canonical style-config discovery
+
 The directories in this package are implementation-agnostic. Assistant-specific metadata belongs under `src/implementations/<assistant>/` and is overlaid during build time.
 
 ## Agent Team
@@ -53,6 +60,14 @@ These agents do not replace team ownership. They help the team govern vibe-coded
 | `/agent-align:at-audit` | Realign | Detect drift, attribute failures, trigger refinement |
 | `/agent-align:at-retro` | Learn | Extract lessons as compounding rules |
 | `/agent-align:at-status` | Govern | Project-wide governance overview and onboarding brief |
+
+## Multi-Team Note
+
+The shared core is the source of truth for multi-team behavior. Claude, Codex, and future implementations must all:
+
+- honor shared task claims and leases
+- honor shared style-governance rules
+- read and write the same governed artifacts rather than keeping assistant-local workflow state
 
 ## Team Contract
 

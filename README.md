@@ -23,6 +23,22 @@ The user interacts with one plugin entrypoint, but each workflow command activat
 
 This is the core operating model: one plugin surface, many specialized agent responsibilities.
 
+## Multi-Team Operating Model
+
+AgentAlign also supports multiple assistant teams sharing the same governed repository at the same time.
+
+Typical example:
+
+- one delivery lane runs in Claude
+- one delivery lane runs in Codex
+- both teams use the same `spec.md`, `plan.md`, ADRs, eval artifacts, and delivery matrix
+- implementation ownership is coordinated through shared task claims and optional team tags in `plan.md`
+
+So the operating model has two layers:
+
+- specialist roles inside one assistant session
+- multiple assistant teams coordinated through one governed workflow
+
 ## Start Here
 
 If you want to use AgentAlign as an operator rather than just inspect its files, start with the vibe-coder operating guide:
@@ -65,6 +81,8 @@ The plugin is built around a shared delivery loop:
 
 This is the core value of the plugin: not just generating files, but giving the team a stable operating model.
 
+When multiple assistant teams are active, the same workflow still applies, but implementation work is lease-based rather than first-come/first-served.
+
 ## Team Contract
 
 
@@ -106,6 +124,7 @@ Human ownership stays with the team. AgentAlign agents act as governed specialis
 | `ADR-*.md`              | Decision record for choices that affect architecture, operations, security, or long-term maintainability    |
 | `ADR-INDEX.md`          | Global index of decisions and drift coverage                                                                |
 | `coordination/*.json`   | Multi-assistant task leases and ownership state for concurrent execution                                    |
+| `tools/style/`          | Canonical repository style standards shared by all teams and plugin implementations                         |
 
 
 ## Commands
@@ -198,6 +217,8 @@ Automatic hooks fire on every file write:
 
 - **PreToolUse**: `check-constitution.sh` validates pending edits for tech leakage in `spec.md` and hardcoded secrets
 - **PreToolUse**: `check-architecture-readiness.sh` blocks implementation edits until the governing plan defines module boundaries, dependency rules, and testability by boundary
+- **PreToolUse**: `check-style-governance.sh` blocks implementation edits when the repository has no declared style standard for that language
+- **PreToolUse**: `check-task-claim.sh` blocks implementation edits unless the current team identity owns an active task claim
 - **PostToolUse**: `quick-drift-check.sh` performs a lightweight spec-alignment pass for missing file references, endpoint mismatch hints, and stale eval results
 
 ## Multi-Assistant Coordination
@@ -215,6 +236,15 @@ Claude and Codex can share the same governed workflow, but concurrent execution 
 This keeps one assistant instance from taking work already assigned or currently leased to the other.
 
 By default the scripts derive team identity from the host plugin environment and derive a stable per-session instance id from the current host/session fingerprint. Set `AGENT_ALIGN_TEAM_ID` or `AGENT_ALIGN_INSTANCE_ID` only when you need to override that automatic identity resolution.
+
+## Multi-Team Style Governance
+
+Multiple teams only stay interchangeable if they follow the same repository-owned style rules.
+
+- `.specify/CONSTITUTION.md` declares shared style standards mandatory across teams and plugins
+- `tools/style/` is the canonical location for checked-in language-specific style configs
+- `check-style-governance.sh` blocks implementation edits for supported languages when no canonical style config exists
+- all teams must use the same repo-defined config paths rather than assistant-local defaults
 
 ## ADR Lifecycle
 
@@ -239,6 +269,8 @@ src/
   implementations/
     claude/              # working Claude implementation
     codex/               # Codex plugin implementation in progress
+tools/
+  style/                 # canonical cross-team style standards by language
 ```
 
 Each implementation overlays the same shared core.
