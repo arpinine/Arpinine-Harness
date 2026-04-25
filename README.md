@@ -23,6 +23,14 @@ The user interacts with one plugin entrypoint, but each workflow command activat
 
 This is the core operating model: one plugin surface, many specialized agent responsibilities.
 
+## Start Here
+
+If you want to use AgentAlign as an operator rather than just inspect its files, start with the vibe-coder operating guide:
+
+- [Vibe Coder Process](docs/vibe-coder-process.md)
+
+That document is the step-by-step playbook for using the plugin in practice. It explains the governed workflow, the role of the virtual agent team, what is automatic versus manual, and what deliverable each step should produce.
+
 ## Agent Team
 
 AgentAlign coordinates a small team of focused AI roles and governance skills:
@@ -227,7 +235,7 @@ The real cross-implementation abstraction is the common-denominator workflow:
 - `make validate-structure IMPLEMENTATION=<name>`
 
 Recommended operating guide for day-to-day usage:
-- [docs/vibe-coder-process.md](docs/vibe-coder-process.md)
+- [Vibe Coder Process](docs/vibe-coder-process.md)
 
 Claude also has native convenience targets for install, uninstall, and validator-backed validation.
 Codex uses the shared abstraction plus Codex marketplace registration.
