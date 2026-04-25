@@ -89,7 +89,7 @@ def main() -> int:
     team_id, instance_id = resolve_runtime_identity()
     if not team_id:
         print("VIOLATION: implementation edit attempted without a resolved team identity")
-        print("Set `AGENT_ALIGN_TEAM_ID` to `claude` or `codex` before running `/agent-align:at-implement`.")
+        print("Set `AGENT_ALIGN_TEAM_ID` to `claude` or `codex` only if the host runtime does not expose its plugin identity.")
         return 1
 
     specs = candidate_specs(spec_root, file_path)
@@ -119,7 +119,7 @@ def main() -> int:
     print(f"Governing specs without active claims: {', '.join(missing)}")
     print(
         "Claim a task first with "
-        "`scripts/claim_task.py --slug <slug> --team-id <team> --instance-id <instance>` "
+        "`scripts/claim_task.py --slug <slug>` "
         "and only then change implementation files."
     )
     return 1

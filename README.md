@@ -214,7 +214,7 @@ Claude and Codex can share the same governed workflow, but concurrent execution 
 
 This keeps one assistant instance from taking work already assigned or currently leased to the other.
 
-Set `AGENT_ALIGN_TEAM_ID` to `claude` or `codex` before `/agent-align:at-implement` when the host runtime does not provide a team identity automatically. Optionally set `AGENT_ALIGN_INSTANCE_ID` to tighten claims to one session.
+By default the scripts derive team identity from the host plugin environment and derive a stable per-session instance id from the current host/session fingerprint. Set `AGENT_ALIGN_TEAM_ID` or `AGENT_ALIGN_INSTANCE_ID` only when you need to override that automatic identity resolution.
 
 ## ADR Lifecycle
 

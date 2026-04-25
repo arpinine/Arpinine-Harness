@@ -23,9 +23,9 @@ Execute the agreed work without drifting from intent.
 5. Preserve the module boundaries and dependency direction defined in `plan.md`.
 6. If the feature uses a harness in the product application, preserve the harness abstraction boundary, tool model, memory model, and permission model defined in `## Harness Strategy`.
 7. For each task in `plan.md`:
-   a. Before starting work on the task, claim the next eligible task through `scripts/claim_task.py --slug <slug> --team-id <team> --instance-id <instance>`.
+   a. Before starting work on the task, claim the next eligible task through `scripts/claim_task.py --slug <slug>`. Override `--team-id` or `--instance-id` only when the host runtime cannot infer them correctly.
    b. Treat `.specify/coordination/<slug>.json` as the source of task ownership and lease state. `plan.md` remains the human-readable source of task intent and progress.
-   c. Resolve runtime identity through `AGENT_ALIGN_TEAM_ID` (`claude` or `codex`) and, when available, `AGENT_ALIGN_INSTANCE_ID`. The shared PreToolUse claim gate blocks implementation-path edits until that identity owns an active lease.
+   c. Resolve runtime identity from the host plugin environment when possible. The shared PreToolUse claim gate blocks implementation-path edits until that identity owns an active lease.
    d. A task is eligible only when:
       - its checkbox is `[ ]`
       - its lease is absent or expired
@@ -35,7 +35,7 @@ Execute the agreed work without drifting from intent.
       - failing test first
       - minimal implementation
       - refactor with tests still green
-   g. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`, then release it with `scripts/release_task.py --slug <slug> --task-id <task> --team-id <team> --instance-id <instance> --state completed`.
+   g. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`, then release it with `scripts/release_task.py --slug <slug> --task-id <task> --state completed`.
    h. If work on a claimed task is abandoned or re-planned, release it with `--state available`.
    i. Perform those `plan.md` status edits directly as part of the command flow; do not ask the user to update task checkboxes manually.
    The task-status edit refreshes `.specify/delivery.md` automatically through the shared `PostToolUse` delivery hook, and the shared `PostToolUse` drift hook also runs after the write.

@@ -8,10 +8,12 @@ from __future__ import annotations
 import contextlib
 import datetime as dt
 import fcntl
+import hashlib
 import json
 import os
 import pathlib
 import re
+import socket
 from typing import Iterator
 
 TASK_RE = re.compile(r"^-\s+\[([ ~xX])\]\s+(TASK-\d+):\s*(.*)$", re.IGNORECASE)
@@ -155,15 +157,41 @@ def claimer_id(team_id: str, instance_id: str | None) -> str:
     return f"{team_id}:{instance_id}" if instance_id else team_id
 
 
+def default_instance_id(team_id: str) -> str:
+    explicit = os.environ.get("AGENT_ALIGN_INSTANCE_ID")
+    if explicit:
+        return explicit
+
+    tty = "no-tty"
+    try:
+        tty = os.ttyname(0).replace("/", "_")
+    except OSError:
+        pass
+
+    host = socket.gethostname() or "localhost"
+    try:
+        session_id = os.getsid(0)
+    except OSError:
+        session_id = os.getpid()
+    try:
+        process_group = os.getpgid(0)
+    except OSError:
+        process_group = os.getpid()
+    fingerprint = f"{team_id}:{host}:{session_id}:{process_group}:{tty}"
+    digest = hashlib.sha1(fingerprint.encode("utf-8")).hexdigest()[:10]
+    return f"{team_id}-{digest}"
+
+
 def resolve_runtime_identity() -> tuple[str | None, str | None]:
     team_id = os.environ.get("AGENT_ALIGN_TEAM_ID")
     if team_id:
-        return team_id.lower(), os.environ.get("AGENT_ALIGN_INSTANCE_ID")
+        team_id = team_id.lower()
+        return team_id, default_instance_id(team_id)
 
     if os.environ.get("CLAUDE_PLUGIN_ROOT"):
-        return "claude", os.environ.get("AGENT_ALIGN_INSTANCE_ID")
+        return "claude", default_instance_id("claude")
 
     if os.environ.get("CODEX_PLUGIN_ROOT"):
-        return "codex", os.environ.get("AGENT_ALIGN_INSTANCE_ID")
+        return "codex", default_instance_id("codex")
 
     return None, os.environ.get("AGENT_ALIGN_INSTANCE_ID")

@@ -19,6 +19,7 @@ from task_coordination import (
     locked_registry,
     parse_plan_tasks,
     plan_path,
+    resolve_runtime_identity,
     sync_registry_with_plan,
     utc_now,
 )
@@ -27,7 +28,7 @@ from task_coordination import (
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--slug", required=True)
-    parser.add_argument("--team-id", required=True)
+    parser.add_argument("--team-id")
     parser.add_argument("--instance-id")
     parser.add_argument("--task-id")
     parser.add_argument("--lease-seconds", type=int, default=1800)
@@ -36,7 +37,12 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    team_id = args.team_id.lower()
+    resolved_team, resolved_instance = resolve_runtime_identity()
+    team_id = (args.team_id or resolved_team or "").lower()
+    instance_id = args.instance_id or resolved_instance
+    if not team_id:
+        print(json.dumps({"ok": False, "error": "missing team identity"}))
+        return 1
     repo = find_project_root(pathlib.Path.cwd())
     plan_file = plan_path(repo, args.slug)
     if not plan_file.exists():
@@ -51,7 +57,7 @@ def main() -> int:
 
     now = utc_now()
     lease_until = now + timedelta(seconds=max(args.lease_seconds, 1))
-    claim_name = claimer_id(team_id, args.instance_id)
+    claim_name = claimer_id(team_id, instance_id)
 
     with locked_registry(repo, args.slug) as (_, registry):
         sync_registry_with_plan(registry, plan_tasks)
@@ -73,7 +79,7 @@ def main() -> int:
                     "state": "claimed",
                     "assigned_team": assigned_team,
                     "team_id": team_id,
-                    "instance_id": args.instance_id,
+                    "instance_id": instance_id,
                     "claimed_by": claim_name,
                     "claimed_at": isoformat(now),
                     "lease_until": isoformat(lease_until),
