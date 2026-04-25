@@ -29,7 +29,7 @@ Gather:
 - `ADR-*.md` files with `governs:` matching this spec
 - `eval-plan.md` and `latest-results.md` (if present)
 - observation artifacts under `.specify/observations/<slug>/` (if present)
-- drift findings from the last `/at-audit` run (check `.specify/specs/<slug>/drift-report.md` if it exists)
+- drift findings from the last `/agent-align:at-audit` run (check `.specify/specs/<slug>/drift-report.md` if it exists)
 
 ### 3. Ask structured retro questions
 
@@ -101,6 +101,6 @@ Rules now compound into future specs automatically.
 
 ## Error Conditions
 
-- No `spec.md` found → "Run `/at-new` to create a spec first"
-- Spec not marked complete → "This spec has open ACs. Run `/at-audit` first to confirm delivery state"
+- No `spec.md` found → "Run `/agent-align:at-new` to create a spec first"
+- Spec not marked complete → "This spec has open ACs. Run `/agent-align:at-audit` first to confirm delivery state"
 - No `plan.md` or ADRs → still proceed, note missing artifacts in retro summary

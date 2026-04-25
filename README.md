@@ -80,45 +80,45 @@ Human ownership stays with the team. AgentAlign agents act as governed specialis
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
-| `/at-init` | Setup | Initialize the shared workflow and ADR structure |
-| `/at-new` | Define | Create a new specification from a product request |
-| `/at-review` | Refine | Improve clarity, measurability, and alignment before execution |
-| `/at-plan` | Plan | Produce plan and tasks from an approved spec |
-| `/at-adr` | Decide | Create and manage Architecture Decision Records |
-| `/at-eval` | Evaluate | Define and run framework-agnostic evaluation |
-| `/at-observe` | Evaluate | Record and review runtime observations |
-| `/at-implement` | Execute | Implement the plan with TDD and security review |
-| `/at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
+| `/agent-align:at-init` | Setup | Initialize the shared workflow and ADR structure |
+| `/agent-align:at-new` | Define | Create a new specification from a product request |
+| `/agent-align:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
+| `/agent-align:at-plan` | Plan | Produce plan and tasks from an approved spec |
+| `/agent-align:at-adr` | Decide | Create and manage Architecture Decision Records |
+| `/agent-align:at-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/agent-align:at-observe` | Evaluate | Record and review runtime observations |
+| `/agent-align:at-implement` | Execute | Implement the plan with TDD and security review |
+| `/agent-align:at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
 
 ## Example Flow
 
 ```bash
 # Initialize team workflow
-/at-init
+/agent-align:at-init
 
 # Define product intent
-/at-new "User login with email and password"
+/agent-align:at-new "User login with email and password"
 
 # Refine before engineering starts
-/at-review .specify/specs/001-user-login/spec.md
+/agent-align:at-review .specify/specs/001-user-login/spec.md
 
 # Create implementation plan
-/at-plan .specify/specs/001-user-login/
+/agent-align:at-plan .specify/specs/001-user-login/
 
 # Record important decision if needed
-/at-adr new "Session storage strategy"
+/agent-align:at-adr new "Session storage strategy"
 
 # Define or run evaluation
-/at-eval plan .specify/specs/001-user-login/
+/agent-align:at-eval plan .specify/specs/001-user-login/
 
 # Record observed runtime behavior
-/at-observe record .specify/specs/001-user-login/
+/agent-align:at-observe record .specify/specs/001-user-login/
 
 # Execute with test-first discipline
-/at-implement .specify/specs/001-user-login/
+/agent-align:at-implement .specify/specs/001-user-login/
 
 # Realign when implementation and intent diverge
-/at-audit .specify/specs/001-user-login/
+/agent-align:at-audit .specify/specs/001-user-login/
 ```
 
 ## End-to-End Demo
@@ -203,7 +203,7 @@ uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai c
 make install
 
 # 3. Initialize the workflow (run inside a Claude Code session)
-/at-init
+/agent-align:at-init
 ```
 
 Or install manually step by step:

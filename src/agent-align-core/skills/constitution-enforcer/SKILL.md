@@ -43,4 +43,4 @@ This skill enforces ADR, drift, evaluation, and architecture-specific rules that
 - Pre-implementation: check architecture sections and module/test boundary clarity
 - Pre-implementation: check harness strategy for harness-based application flows
 - Pre-completion: check observations against harness strategy when observation artifacts exist
-- On `/at-adr status` update: check Superseded invariants
+- On `/agent-align:at-adr status` update: check Superseded invariants

@@ -22,4 +22,4 @@ Detected architectural decision:
 - Alternative implied: Redis
 
 Decision key: `decision:001-user-login:session-storage`
-Create ADR? (/at-adr new "Session storage: PostgreSQL vs Redis")
+Create ADR? (/agent-align:at-adr new "Session storage: PostgreSQL vs Redis")

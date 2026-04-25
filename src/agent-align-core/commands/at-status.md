@@ -102,9 +102,9 @@ TEAM ONBOARDING BRIEF
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 WORKFLOW
-This project uses /at-init → /at-new → /at-review →
-/at-plan → /at-eval → /at-observe → /at-implement →
-/at-audit → /at-retro. Do not skip stages — hooks will
+This project uses /agent-align:at-init → /agent-align:at-new → /agent-align:at-review →
+/agent-align:at-plan → /agent-align:at-eval → /agent-align:at-observe → /agent-align:at-implement →
+/agent-align:at-audit → /agent-align:at-retro. Do not skip stages — hooks will
 block you if constitution, architecture, or harness
 requirements are not met.
 
@@ -133,6 +133,6 @@ OPEN ITEMS
 
 ## Error Conditions
 
-- `.specify/` not found → "Run `/at-init` first"
-- No specs found → "No specs yet. Run `/at-new` to create the first one"
-- ADR-INDEX.md missing → note in output, suggest running `/at-adr list`
+- `.specify/` not found → "Run `/agent-align:at-init` first"
+- No specs found → "No specs yet. Run `/agent-align:at-new` to create the first one"
+- ADR-INDEX.md missing → note in output, suggest running `/agent-align:at-adr list`

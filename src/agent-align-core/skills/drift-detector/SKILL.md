@@ -7,7 +7,7 @@ description: Detects and classifies drift between specs and code; triggers ADR c
 
 ## When to Run
 - After any file edit (quick check via PostToolUse hook)
-- On `/at-audit` command (full analysis)
+- On `/agent-align:at-audit` command (full analysis)
 - Before PR merge
 
 The PostToolUse hook is intentionally lightweight:
@@ -15,7 +15,7 @@ The PostToolUse hook is intentionally lightweight:
 - endpoint mismatch hints
 - stale or missing eval result hints for agentic specs
 
-Use `/at-audit` for the full comparison workflow.
+Use `/agent-align:at-audit` for the full comparison workflow.
 
 ## Detection Methods
 
@@ -104,7 +104,7 @@ HIGH      GET /api/users/profile — in code, not in spec
 MEDIUM    Spec mentions email verification, not yet implemented
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 3 issues found (1 CRITICAL, 1 HIGH, 1 MEDIUM)
-Run /at-audit for full analysis and ADR resolution.
+Run /agent-align:at-audit for full analysis and ADR resolution.
 ```
 
 ## Supersedes

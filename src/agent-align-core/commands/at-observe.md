@@ -7,8 +7,8 @@ description: Record and review runtime observations so actual harness behavior c
 Record or review runtime observations.
 
 ## Usage
-- `/at-observe record <slug>` — create or update observation artifacts for a scenario or trace
-- `/at-observe review <slug>` — summarize observed runtime behavior and highlight drift signals
+- `/agent-align:at-observe record <slug>` — create or update observation artifacts for a scenario or trace
+- `/agent-align:at-observe review <slug>` — summarize observed runtime behavior and highlight drift signals
 
 `<slug>`: feature slug matching a directory under `.specify/specs/`, e.g. `001-user-login`
 
@@ -30,7 +30,7 @@ Record or review runtime observations.
    - final outcome
 4. Normalize the trace using `templates/schemas/observation-schema.yaml`.
 5. Record raw runtime evidence only. Do not classify drift in this step.
-6. Leave `## Drift Signals` empty or marked `pending review` until `/at-observe review` runs.
+6. Leave `## Drift Signals` empty or marked `pending review` until `/agent-align:at-observe review` runs.
 
 ## Workflow: `review`
 
@@ -61,5 +61,5 @@ Record or review runtime observations.
 
 ## Error Conditions
 
-- Observation artifacts missing → "Run `/at-observe record` first"
+- Observation artifacts missing → "Run `/agent-align:at-observe record` first"
 - Trace missing required event data → "Normalize trace against observation-schema.yaml"

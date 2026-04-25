@@ -42,17 +42,17 @@ These agents do not replace team ownership. They help the team govern vibe-coded
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
-| `/at-init` | Setup | Initialize the workflow, ADR structure, and rules directory |
-| `/at-new` | Define | Create a specification from a feature request |
-| `/at-review` | Refine | Tighten clarity, scope, and measurability |
-| `/at-plan` | Plan | Generate plan and tasks from the spec |
-| `/at-adr` | Decide | Create and manage decision records |
-| `/at-eval` | Evaluate | Define and run framework-agnostic evaluation |
-| `/at-observe` | Evaluate | Record and review observed runtime behavior |
-| `/at-implement` | Execute | Implement with TDD and security review |
-| `/at-audit` | Realign | Detect drift, attribute failures, trigger refinement |
-| `/at-retro` | Learn | Extract lessons as compounding rules |
-| `/at-status` | Govern | Project-wide governance overview and onboarding brief |
+| `/agent-align:at-init` | Setup | Initialize the workflow, ADR structure, and rules directory |
+| `/agent-align:at-new` | Define | Create a specification from a feature request |
+| `/agent-align:at-review` | Refine | Tighten clarity, scope, and measurability |
+| `/agent-align:at-plan` | Plan | Generate plan and tasks from the spec |
+| `/agent-align:at-adr` | Decide | Create and manage decision records |
+| `/agent-align:at-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/agent-align:at-observe` | Evaluate | Record and review observed runtime behavior |
+| `/agent-align:at-implement` | Execute | Implement with TDD and security review |
+| `/agent-align:at-audit` | Realign | Detect drift, attribute failures, trigger refinement |
+| `/agent-align:at-retro` | Learn | Extract lessons as compounding rules |
+| `/agent-align:at-status` | Govern | Project-wide governance overview and onboarding brief |
 
 ## Team Contract
 

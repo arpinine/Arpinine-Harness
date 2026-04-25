@@ -7,9 +7,9 @@ description: Define and run evaluation for a spec or agent using any suitable fr
 Define or run evaluation for the current spec.
 
 ## Usage
-- `/at-eval plan <slug>` — create or update the evaluation plan
-- `/at-eval run <slug>` — run the chosen evaluation framework and record results
-- `/at-eval review <slug>` — review the latest evaluation results against thresholds
+- `/agent-align:at-eval plan <slug>` — create or update the evaluation plan
+- `/agent-align:at-eval run <slug>` — run the chosen evaluation framework and record results
+- `/agent-align:at-eval review <slug>` — review the latest evaluation results against thresholds
 
 `<slug>`: feature slug matching a directory under `.specify/specs/`, e.g. `001-user-login`
 
@@ -66,7 +66,7 @@ Define or run evaluation for the current spec.
 
 ## Error Conditions
 
-- Eval plan missing → "Run `/at-eval plan` first"
+- Eval plan missing → "Run `/agent-align:at-eval plan` first"
 - Framework command missing → "Add an execution command to eval-plan.md"
-- Framework dependency unavailable → "Install the tool declared in eval-plan.md before running `/at-eval run`"
+- Framework dependency unavailable → "Install the tool declared in eval-plan.md before running `/agent-align:at-eval run`"
 - Results missing thresholds → "Define thresholds before evaluation can pass"

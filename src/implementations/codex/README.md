@@ -52,10 +52,10 @@ Add a real Codex implementation without changing the shared AgentAlign core cont
 
 5. Implement the smallest supported Codex feature set first.
    Initial target:
-   - `/at-init`
-   - `/at-new`
-   - `/at-review`
-   - `/at-plan`
+   - `/agent-align:at-init`
+   - `/agent-align:at-new`
+   - `/agent-align:at-review`
+   - `/agent-align:at-plan`
 
 6. Add Codex-specific shims only where required.
    Keep shared prompts and workflow assets in the core unless Codex imposes a real limitation.

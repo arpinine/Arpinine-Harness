@@ -7,10 +7,10 @@ description: "Create and manage Architecture Decision Records. Subcommands: new,
 Manage Architecture Decision Records (ADRs).
 
 ## Usage
-- `/at-adr new "title"` — create and index a new ADR
-- `/at-adr list` — display all ADRs with status
-- `/at-adr show <number>` — display ADR-NNNN full content
-- `/at-adr status <number> <status>` — update lifecycle status
+- `/agent-align:at-adr new "title"` — create and index a new ADR
+- `/agent-align:at-adr list` — display all ADRs with status
+- `/agent-align:at-adr show <number>` — display ADR-NNNN full content
+- `/agent-align:at-adr status <number> <status>` — update lifecycle status
 
 ---
 
@@ -33,7 +33,7 @@ Manage Architecture Decision Records (ADRs).
 ## Steps: `list`
 
 Read `.specify/adr/ADR-INDEX.md` and display as table.
-If index missing: "No ADRs yet. Run `/at-adr new` to create one."
+If index missing: "No ADRs yet. Run `/agent-align:at-adr new` to create one."
 
 ## Steps: `show <number>`
 
@@ -51,6 +51,6 @@ Valid statuses: `Proposed`, `Accepted`, `Implemented`, `Superseded`, `Rejected`
 4. Update matching row in ADR-INDEX.md
 
 ## Error Conditions
-- `.specify/adr/` not found → "Run `/at-init` first"
+- `.specify/adr/` not found → "Run `/agent-align:at-init` first"
 - ADR number not found → show ADR-INDEX.md
 - Invalid status value → list valid statuses

@@ -43,14 +43,14 @@ cat product-request.md
 2. Run the AgentAlign workflow in Claude Code:
 
 ```text
-/at-init
-/at-review .specify/specs/001-support-triage-agent/spec.md
-/at-plan .specify/specs/001-support-triage-agent/
-/at-eval plan .specify/specs/001-support-triage-agent/
-/at-eval review .specify/specs/001-support-triage-agent/
-/at-observe review .specify/specs/001-support-triage-agent/
-/at-status --onboard
-/at-audit .specify/specs/001-support-triage-agent/spec.md
+/agent-align:at-init
+/agent-align:at-review .specify/specs/001-support-triage-agent/spec.md
+/agent-align:at-plan .specify/specs/001-support-triage-agent/
+/agent-align:at-eval plan .specify/specs/001-support-triage-agent/
+/agent-align:at-eval review .specify/specs/001-support-triage-agent/
+/agent-align:at-observe review .specify/specs/001-support-triage-agent/
+/agent-align:at-status --onboard
+/agent-align:at-audit .specify/specs/001-support-triage-agent/spec.md
 ```
 
 3. Run the implementation tests:

@@ -129,6 +129,6 @@ For each confirmed drift item, choose the right correction path based on attribu
   - clear contract violated by runtime or implementation -> POSTCONDITION FAILURE
 
 ## Error Conditions
-- `.specify/specs/` not found → "Run `/at-init` first"
+- `.specify/specs/` not found → "Run `/agent-align:at-init` first"
 - Spec not readable → report file path and skip
 - No specs found at given path → list available specs

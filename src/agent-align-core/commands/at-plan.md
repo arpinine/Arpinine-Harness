@@ -28,7 +28,7 @@ Turn an approved spec into an executable engineering plan.
 10. Invoke the `tech-architect` agent on `plan.md` to identify architectural decisions that deserve ADRs.
 11. For each significant decision:
     - capture a concise decision key such as `decision:001-user-login:session-storage`
-    - either link an existing ADR or suggest `/at-adr new "..."`
+    - either link an existing ADR or suggest `/agent-align:at-adr new "..."`
 12. Ensure `plan.md` defines:
     - `## Module Boundaries`
     - `## Dependency Rules`

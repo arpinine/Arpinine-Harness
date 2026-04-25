@@ -13,7 +13,7 @@ You review plan.md and implementation for security issues.
 ## When Invoked
 - After `/speckit.plan` (review plan.md)
 - During `/speckit.implement` (review code changes)
-- After `/at-audit` when drift introduces a security-sensitive divergence
+- After `/agent-align:at-audit` when drift introduces a security-sensitive divergence
 
 ## Security Checklist
 - [ ] No hardcoded secrets
