@@ -18,6 +18,7 @@ This feature gives the governed workflow a real coordination contract so one tea
 - FR-002: The plugin SHALL support explicit task ownership hints in `plan.md` using optional team tags such as `[team: claude]` and `[team: codex]`.
 - FR-003: The plugin SHALL provide deterministic shared scripts to claim and release tasks with lease-based ownership.
 - FR-004: The plugin SHALL prevent a team from claiming a task that is actively leased by another team or explicitly assigned to another team.
+- FR-004a: The plugin SHALL treat untagged tasks as shared work claimable by any eligible team, subject to lease rules.
 - FR-005: The plugin SHALL block implementation-path edits unless the current runtime identity owns an active task claim for the governing spec.
 - FR-006: Delivery reporting SHALL expose assigned team, active claimer, and lease state alongside task progress.
 - FR-007: Runtime identity resolution SHALL work across Claude and Codex without requiring divergent coordination semantics in host overlays.
@@ -37,7 +38,7 @@ This feature gives the governed workflow a real coordination contract so one tea
 - [x] AC-003: Given an expired lease, another eligible team can claim the task successfully.
 - [x] AC-004: Given an implementation-path edit without an active claim, the shared pre-edit gate blocks the write with a clear ownership message.
 - [x] AC-005: Given a claimed task, delivery reporting shows assigned team, active claimer, and lease state.
-- [x] AC-006: Given Claude and Codex plugin sessions, runtime identity resolves consistently enough that claim, release, and edit-gating flows agree on task ownership.
+- [x] AC-006: Given the same host environment, claim and hook flows produce identical claimer identity for the same assistant team.
 
 ## Out of Scope
 
@@ -68,11 +69,17 @@ This feature gives the governed workflow a real coordination contract so one tea
 - Coordination state must be stored in repository artifacts so both implementations can inspect the same source of truth.
 - Claim enforcement must remain compatible with the shared hook model already used for constitution and architecture checks.
 - Host overlays may infer runtime identity differently, but claim semantics must remain identical once identity is resolved.
+- Untagged tasks are shared tasks by default and may be claimed by any eligible team when no active lease exists.
+- Lease recovery is timeout-based: interrupted sessions recover through lease expiry rather than permanent locks.
+- Operators may force release a task explicitly through `scripts/release_task.py --slug <slug> --task-id <task> --state available` when human recovery is required.
 
 ## Open Questions
 
-- OQ-001: Should a later phase add heartbeats for long-running sessions or is lease renewal on repeated claims sufficient for now?
-- OQ-002: Should multi-machine coordination stay file-based or move to a shared backend when the repo needs distributed execution?
+- OQ-001: Should multi-machine coordination stay file-based or move to a shared backend when the repo needs distributed execution?
+
+## Resolved Decisions
+
+- RD-001: Lease renewal on repeated claim is sufficient for the current local shared-repo model; heartbeats are deferred until real session durations or distributed execution make them necessary.
 
 ## Related ADRs
 

@@ -18,9 +18,10 @@ That inconsistency increases review noise, weakens trust in generated changes, a
 - FR-002: The repository SHALL store canonical style configuration files in one shared location rather than scattering them across assistant-specific overlays.
 - FR-003: The plugin SHALL provide checked-in style configuration for Python, JavaScript/TypeScript, Java, and Rust.
 - FR-004: A shared PreToolUse governance hook SHALL block implementation-path edits when a language is used without a declared repository style standard.
-- FR-005: The shared style-governance hook SHALL recognize the canonical style-config directory as the source of truth.
+- FR-005: The shared style-governance hook SHALL recognize the canonical `tools/style/` directory as the source of truth and fail closed for supported languages when that directory or the relevant canonical config is absent.
 - FR-006: The repository SHALL document the canonical style-config paths and how teams should invoke the relevant tools against them.
 - FR-007: The plugin SHALL provide automated tests for style-governance blocking and allow-path behavior.
+- FR-008: Style-governance enforcement SHALL remain in shared core hook wiring rather than diverging per assistant implementation.
 
 ## Non-Functional Requirements
 
@@ -33,10 +34,11 @@ That inconsistency increases review noise, weakens trust in generated changes, a
 
 - [x] AC-001: Given a Python edit, the shared style-governance hook blocks the write when no repository Python style config is present and allows it when the canonical Python config exists.
 - [x] AC-002: Given a JavaScript or TypeScript edit, the shared style-governance hook blocks the write when no repository frontend style config is present and allows it when canonical ESLint or Prettier config exists.
-- [x] AC-003: Given a Java edit, the shared style-governance hook allows the write when canonical Java style config exists.
-- [x] AC-004: Given a Rust edit, the shared style-governance hook allows the write when canonical Rust style config exists.
+- [x] AC-003: Given a Java edit, the shared style-governance hook blocks the write when canonical Java style config is absent and allows it when canonical Java style config exists.
+- [x] AC-004: Given a Rust edit, the shared style-governance hook blocks the write when canonical Rust style config is absent and allows it when canonical Rust style config exists.
 - [x] AC-005: Given the canonical style-config directory, the repository documents the path conventions clearly enough for plugin teams and humans to use the same configs.
 - [x] AC-006: Given the style-governance tests, automated coverage verifies both blocking and allow-path behavior for supported languages.
+- [x] AC-007: Given assembled Claude and Codex plugin structures, style-governance enforcement is inherited from shared core hook wiring rather than duplicated with divergent semantics.
 
 ## Out of Scope
 
@@ -70,8 +72,12 @@ That inconsistency increases review noise, weakens trust in generated changes, a
 
 ## Open Questions
 
-- OQ-001: Should later phases add executable wrapper targets for running each formatter or linter through the canonical config path?
-- OQ-002: Which additional languages should be standardized next if the repository grows beyond the current set?
+- OQ-001: Which additional languages should be standardized next if the repository grows beyond the current set?
+
+## Resolved Decisions
+
+- RD-001: Canonical style config discovery fails closed through `tools/style/` for supported languages.
+- RD-002: Repository path discoverability is surfaced through checked-in documentation and the `make style-paths` target.
 
 ## Related ADRs
 

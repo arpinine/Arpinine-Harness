@@ -9,8 +9,10 @@
 6. Modular boundaries before implementation
 7. Business rules isolated from framework and infrastructure concerns
 8. Repository-defined, language-specific code style standards are mandatory for every team and plugin
+9. Task ownership is explicit and machine-enforced before implementation edits begin
 
 ## Enforcement
 - Code style standards MUST be defined by checked-in repository tooling or configuration for each language used in implementation files.
 - Claude, Codex, and any future implementation team MUST follow the same repository-defined style standards for a given language.
 - Hooks and automated validation SHOULD block implementation-path edits when a language is used without a declared repository style standard.
+- Implementation-path edits SHALL be blocked unless the runtime identity holds an active task claim for the governing spec.
