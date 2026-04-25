@@ -20,6 +20,15 @@
         }]
       },
       {
+        "description": "Block implementation edits when the repository has no declared style standard for the language",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-style-governance.sh",
+          "timeout": 5
+        }]
+      },
+      {
         "description": "Block implementation edits unless the current team has an active task claim",
         "matcher": "Edit|Write",
         "hooks": [{

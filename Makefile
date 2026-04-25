@@ -15,7 +15,9 @@ CODEX_MARKETPLACE_FILE := .agents/plugins/marketplace.json
 
 .DEFAULT_GOAL := build
 
-.PHONY: assemble build clean delivery register validate-structure install uninstall validate help
+STYLE_DIR := tools/style
+
+.PHONY: assemble build clean delivery register validate-structure install uninstall validate help style-paths
 
 assemble: clean
 	@set -e; \
@@ -135,3 +137,12 @@ help:
 	@echo ""
 	@echo "Targets: build (default), clean, delivery, register, validate-structure, install, uninstall, validate"
 	@echo "Variables: IMPLEMENTATION=claude (default)"
+
+## Show canonical style config locations
+style-paths:
+	@echo "Python: $(STYLE_DIR)/python/pyproject.toml"
+	@echo "Frontend: $(STYLE_DIR)/frontend/eslint.config.cjs"
+	@echo "Frontend: $(STYLE_DIR)/frontend/.prettierrc.json"
+	@echo "Java: $(STYLE_DIR)/java/checkstyle.xml"
+	@echo "Rust: $(STYLE_DIR)/rust/rustfmt.toml"
+	@echo "Shared: $(STYLE_DIR)/shared/.editorconfig"

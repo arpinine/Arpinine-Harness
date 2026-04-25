@@ -118,7 +118,22 @@ Plan: [specs/007-multi-team-task-coordination/plan.md](specs/007-multi-team-task
 | [TASK-007](specs/007-multi-team-task-coordination/plan.md#L67) | full | - | - | - |
 | [TASK-008](specs/007-multi-team-task-coordination/plan.md#L68) | full | - | - | - |
 
----
-_Last updated: 2026-04-25 15:37_
+## [008-cross-language-code-style-governance](specs/008-cross-language-code-style-governance/spec.md)
+Plan: [specs/008-cross-language-code-style-governance/plan.md](specs/008-cross-language-code-style-governance/plan.md) &nbsp;|&nbsp; Progress: 9/9 full, 0 partial
 
-**Total tasks:** 63 &nbsp;|&nbsp; **Full:** 8 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 55
+| Task | Status | Assigned Team | Claimed By | Lease Until |
+|------|--------|---------------|------------|-------------|
+| [TASK-001](specs/008-cross-language-code-style-governance/plan.md#L64) | full | - | - | - |
+| [TASK-002](specs/008-cross-language-code-style-governance/plan.md#L65) | full | - | - | - |
+| [TASK-003](specs/008-cross-language-code-style-governance/plan.md#L66) | full | - | - | - |
+| [TASK-004](specs/008-cross-language-code-style-governance/plan.md#L67) | full | - | - | - |
+| [TASK-005](specs/008-cross-language-code-style-governance/plan.md#L68) | full | - | - | - |
+| [TASK-006](specs/008-cross-language-code-style-governance/plan.md#L69) | full | - | - | - |
+| [TASK-007](specs/008-cross-language-code-style-governance/plan.md#L70) | full | - | - | - |
+| [TASK-008](specs/008-cross-language-code-style-governance/plan.md#L71) | full | - | - | - |
+| [TASK-009](specs/008-cross-language-code-style-governance/plan.md#L72) | full | - | - | - |
+
+---
+_Last updated: 2026-04-25 15:54_
+
+**Total tasks:** 72 &nbsp;|&nbsp; **Full:** 17 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 55
