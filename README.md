@@ -28,9 +28,8 @@ This is the core operating model: one plugin surface, many specialized agent res
 If you want to use AgentAlign as an operator rather than just inspect its files, start with the vibe-coder operating guide:
 
 - [Vibe Coder Process](docs/vibe-coder-process.md)
-- [Repository Relocation Checklist](docs/repository-relocation-checklist.md)
 
-Use the process guide for day-to-day operation of the plugin, and use the relocation checklist for the GitHub-side and external follow-up work after the repository move.
+Use the process guide for day-to-day operation of the plugin.
 
 ## Agent Team
 
