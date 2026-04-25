@@ -234,8 +234,6 @@ The real cross-implementation abstraction is the common-denominator workflow:
 - `make register IMPLEMENTATION=<name>`
 - `make validate-structure IMPLEMENTATION=<name>`
 
-Recommended operating guide for day-to-day usage:
-- [Vibe Coder Process](docs/vibe-coder-process.md)
 
 Claude also has native convenience targets for install, uninstall, and validator-backed validation.
 Codex uses the shared abstraction plus Codex marketplace registration.
