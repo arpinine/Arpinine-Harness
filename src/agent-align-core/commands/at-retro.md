@@ -65,6 +65,11 @@ Work through each question with the user. Ask concise, focused questions and rec
 - Were any AI-specific failure modes (hallucination, context overflow, tool misuse) encountered that the plan did not anticipate?
 - Did evaluation metrics for AI outputs match what was defined in the eval plan?
 
+**Data pipeline and RAG fidelity**
+- Were chunking strategy, embedding model, and retrieval strategy implemented as designed in `## Data Pipeline`?
+- Were there schema migration issues, data quality failures, or pipeline errors not anticipated in the plan?
+- Were vector store or embedding model choices changed reactively during implementation?
+
 **Rule candidates**
 - For each "yes" above: is this a pattern the team should prevent in future specs?
 - Would a rule have caught this earlier in the workflow (at PreToolUse, at audit, at planning)?
@@ -80,7 +85,7 @@ LESSON [N]:
   Attribution: PRECONDITION FAILURE (spec/plan was unclear) | POSTCONDITION FAILURE (deviated from clear spec)
   Rule candidate? YES | NO
   Proposed rule: [One sentence: "When X, require Y to prevent Z"]
-  Category: security | architecture | harness | spec-quality | evaluation | process | devops | ai-design
+  Category: security | architecture | harness | spec-quality | evaluation | process | devops | ai-design | data-pipeline
   Severity: CRITICAL | HIGH | MEDIUM | LOW
 ```
 

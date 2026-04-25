@@ -27,11 +27,42 @@ The directories in this package are implementation-agnostic. Assistant-specific 
 | Security | `security-reviewer` checks implementation risk before completion |
 | Evaluation | `evaluation-governor` enforces quality metrics, thresholds, and evidence |
 | Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries |
-| AI design | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes |
-| Prod-readiness | `devops` owns deployment, secrets hygiene, CI/CD, and infrastructure decisions for the product |
+| AI design | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes — scoped to AI/LLM features |
+| Prod-readiness | `devops` owns deployment, secrets hygiene, CI/CD, and infrastructure decisions — scoped to deployed services, secrets, or CI/CD |
+| Data architecture | `data-engineer` owns data pipelines, RAG design, schema, vector stores, and data quality — scoped to pipeline or RAG features |
 | Realignment | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent |
 
 These agents do not replace team ownership. They help the team govern vibe-coded work through explicit artifacts and automated checks.
+
+## Agent Activation Model
+
+Not every agent fires on every spec. AgentAlign uses two activation modes to keep governance proportional to what the feature actually requires.
+
+### Always-On
+
+These agents activate on every spec, regardless of content. They govern concerns that every feature shares.
+
+| Agent | Fires because |
+|-------|---------------|
+| `product-owner` | Every spec has a business case and acceptance criteria to protect |
+| `tech-architect` | Every plan has architectural decisions worth surfacing |
+| `architecture-governor` | Every plan needs module boundary and dependency enforcement |
+| `tdd-guide` | Every implementation requires test-first discipline |
+| `security-reviewer` | Every feature has a security surface |
+
+### Scoped
+
+These agents activate only when the spec signals their domain. Invoking them unconditionally would create noise and irrelevant blockers on features that don't need them.
+
+| Agent | Activates when spec involves |
+|-------|------------------------------|
+| `harness-governor` | An agent harness or runtime in the product |
+| `evaluation-governor` | Agentic or AI-assisted workflows requiring quality gates |
+| `ai-engineer` | AI, LLMs, agent runtimes, or prompt-driven behavior |
+| `devops` | A deployed service, external API keys, secrets, or CI/CD pipeline |
+| `data-engineer` | Data pipelines, RAG, vector stores, ETL, or multi-source ingestion |
+
+The scope condition is evaluated during `/at-plan` by reading the spec and plan content. When a scoped agent activates, it also requires its corresponding section in `plan.md` — `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` — ensuring the plan is complete for the feature's domain before implementation begins.
 
 ## Workflow
 
@@ -80,8 +111,9 @@ The shared core is the source of truth for multi-team behavior. Claude, Codex, a
 | Engineering | Owns module boundaries, dependency rules, and testability by boundary |
 | Engineering | Owns harness strategy when product features depend on an agent runtime |
 | Engineering | Owns evaluation strategy, release thresholds, and runtime evidence expectations for agentic systems |
-| Engineering | Owns AI design decisions: model selection, prompting strategy, context management, agent topology, and AI-specific failure modes |
-| Engineering | Owns prod-readiness: deployment pipeline, secrets management, environment configuration, CI/CD, and infrastructure decisions |
+| Engineering | Owns AI design decisions: model selection, prompting strategy, context management, agent topology, and AI-specific failure modes — when spec uses AI/LLMs |
+| Engineering | Owns prod-readiness: deployment pipeline, secrets management, environment configuration, CI/CD, and infrastructure decisions — when spec involves deployed services or secrets |
+| Engineering | Owns data architecture: pipeline design, schema and migrations, RAG pipeline, vector store selection, and data quality — when spec involves data pipelines or RAG |
 | Tech Leads | Own consequential decisions and approve ADRs when needed |
 | AI Agents | Help execute within the rules set by the spec, plan, ADRs, eval plan, and observation evidence |
 
@@ -95,8 +127,9 @@ Human ownership stays with the team. AgentAlign agents act as governed specialis
 | `tech-architect` | Protects modular design, identifies consequential decisions, and pushes architecture changes into ADRs before they become accidental code structure | `architecture-governor`, `adr-manager` |
 | `tdd-guide` | Keeps implementation task-aligned and test-first so code changes stay traceable to planned work and verifiable by tests | `constitution-enforcer` |
 | `security-reviewer` | Reviews plans and implementation for security-sensitive gaps and blocks completion when risky behavior is undocumented or unsafe | `constitution-enforcer`, `rule-manager` |
-| `ai-engineer` | Owns AI/LLM design decisions: model selection, prompting strategy, context management, agent topology, failure modes, and AI-specific evaluation metrics | `evaluation-governor`, `adr-manager` |
-| `devops` | Owns prod-readiness for the product: deployment strategy, secrets hygiene, CI/CD, environment configuration, and infrastructure decisions | `adr-manager`, `rule-manager` |
+| `ai-engineer` | Owns AI/LLM design decisions: model selection, prompting strategy, context management, agent topology, failure modes, and AI-specific evaluation metrics. Scoped: invoked only when spec uses AI, LLMs, or agent runtimes | `evaluation-governor`, `adr-manager` |
+| `devops` | Owns prod-readiness: deployment strategy, secrets hygiene, CI/CD, environment configuration, and infrastructure decisions. Scoped: invoked only when spec involves deployed services, external APIs, secrets, or CI/CD | `adr-manager`, `rule-manager` |
+| `data-engineer` | Owns data pipeline architecture, RAG pipeline design, schema and migration strategy, vector store selection, and data quality. Scoped: invoked only when spec involves data pipelines, RAG, vector stores, ETL, or multi-source ingestion | `adr-manager`, `rule-manager` |
 | Governance skills | Provide the codebase-wide enforcement layer for architecture, harness boundaries, evaluation, drift detection, ADR discipline, and compounding rules | `architecture-governor`, `harness-governor`, `evaluation-governor`, `drift-detector`, `adr-manager`, `rule-manager` |
 
 ## Alignment Rules

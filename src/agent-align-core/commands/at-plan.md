@@ -30,29 +30,35 @@ Turn an approved spec into an executable engineering plan.
     - Flag AI-specific failure modes (hallucination risk, context overflow, tool misuse, prompt injection surface).
     - Suggest ADRs for model choice, orchestration pattern, and non-obvious prompting approaches.
     - Block planning if no model is named or if prompt injection surface is unmitigated.
-11. Invoke the `devops` agent on `plan.md` to assess prod-readiness decisions:
+11. Invoke the `devops` agent on `plan.md` when the spec involves a deployed service, external API keys, secrets, or a CI/CD pipeline:
     - Review deployment strategy, secrets management approach, environment configuration, and CI/CD pipeline.
     - Flag hardcoded secrets, missing deployment path, or absent rollback plan.
     - Suggest ADRs for hosting platform, database provisioning, and secrets management strategy.
     - Block planning if no deployment path is defined or if secrets management is absent.
-12. Invoke the `tech-architect` agent on `plan.md` to identify architectural decisions that deserve ADRs.
-13. For each significant decision:
+12. Invoke the `data-engineer` agent on `plan.md` when the spec involves data pipelines, RAG, vector stores, ETL, or multi-source data ingestion:
+    - Review data pipeline architecture, schema design, migration strategy, and data quality gates.
+    - For RAG: review chunking strategy, embedding model selection, vector store choice, and retrieval strategy.
+    - Suggest ADRs for vector store platform, embedding model, and primary database choice.
+    - Block planning if RAG pipeline has no embedding model named or no retrieval strategy defined.
+13. Invoke the `tech-architect` agent on `plan.md` to identify architectural decisions that deserve ADRs.
+14. For each significant decision:
     - capture a concise decision key such as `decision:001-user-login:session-storage`
     - either link an existing ADR or suggest `/agent-align:at-adr new "..."`
-14. Ensure `plan.md` defines:
+15. Ensure `plan.md` defines:
     - `## Module Boundaries`
     - `## Dependency Rules`
     - `## Testability By Boundary`
     - `## Harness Strategy` when the feature uses a harness in the product application
-    - `## Deployment Strategy` with target platform, deploy command, and rollback procedure
+    - `## Deployment Strategy` when the feature involves a deployed service, external APIs, or secrets
     - `## AI Design Decisions` when the feature uses LLMs or agent runtimes
-15. Invoke the `evaluation-governor` skill for agentic or AI-assisted workflows.
-16. Create or update `.specify/evals/<slug>/eval-plan.md` with metrics, thresholds, datasets, and the chosen framework command.
-17. Update `plan.md` so the `## Technical Decisions`, `## Harness Strategy`, `## Evaluation Strategy`, `## Deployment Strategy`, `## AI Design Decisions`, and `## ADRs Created During Planning` sections reference the governing artifacts explicitly.
-18. When the team intends to run multiple assistant instances concurrently, annotate tasks with optional team tags such as `[team: claude]` or `[team: codex]` so ownership intent is explicit in `plan.md`.
-19. Explain that task execution uses a shared coordination registry under `.specify/coordination/` and that team tags restrict which assistant may claim a task.
-20. If architecture, task sequencing, harness strategy, AI design, deployment strategy, evaluation strategy, or team assignment remains unclear, ask the user the minimum focused planning questions required to complete the plan.
-21. Write the user's answers directly into `plan.md` and any related artifacts. Do not require the user to edit the plan manually.
-22. If no ADR is needed for a decision, state why.
-23. Confirm that planning preserved the spec intent rather than redefining it.
-24. Confirm: "Plan created at `.specify/specs/<slug>/plan.md`"
+    - `## Data Pipeline` when the feature involves data pipelines, RAG, vector stores, or ETL
+16. Invoke the `evaluation-governor` skill for agentic or AI-assisted workflows.
+17. Create or update `.specify/evals/<slug>/eval-plan.md` with metrics, thresholds, datasets, and the chosen framework command.
+18. Update `plan.md` so the `## Technical Decisions`, `## Harness Strategy`, `## Evaluation Strategy`, `## Deployment Strategy`, `## AI Design Decisions`, `## Data Pipeline`, and `## ADRs Created During Planning` sections reference the governing artifacts explicitly.
+19. When the team intends to run multiple assistant instances concurrently, annotate tasks with optional team tags such as `[team: claude]` or `[team: codex]` so ownership intent is explicit in `plan.md`.
+20. Explain that task execution uses a shared coordination registry under `.specify/coordination/` and that team tags restrict which assistant may claim a task.
+21. If architecture, task sequencing, harness strategy, AI design, data pipeline, deployment strategy, evaluation strategy, or team assignment remains unclear, ask the user the minimum focused planning questions required to complete the plan.
+22. Write the user's answers directly into `plan.md` and any related artifacts. Do not require the user to edit the plan manually.
+23. If no ADR is needed for a decision, state why.
+24. Confirm that planning preserved the spec intent rather than redefining it.
+25. Confirm: "Plan created at `.specify/specs/<slug>/plan.md`"

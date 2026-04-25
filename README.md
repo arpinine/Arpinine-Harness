@@ -18,8 +18,9 @@ The user interacts with one plugin entrypoint, but each workflow command activat
 - a `tech-architect` that shapes boundaries, dependencies, and ADR-worthy decisions
 - a `tdd-guide` that keeps execution task-aligned and test-first
 - a `security-reviewer` that challenges risky or underspecified changes
-- an `ai-engineer` that owns model selection, prompting strategy, and AI-specific failure modes
-- a `devops` that closes the prod-readiness gap: deployment, secrets, CI/CD, and infrastructure
+- an `ai-engineer` that owns model selection, prompting strategy, and AI-specific failure modes — active when spec uses AI or LLMs
+- a `devops` that closes the prod-readiness gap: deployment, secrets, CI/CD, and infrastructure — active when spec involves deployed services or secrets
+- a `data-engineer` that owns data pipelines, RAG design, schema, and vector stores — active when spec involves pipelines or RAG
 - an `evaluation-governor` that pushes for measurable quality gates
 - a `drift-detector` that checks whether code, plans, ADRs, and runtime evidence still agree
 
@@ -60,14 +61,45 @@ AgentAlign coordinates a small team of focused AI roles and governance skills:
 | Architecture       | `tech-architect` and `architecture-governor` help define modular boundaries and consequential decisions |
 | Delivery           | `tdd-guide` keeps implementation test-first and task-aligned                                            |
 | Security           | `security-reviewer` checks implementation risk before completion                                        |
-| AI design          | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes   |
-| Prod-readiness     | `devops` owns deployment, secrets hygiene, CI/CD, and infrastructure decisions for the product          |
+| AI design          | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes — scoped to AI/LLM features        |
+| Prod-readiness     | `devops` owns deployment, secrets hygiene, CI/CD, and infrastructure — scoped to deployed services, secrets, or CI/CD                    |
+| Data architecture  | `data-engineer` owns data pipelines, RAG design, schema, vector stores, and data quality — scoped to pipeline or RAG features            |
 | Evaluation         | `evaluation-governor` enforces quality metrics, thresholds, and evidence                                |
 | Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries                              |
 | Realignment        | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent                   |
 
 
 These agents do not replace team ownership. They help the team govern vibe-coded work through explicit artifacts and automated checks.
+
+## Agent Activation Model
+
+Not every agent fires on every spec. AgentAlign uses two activation modes to keep governance proportional to what the feature actually requires.
+
+### Always-On
+
+These agents activate on every spec, regardless of content. They govern concerns that every feature shares.
+
+| Agent | Fires because |
+|-------|---------------|
+| `product-owner` | Every spec has a business case and acceptance criteria to protect |
+| `tech-architect` | Every plan has architectural decisions worth surfacing |
+| `architecture-governor` | Every plan needs module boundary and dependency enforcement |
+| `tdd-guide` | Every implementation requires test-first discipline |
+| `security-reviewer` | Every feature has a security surface |
+
+### Scoped
+
+These agents activate only when the spec signals their domain. Invoking them unconditionally would create noise and irrelevant blockers on features that don't need them.
+
+| Agent | Activates when spec involves |
+|-------|------------------------------|
+| `harness-governor` | An agent harness or runtime in the product |
+| `evaluation-governor` | Agentic or AI-assisted workflows requiring quality gates |
+| `ai-engineer` | AI, LLMs, agent runtimes, or prompt-driven behavior |
+| `devops` | A deployed service, external API keys, secrets, or CI/CD pipeline |
+| `data-engineer` | Data pipelines, RAG, vector stores, ETL, or multi-source ingestion |
+
+The scope condition is evaluated during `/at-plan` by reading the spec and plan content. When a scoped agent activates, it also requires its corresponding section in `plan.md` — `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` — ensuring the plan is complete for the feature's domain before implementation begins.
 
 ## Team Workflow
 
