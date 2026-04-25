@@ -289,17 +289,17 @@ Execute the plan without drifting from the spec, architecture, or ADRs.
 - security review
 
 **Manual**
-- choose the next task
-- set the task checkbox in `plan.md` from `[ ]` to `[~]`
 - review and accept code changes
-- mark completed tasks `[x]`
-- decide when to stop and re-plan if drift appears
+- answer the plugin's implementation questions in chat if the current task is ambiguous or blocked
+- decide whether to accept a re-plan or ADR update when the plugin detects consequential drift
 
 **Automatic**
-- hooks block invalid edits
-- delivery matrix updates from `plan.md` task status
-- governance checks run on file writes
-- planned workflow reminders from the command
+- the plugin selects the next eligible task from `plan.md`
+- the plugin updates the task state in `plan.md` from `[ ]` to `[~]` when work starts
+- the plugin updates the task state in `plan.md` from `[~]` to `[x]` when work is complete
+- the `PostToolUse` delivery hook regenerates `.specify/delivery.md` after `plan.md` changes
+- the `PostToolUse` drift hook runs after file writes and surfaces lightweight alignment issues
+- the `PreToolUse` governance hooks block invalid implementation edits before they land
 
 **Expected Deliverable**
 - implementation for the selected tasks
@@ -310,7 +310,7 @@ Execute the plan without drifting from the spec, architecture, or ADRs.
 **Exit Criteria**
 - code matches the plan
 - tests pass
-- completed tasks are marked `[x]`
+- completed tasks are marked `[x]` by the plugin
 
 ## Step 7: Evaluate Where Required
 

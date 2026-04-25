@@ -23,13 +23,14 @@ Execute the agreed work without drifting from intent.
 5. Preserve the module boundaries and dependency direction defined in `plan.md`.
 6. If the feature uses a harness in the product application, preserve the harness abstraction boundary, tool model, memory model, and permission model defined in `## Harness Strategy`.
 7. For each task in `plan.md`:
-   a. Before starting work on the task: change its checkbox from `[ ]` to `[~]` in `plan.md`.
+   a. Before starting work on the task: select the next eligible task and change its checkbox from `[ ]` to `[~]` in `plan.md`.
    b. Enforce RED → GREEN → REFACTOR:
       - failing test first
       - minimal implementation
       - refactor with tests still green
    c. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`.
-   The task-status edit refreshes `.specify/delivery.md` automatically through the shared hook configuration.
+   d. Perform those `plan.md` status edits directly as part of the command flow; do not ask the user to update task checkboxes manually.
+   The task-status edit refreshes `.specify/delivery.md` automatically through the shared `PostToolUse` delivery hook, and the shared `PostToolUse` drift hook also runs after the write.
 8. Invoke the `product-owner` agent before completion to compare implementation evidence against the spec business case and acceptance criteria.
 9. Invoke the `security-reviewer` agent on the plan and code changes before concluding the task.
 10. Run `/agent-align:at-eval run <slug>` for any workflow whose plan declares required evaluation.
@@ -39,6 +40,7 @@ Execute the agreed work without drifting from intent.
 12. If a CRITICAL or HIGH drift item is discovered during implementation:
    - stop and run `/agent-align:at-audit`
    - require a matching ADR before proceeding
+   - do not ask the user to manually edit `plan.md`; update the relevant planning artifacts directly after the decision is made
 13. If implementation breaks planned boundaries or introduces tight coupling, send the work back into planning or ADR refinement before completion.
 14. If harness behavior exceeds the documented tool, memory, or permission model, send the work back into planning or ADR refinement before completion.
 15. If implementation changes the original intent or weakens the business case, send the work back into refinement by updating the spec or ADRs.

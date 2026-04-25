@@ -22,7 +22,7 @@
     ],
     "PostToolUse": [
       {
-        "description": "Detect lightweight spec drift after file writes",
+        "description": "Detect lightweight spec drift after file writes, including implementation-time plan updates",
         "matcher": "Edit|Write",
         "hooks": [{
           "type": "command",
@@ -31,7 +31,7 @@
         }]
       },
       {
-        "description": "Regenerate delivery matrix when a plan.md is updated",
+        "description": "Regenerate delivery matrix when task state or other plan.md content is updated",
         "matcher": "Edit|Write",
         "hooks": [{
           "type": "command",
