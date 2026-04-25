@@ -80,6 +80,8 @@ The shared core is the source of truth for multi-team behavior. Claude, Codex, a
 | Engineering | Owns module boundaries, dependency rules, and testability by boundary |
 | Engineering | Owns harness strategy when product features depend on an agent runtime |
 | Engineering | Owns evaluation strategy, release thresholds, and runtime evidence expectations for agentic systems |
+| Engineering | Owns AI design decisions: model selection, prompting strategy, context management, agent topology, and AI-specific failure modes |
+| Engineering | Owns prod-readiness: deployment pipeline, secrets management, environment configuration, CI/CD, and infrastructure decisions |
 | Tech Leads | Own consequential decisions and approve ADRs when needed |
 | AI Agents | Help execute within the rules set by the spec, plan, ADRs, eval plan, and observation evidence |
 
