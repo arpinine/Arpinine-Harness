@@ -37,6 +37,8 @@ Turn an approved spec into an executable engineering plan.
 13. Invoke the `evaluation-governor` skill for agentic or AI-assisted workflows.
 14. Create or update `.specify/evals/<slug>/eval-plan.md` with metrics, thresholds, datasets, and the chosen framework command.
 15. Update `plan.md` so the `## Technical Decisions`, `## Harness Strategy`, `## Evaluation Strategy`, and `## ADRs Created During Planning` sections reference the governing artifacts explicitly.
-16. If no ADR is needed for a decision, state why.
-17. Confirm that planning preserved the spec intent rather than redefining it.
-18. Confirm: "Plan created at `.specify/specs/<slug>/plan.md`"
+16. If architecture, task sequencing, harness strategy, or evaluation strategy remains unclear, ask the user the minimum focused planning questions required to complete the plan.
+17. Write the user's answers directly into `plan.md` and any related artifacts. Do not require the user to edit the plan manually.
+18. If no ADR is needed for a decision, state why.
+19. Confirm that planning preserved the spec intent rather than redefining it.
+20. Confirm: "Plan created at `.specify/specs/<slug>/plan.md`"

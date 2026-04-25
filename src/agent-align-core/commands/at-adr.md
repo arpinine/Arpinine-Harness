@@ -26,9 +26,10 @@ Manage Architecture Decision Records (ADRs).
    - derive a stable drift key such as `drift:001-user-login:route:GET-/api/users/profile`
    - store that key in `covers:`
 7. If this ADR documents a planned engineering choice rather than drift, add a decision key such as `decision:001-user-login:session-storage` to `covers:`
-8. Prompt user to fill: Context → Decision → Consequences → Alternatives Considered
-9. Append row to ADR-INDEX.md: `| ADR-NNNN | <title> | Proposed | <governs> | <covers> |`
-9. Confirm: "ADR-NNNN created at `.specify/adr/ADR-NNNN-<title>.md`"
+8. Ask the user the minimum focused questions needed to complete: Context → Decision → Consequences → Alternatives Considered.
+9. Write those answers directly into the ADR document. Do not require the user to edit the ADR manually.
+10. Append row to ADR-INDEX.md: `| ADR-NNNN | <title> | Proposed | <governs> | <covers> |`
+11. Confirm: "ADR-NNNN created at `.specify/adr/ADR-NNNN-<title>.md`"
 
 ## Steps: `list`
 

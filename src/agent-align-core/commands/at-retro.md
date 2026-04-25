@@ -33,7 +33,7 @@ Gather:
 
 ### 3. Ask structured retro questions
 
-Work through each question. Record answers:
+Work through each question with the user. Ask concise, focused questions and record the answers directly in the retro output and any generated rule artifacts:
 
 **Intent vs Reality**
 - Did the delivered system match the acceptance criteria in `spec.md`? Which ACs were not met?
@@ -78,6 +78,8 @@ For each lesson confirmed as a rule candidate:
 1. Invoke `rule-manager` skill → `add-rule(finding, source_type="retro", source_ref=spec_slug)`
 2. Confirm: "Rule [rule-id] created: [prevents value]"
 3. If the lesson traces to a specific drift finding with an ADR: set `source-adr` automatically
+
+The user should not need to manually edit rule files unless they explicitly choose to override the generated wording.
 
 ### 6. Update ADR-INDEX if needed
 

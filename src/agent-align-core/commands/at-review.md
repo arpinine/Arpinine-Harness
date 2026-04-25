@@ -27,7 +27,8 @@ Refine and realign the specification.
 8. If the product feature implies a harness-based agent workflow, ensure the spec makes that operational need explicit enough to drive a later harness strategy.
 9. If the spec describes agentic behavior, ensure the evaluation expectations are measurable enough to support an eval plan.
 10. If the spec references a decision already implemented in code, ensure the relevant ADR is linked.
-11. Report issues as:
+11. For any CRITICAL or HIGH issue that can be resolved by clarification, ask the user the minimum focused questions needed to resolve it, then update `spec.md` directly instead of asking the user to edit the document.
+12. Report unresolved issues as:
    - `CRITICAL`: contradicts implementation or missing governing ADR for a known drift item
    - `HIGH`: ambiguous or untestable requirement
    - `MEDIUM`: missing structure section or weak wording

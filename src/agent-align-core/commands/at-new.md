@@ -34,6 +34,7 @@ Create the first aligned version of a specification for a named feature.
 9. Identify any architectural constraints implied by the spec, such as modularity, replaceable integrations, boundary isolation, or separation of concerns.
 10. Add those constraints as product-facing non-functional expectations, not implementation details.
 11. If the feature may require an agent harness in the product application, call out that need as an explicit product or operating constraint without naming low-level implementation APIs.
-12. Prepare the spec for refinement by calling out open questions, ambiguities, and scope edges.
-13. Summarize any constitution fixes that were applied after generation.
-14. Confirm: "Spec created at `.specify/specs/<slug>/spec.md`"
+12. If open questions, ambiguities, or scope edges remain, ask the user the minimum set of focused clarification questions needed to remove ambiguity.
+13. Write the user's answers directly into `.specify/specs/<slug>/spec.md` by updating the relevant sections and the `## Open Questions` section. Do not require the user to edit the spec manually.
+14. Summarize any constitution fixes and clarifications that were applied after generation.
+15. Confirm: "Spec created at `.specify/specs/<slug>/spec.md`"

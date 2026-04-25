@@ -8,6 +8,21 @@ The goal is not to stop fast AI-assisted execution. The goal is to make it safe,
 
 It standardizes how work moves from idea to specification, from specification to evaluation and execution, and from execution back into refinement when reality diverges from intent.
 
+## One Plugin, Team Of Agents
+
+AgentAlign should be understood as a virtual delivery team, not as a single assistant with a prompt bundle.
+
+The user interacts with one plugin entrypoint, but each workflow command activates a coordinated set of specialized agent roles. In practice, the plugin behaves like:
+
+- a `product-owner` that clarifies intent, scope, and acceptance criteria
+- a `tech-architect` that shapes boundaries, dependencies, and ADR-worthy decisions
+- a `tdd-guide` that keeps execution task-aligned and test-first
+- a `security-reviewer` that challenges risky or underspecified changes
+- an `evaluation-governor` that pushes for measurable quality gates
+- a `drift-detector` that checks whether code, plans, ADRs, and runtime evidence still agree
+
+This is the core operating model: one plugin surface, many specialized agent responsibilities.
+
 ## Agent Team
 
 AgentAlign coordinates a small team of focused AI roles and governance skills:
@@ -211,6 +226,9 @@ The real cross-implementation abstraction is the common-denominator workflow:
 - `make register IMPLEMENTATION=<name>`
 - `make validate-structure IMPLEMENTATION=<name>`
 
+Recommended operating guide for day-to-day usage:
+- [docs/vibe-coder-process.md](docs/vibe-coder-process.md)
+
 Claude also has native convenience targets for install, uninstall, and validator-backed validation.
 Codex uses the shared abstraction plus Codex marketplace registration.
 
@@ -284,5 +302,3 @@ In practice:
 - if `## Harness Strategy` selects a runtime such as OpenHarness or an internal agent runtime, that runtime becomes a required dependency for that feature
 
 Use `src/agent-align-core/scripts/check-dependencies.sh --json` for machine-readable readiness, or without flags for a text report.
-
-
