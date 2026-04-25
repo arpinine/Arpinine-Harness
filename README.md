@@ -12,15 +12,17 @@ It standardizes how work moves from idea to specification, from specification to
 
 AgentAlign coordinates a small team of focused AI roles and governance skills:
 
-| Capability | Role |
-|------------|------|
-| Product alignment | `product-owner` keeps business cases, acceptance criteria, and execution aligned with `spec.md` |
-| Architecture | `tech-architect` and `architecture-governor` help define modular boundaries and consequential decisions |
-| Delivery | `tdd-guide` keeps implementation test-first and task-aligned |
-| Security | `security-reviewer` checks implementation risk before completion |
-| Evaluation | `evaluation-governor` enforces quality metrics, thresholds, and evidence |
-| Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries |
-| Realignment | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent |
+
+| Capability         | Role                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| Product alignment  | `product-owner` keeps business cases, acceptance criteria, and execution aligned with `spec.md`         |
+| Architecture       | `tech-architect` and `architecture-governor` help define modular boundaries and consequential decisions |
+| Delivery           | `tdd-guide` keeps implementation test-first and task-aligned                                            |
+| Security           | `security-reviewer` checks implementation risk before completion                                        |
+| Evaluation         | `evaluation-governor` enforces quality metrics, thresholds, and evidence                                |
+| Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries                              |
+| Realignment        | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent                   |
+
 
 These agents do not replace team ownership. They help the team govern vibe-coded work through explicit artifacts and automated checks.
 
@@ -42,53 +44,61 @@ This is the core value of the plugin: not just generating files, but giving the 
 
 ## Team Contract
 
-| Team Role | Responsibility |
-|-----------|----------------|
-| Product | Owns the problem, user value, scope, business case, and acceptance criteria in `spec.md` |
-| Engineering | Owns `plan.md`, task breakdown, and implementation approach |
-| Engineering | Owns module boundaries, dependency rules, and testability by boundary |
+
+| Team Role   | Responsibility                                                                                      |
+| ----------- | --------------------------------------------------------------------------------------------------- |
+| Product     | Owns the problem, user value, scope, business case, and acceptance criteria in `spec.md`            |
+| Engineering | Owns `plan.md`, task breakdown, and implementation approach                                         |
+| Engineering | Owns module boundaries, dependency rules, and testability by boundary                               |
 | Engineering | Owns evaluation strategy, release thresholds, and runtime evidence expectations for agentic systems |
-| Tech Leads | Own consequential decisions and approve ADRs when needed |
-| AI Agents | Help execute within the rules set by the spec, plan, ADRs, eval plan, and observation evidence |
+| Tech Leads  | Own consequential decisions and approve ADRs when needed                                            |
+| AI Agents   | Help execute within the rules set by the spec, plan, ADRs, eval plan, and observation evidence      |
+
 
 Human ownership stays with the team. AgentAlign agents act as governed specialists inside that contract.
 
 ## Agent Responsibilities
 
-| Agent | Responsibility In The Governed Codebase | Primary Skills Used |
-|-------|------------------------------------------|---------------------|
-| `product-owner` | Keeps the business case, scope, and acceptance criteria aligned from `spec.md` through planning, implementation, evaluation, and audit | `constitution-enforcer`, `evaluation-governor`, `drift-detector` |
-| `tech-architect` | Protects modular design, identifies consequential decisions, and pushes architecture changes into ADRs before they become accidental code structure | `architecture-governor`, `adr-manager` |
-| `tdd-guide` | Keeps implementation task-aligned and test-first so code changes stay traceable to planned work and verifiable by tests | `constitution-enforcer` |
-| `security-reviewer` | Reviews plans and implementation for security-sensitive gaps and blocks completion when risky behavior is undocumented or unsafe | `constitution-enforcer`, `rule-manager` |
-| Governance skills | Provide the codebase-wide enforcement layer for architecture, harness boundaries, evaluation, drift detection, ADR discipline, and compounding rules | `architecture-governor`, `harness-governor`, `evaluation-governor`, `drift-detector`, `adr-manager`, `rule-manager` |
+
+| Agent               | Responsibility In The Governed Codebase                                                                                                              | Primary Skills Used                                                                                                 |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `product-owner`     | Keeps the business case, scope, and acceptance criteria aligned from `spec.md` through planning, implementation, evaluation, and audit               | `constitution-enforcer`, `evaluation-governor`, `drift-detector`                                                    |
+| `tech-architect`    | Protects modular design, identifies consequential decisions, and pushes architecture changes into ADRs before they become accidental code structure  | `architecture-governor`, `adr-manager`                                                                              |
+| `tdd-guide`         | Keeps implementation task-aligned and test-first so code changes stay traceable to planned work and verifiable by tests                              | `constitution-enforcer`                                                                                             |
+| `security-reviewer` | Reviews plans and implementation for security-sensitive gaps and blocks completion when risky behavior is undocumented or unsafe                     | `constitution-enforcer`, `rule-manager`                                                                             |
+| Governance skills   | Provide the codebase-wide enforcement layer for architecture, harness boundaries, evaluation, drift detection, ADR discipline, and compounding rules | `architecture-governor`, `harness-governor`, `evaluation-governor`, `drift-detector`, `adr-manager`, `rule-manager` |
+
 
 ## Shared Artifacts
 
-| Artifact | Purpose |
-|----------|---------|
-| `spec.md` | Product intent: what problem is being solved, for whom, and how success is measured |
-| `plan.md` | Engineering approach: how the team intends to implement the work |
-| `harness strategy` | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
-| `module boundaries` | Architectural contract for responsibilities, dependency direction, and replaceable seams |
-| `eval-plan.md` | Quality gate: how the team measures readiness, regressions, and release fitness |
-| `observation artifacts` | Runtime evidence: how the system actually behaved under real or simulated execution |
-| `ADR-*.md` | Decision record for choices that affect architecture, operations, security, or long-term maintainability |
-| `ADR-INDEX.md` | Global index of decisions and drift coverage |
+
+| Artifact                | Purpose                                                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `spec.md`               | Product intent: what problem is being solved, for whom, and how success is measured                         |
+| `plan.md`               | Engineering approach: how the team intends to implement the work                                            |
+| `harness strategy`      | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
+| `module boundaries`     | Architectural contract for responsibilities, dependency direction, and replaceable seams                    |
+| `eval-plan.md`          | Quality gate: how the team measures readiness, regressions, and release fitness                             |
+| `observation artifacts` | Runtime evidence: how the system actually behaved under real or simulated execution                         |
+| `ADR-*.md`              | Decision record for choices that affect architecture, operations, security, or long-term maintainability    |
+| `ADR-INDEX.md`          | Global index of decisions and drift coverage                                                                |
+
 
 ## Commands
 
-| Command | Stage | Purpose |
-|---------|-------|---------|
-| `/agent-align:at-init` | Setup | Initialize the shared workflow and ADR structure |
-| `/agent-align:at-new` | Define | Create a new specification from a product request |
-| `/agent-align:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
-| `/agent-align:at-plan` | Plan | Produce plan and tasks from an approved spec |
-| `/agent-align:at-adr` | Decide | Create and manage Architecture Decision Records |
-| `/agent-align:at-eval` | Evaluate | Define and run framework-agnostic evaluation |
-| `/agent-align:at-observe` | Evaluate | Record and review runtime observations |
-| `/agent-align:at-implement` | Execute | Implement the plan with TDD and security review |
-| `/agent-align:at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
+
+| Command                     | Stage    | Purpose                                                          |
+| --------------------------- | -------- | ---------------------------------------------------------------- |
+| `/agent-align:at-init`      | Setup    | Initialize the shared workflow and ADR structure                 |
+| `/agent-align:at-new`       | Define   | Create a new specification from a product request                |
+| `/agent-align:at-review`    | Refine   | Improve clarity, measurability, and alignment before execution   |
+| `/agent-align:at-plan`      | Plan     | Produce plan and tasks from an approved spec                     |
+| `/agent-align:at-adr`       | Decide   | Create and manage Architecture Decision Records                  |
+| `/agent-align:at-eval`      | Evaluate | Define and run framework-agnostic evaluation                     |
+| `/agent-align:at-observe`   | Evaluate | Record and review runtime observations                           |
+| `/agent-align:at-implement` | Execute  | Implement the plan with TDD and security review                  |
+| `/agent-align:at-audit`     | Realign  | Detect drift and trigger refinement, ADR updates, or eval reruns |
+
 
 ## Example Flow
 
@@ -130,6 +140,7 @@ examples/end-to-end/support-agent-demo/
 ```
 
 It shows the full AgentAlign loop on a small support triage agent:
+
 - product request and governed `spec.md`
 - `plan.md` with module boundaries, dependency rules, harness strategy, and eval strategy
 - fake harness adapter so no external runtime is required
@@ -160,6 +171,7 @@ PYTHONPATH=app python3 app/eval/run_eval.py
 - refinement happens continuously, not only at the beginning
 
 Automatic hooks fire on every file write:
+
 - **PreToolUse**: `check-constitution.sh` validates pending edits for tech leakage in `spec.md` and hardcoded secrets
 - **PreToolUse**: `check-architecture-readiness.sh` blocks implementation edits until the governing plan defines module boundaries, dependency rules, and testability by boundary
 - **PostToolUse**: `quick-drift-check.sh` performs a lightweight spec-alignment pass for missing file references, endpoint mismatch hints, and stale eval results
@@ -173,6 +185,7 @@ Proposed -> Accepted -> Implemented -> Superseded
 
 All ADRs live in `.specify/adr/`.
 Each ADR has:
+
 - `governs:` to link it to a spec
 - `covers:` to link it to a concrete decision key or drift key
 
@@ -191,6 +204,7 @@ src/
 Each implementation overlays the same shared core.
 
 The real cross-implementation abstraction is the common-denominator workflow:
+
 - `make assemble IMPLEMENTATION=<name>`
 - `make build IMPLEMENTATION=<name>`
 - `make delivery`
@@ -263,11 +277,11 @@ Instead, it validates them during setup and before the relevant workflow stage:
 - eval tools are required only when `eval-plan.md` selects them
 
 In practice:
+
 - if `## Harness Strategy` is `N/A`, the project does not need a harness runtime
 - if `## Harness Strategy` selects a runtime such as OpenHarness or an internal agent runtime, that runtime becomes a required dependency for that feature
 
 Use `src/agent-align-core/scripts/check-dependencies.sh --json` for machine-readable readiness, or without flags for a text report.
 
-## License
 
-MIT
+
