@@ -6,9 +6,17 @@ description: Execute an approved plan with TDD and security review, while keepin
 
 Execute the agreed work without drifting from intent.
 
+## Usage
+`/at-implement <slug>`
+
+- `<slug>`: feature slug matching a directory under `.specify/specs/`, e.g. `001-user-login`
+- If omitted: list available specs and ask the user to choose
+
+---
+
 ## Workflow
 
-1. Read the governing `spec.md`, `plan.md`, and linked ADRs before changing code.
+1. Read `.specify/specs/<slug>/spec.md`, `.specify/specs/<slug>/plan.md`, and linked ADRs before changing code.
 2. Invoke the `product-owner` agent before implementation starts to identify business-case and acceptance-criteria risks.
 3. Invoke the `tdd-guide` agent before implementation starts.
 4. Run `/speckit.implement`.
@@ -20,7 +28,7 @@ Execute the agreed work without drifting from intent.
    - refactor with tests still green
 8. Invoke the `product-owner` agent before completion to compare implementation evidence against the spec business case and acceptance criteria.
 9. Invoke the `security-reviewer` agent on the plan and code changes before concluding the task.
-10. Run `/at-eval run <spec-path>` for any workflow whose plan declares required evaluation.
+10. Run `/at-eval run <slug>` for any workflow whose plan declares required evaluation.
 11. If evaluation fails required thresholds:
    - block completion
    - refine code, prompts, plan, or spec before retrying

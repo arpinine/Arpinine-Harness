@@ -7,12 +7,14 @@ description: Record and review runtime observations so actual harness behavior c
 Record or review runtime observations.
 
 ## Usage
-- `/at-observe record <spec-path>` — create or update observation artifacts for a scenario or trace
-- `/at-observe review <spec-path>` — summarize observed runtime behavior and highlight drift signals
+- `/at-observe record <slug>` — create or update observation artifacts for a scenario or trace
+- `/at-observe review <slug>` — summarize observed runtime behavior and highlight drift signals
+
+`<slug>`: feature slug matching a directory under `.specify/specs/`, e.g. `001-user-login`
 
 ## Workflow: `record`
 
-1. Locate the governing `spec.md`, `plan.md`, and optional harness strategy.
+1. Locate `.specify/specs/<slug>/spec.md`, `.specify/specs/<slug>/plan.md`, and optional harness strategy.
 2. Create or update:
    - `.specify/observations/<spec-slug>/latest-observation.md`
    - `.specify/observations/<spec-slug>/trace.json`

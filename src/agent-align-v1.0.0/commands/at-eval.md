@@ -7,9 +7,11 @@ description: Define and run evaluation for a spec or agent using any suitable fr
 Define or run evaluation for the current spec.
 
 ## Usage
-- `/at-eval plan <spec-path>` — create or update the evaluation plan
-- `/at-eval run <spec-path>` — run the chosen evaluation framework and record results
-- `/at-eval review <spec-path>` — review the latest evaluation results against thresholds
+- `/at-eval plan <slug>` — create or update the evaluation plan
+- `/at-eval run <slug>` — run the chosen evaluation framework and record results
+- `/at-eval review <slug>` — review the latest evaluation results against thresholds
+
+`<slug>`: feature slug matching a directory under `.specify/specs/`, e.g. `001-user-login`
 
 ## Principles
 
@@ -19,7 +21,7 @@ Define or run evaluation for the current spec.
 
 ## Workflow: `plan`
 
-1. Locate the governing `spec.md` and `plan.md`.
+1. Locate `.specify/specs/<slug>/spec.md` and `.specify/specs/<slug>/plan.md`.
 2. Create or update `.specify/evals/<spec-slug>/eval-plan.md` from `templates/eval-plan-template.md`.
 3. Determine whether the spec produces agentic behavior, AI-assisted decisioning, or prompt-driven output.
 4. If yes, define:

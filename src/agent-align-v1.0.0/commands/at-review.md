@@ -6,9 +6,17 @@ description: Refine a spec before or after implementation. Validate it against t
 
 Refine and realign the specification.
 
+## Usage
+`/at-review <slug>`
+
+- `<slug>`: feature slug matching a directory under `.specify/specs/`, e.g. `001-user-login`
+- If omitted: list available specs and ask the user to choose
+
+---
+
 ## Workflow
 
-1. Open the target `spec.md`.
+1. Open `.specify/specs/<slug>/spec.md`.
 2. Invoke the `product-owner` agent to verify business case, user value, scope, and acceptance criteria.
 3. Check that the spec stays product-facing:
    - no frameworks, databases, protocols, or deployment choices

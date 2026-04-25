@@ -12,6 +12,7 @@ Initialize the shared team workflow.
 2. If `spec-kit` is missing, stop and install it before relying on automated `/at-*` generation flows.
 3. Run `/speckit.constitution`.
 4. Ensure these paths exist:
+   - `.specify/specs/`
    - `.specify/adr/`
    - `.specify/adr/ADR-INDEX.md`
    - `.specify/evals/`
@@ -27,8 +28,9 @@ Initialize the shared team workflow.
 ```
 
 6. Confirm the plugin conventions in the repo:
-   - `spec.md` captures product intent only
-   - `plan.md` captures implementation details
+   - each feature lives under `.specify/specs/<slug>/` — slug format: `NNN-kebab-name`
+   - `spec.md` captures product intent only — lives at `.specify/specs/<slug>/spec.md`
+   - `plan.md` captures implementation details — lives at `.specify/specs/<slug>/plan.md`
    - `plan.md` must define module boundaries and dependency rules before implementation
    - harness-based product features must document harness strategy before implementation
    - ADRs capture architectural decisions and drift resolutions
