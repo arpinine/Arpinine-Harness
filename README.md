@@ -242,7 +242,7 @@ For a session-only load without installing (dev/testing):
 
 ```bash
 make assemble IMPLEMENTATION=claude
-claude --plugin-dir ./dist/agent-align-claude-v1.4.0
+claude --plugin-dir ./plugins/agent-align-claude
 ```
 
 Or build explicitly for an implementation:
@@ -251,6 +251,8 @@ Or build explicitly for an implementation:
 make build IMPLEMENTATION=claude
 make assemble IMPLEMENTATION=codex
 ```
+
+The versioned zip artifact under `dist/` always uses the current plugin version from the Claude manifest, so commands and docs should refer to the stable plugin directories under `plugins/` for local usage rather than a hardcoded versioned path.
 
 Common structural validation:
 
@@ -282,6 +284,5 @@ In practice:
 - if `## Harness Strategy` selects a runtime such as OpenHarness or an internal agent runtime, that runtime becomes a required dependency for that feature
 
 Use `src/agent-align-core/scripts/check-dependencies.sh --json` for machine-readable readiness, or without flags for a text report.
-
 
 

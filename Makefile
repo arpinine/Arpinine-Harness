@@ -1,5 +1,5 @@
 PLUGIN_NAME  := agent-align
-VERSION      := 1.4.0
+VERSION      := $(shell python3 -c 'import json; print(json.load(open("src/implementations/claude/.claude-plugin/plugin.json"))["version"])')
 IMPLEMENTATION ?= claude
 CORE_DIR     := src/agent-align-core
 IMPLEMENTATION_DIR := src/implementations/$(IMPLEMENTATION)
