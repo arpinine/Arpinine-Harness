@@ -1,7 +1,7 @@
 ---
 governs: specs/007-multi-team-task-coordination
 supersedes: ~
-status: Proposed
+status: Accepted
 date: 2026-04-25
 covers:
   - decision:007-multi-team-task-coordination:shared-file-based-task-coordination
@@ -10,7 +10,7 @@ covers:
 # ADR-0005: Shared file-based task coordination for multi-team execution
 
 ## Status
-Proposed
+Accepted
 
 ## Context
 AgentAlign supports multiple assistant implementations, but the original implementation workflow assumed one active delivery team at a time. Task selection was effectively derived from `plan.md` checkbox state alone, which is sufficient for sequential work but unsafe for concurrent execution by Claude and Codex.
