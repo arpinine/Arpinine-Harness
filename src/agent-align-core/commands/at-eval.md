@@ -24,16 +24,22 @@ Define or run evaluation for the current spec.
 1. Locate `.specify/specs/<slug>/spec.md` and `.specify/specs/<slug>/plan.md`.
 2. Create or update `.specify/evals/<spec-slug>/eval-plan.md` from `templates/eval-plan-template.md`.
 3. Determine whether the spec produces agentic behavior, AI-assisted decisioning, or prompt-driven output.
-4. If yes, define:
+4. If yes, invoke the `ai-engineer` agent to define AI-specific evaluation metrics before writing the eval plan:
+   - Output quality: accuracy, coherence, factual grounding, instruction following
+   - Tool use: correct tool selection rate, tool call correctness, unnecessary tool use rate
+   - Reliability: failure rate, fallback trigger rate, retry rate
+   - Performance: latency P50/P95, token cost per task
+   - Safety: prompt injection resistance, output policy compliance
+5. If yes, define:
    - evaluation objective
    - evaluation framework
    - datasets or scenarios
-   - metrics
+   - metrics (including AI-specific metrics from the `ai-engineer` review)
    - pass thresholds
    - regression policy
    - execution command
-5. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
-6. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
+6. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
+7. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
 
 ## Workflow: `run`
 

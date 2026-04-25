@@ -27,6 +27,8 @@ The directories in this package are implementation-agnostic. Assistant-specific 
 | Security | `security-reviewer` checks implementation risk before completion |
 | Evaluation | `evaluation-governor` enforces quality metrics, thresholds, and evidence |
 | Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries |
+| AI design | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes |
+| Prod-readiness | `devops` owns deployment, secrets hygiene, CI/CD, and infrastructure decisions for the product |
 | Realignment | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent |
 
 These agents do not replace team ownership. They help the team govern vibe-coded work through explicit artifacts and automated checks.
@@ -91,6 +93,8 @@ Human ownership stays with the team. AgentAlign agents act as governed specialis
 | `tech-architect` | Protects modular design, identifies consequential decisions, and pushes architecture changes into ADRs before they become accidental code structure | `architecture-governor`, `adr-manager` |
 | `tdd-guide` | Keeps implementation task-aligned and test-first so code changes stay traceable to planned work and verifiable by tests | `constitution-enforcer` |
 | `security-reviewer` | Reviews plans and implementation for security-sensitive gaps and blocks completion when risky behavior is undocumented or unsafe | `constitution-enforcer`, `rule-manager` |
+| `ai-engineer` | Owns AI/LLM design decisions: model selection, prompting strategy, context management, agent topology, failure modes, and AI-specific evaluation metrics | `evaluation-governor`, `adr-manager` |
+| `devops` | Owns prod-readiness for the product: deployment strategy, secrets hygiene, CI/CD, environment configuration, and infrastructure decisions | `adr-manager`, `rule-manager` |
 | Governance skills | Provide the codebase-wide enforcement layer for architecture, harness boundaries, evaluation, drift detection, ADR discipline, and compounding rules | `architecture-governor`, `harness-governor`, `evaluation-governor`, `drift-detector`, `adr-manager`, `rule-manager` |
 
 ## Alignment Rules

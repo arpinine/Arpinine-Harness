@@ -18,6 +18,8 @@ The user interacts with one plugin entrypoint, but each workflow command activat
 - a `tech-architect` that shapes boundaries, dependencies, and ADR-worthy decisions
 - a `tdd-guide` that keeps execution task-aligned and test-first
 - a `security-reviewer` that challenges risky or underspecified changes
+- an `ai-engineer` that owns model selection, prompting strategy, and AI-specific failure modes
+- a `devops` that closes the prod-readiness gap: deployment, secrets, CI/CD, and infrastructure
 - an `evaluation-governor` that pushes for measurable quality gates
 - a `drift-detector` that checks whether code, plans, ADRs, and runtime evidence still agree
 
@@ -58,6 +60,8 @@ AgentAlign coordinates a small team of focused AI roles and governance skills:
 | Architecture       | `tech-architect` and `architecture-governor` help define modular boundaries and consequential decisions |
 | Delivery           | `tdd-guide` keeps implementation test-first and task-aligned                                            |
 | Security           | `security-reviewer` checks implementation risk before completion                                        |
+| AI design          | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes   |
+| Prod-readiness     | `devops` owns deployment, secrets hygiene, CI/CD, and infrastructure decisions for the product          |
 | Evaluation         | `evaluation-governor` enforces quality metrics, thresholds, and evidence                                |
 | Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries                              |
 | Realignment        | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent                   |

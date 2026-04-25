@@ -40,16 +40,23 @@ Execute the agreed work without drifting from intent.
    i. Perform those `plan.md` status edits directly as part of the command flow; do not ask the user to update task checkboxes manually.
    The task-status edit refreshes `.specify/delivery.md` automatically through the shared `PostToolUse` delivery hook, and the shared `PostToolUse` drift hook also runs after the write.
 8. Invoke the `product-owner` agent before completion to compare implementation evidence against the spec business case and acceptance criteria.
-9. Invoke the `security-reviewer` agent on the plan and code changes before concluding the task.
-10. Run `/agent-align:at-eval run <slug>` for any workflow whose plan declares required evaluation.
-11. If evaluation fails required thresholds:
+9. Invoke the `devops` agent before completion to verify:
+   - No hardcoded secrets, API keys, or credentials in source code or committed config files.
+   - All required env vars are documented and accessed via environment (not hardcoded).
+   - `.env` and secrets files are in `.gitignore`.
+   - Deployment path defined in `## Deployment Strategy` is implementable with the code as written.
+   - Block completion on any CRITICAL secrets finding.
+10. Invoke the `security-reviewer` agent on the plan and code changes before concluding the task.
+11. Run `/agent-align:at-eval run <slug>` for any workflow whose plan declares required evaluation.
+12. If evaluation fails required thresholds:
    - block completion
    - refine code, prompts, plan, or spec before retrying
-12. If a CRITICAL or HIGH drift item is discovered during implementation:
+13. If a CRITICAL or HIGH drift item is discovered during implementation:
    - stop and run `/agent-align:at-audit`
    - require a matching ADR before proceeding
    - do not ask the user to manually edit `plan.md`; update the relevant planning artifacts directly after the decision is made
-13. If implementation breaks planned boundaries or introduces tight coupling, send the work back into planning or ADR refinement before completion.
-14. If harness behavior exceeds the documented tool, memory, or permission model, send the work back into planning or ADR refinement before completion.
-15. If implementation changes the original intent or weakens the business case, send the work back into refinement by updating the spec or ADRs.
-16. Summarize what changed, which tests prove it, which evaluations passed, which acceptance criteria were satisfied, and which ADRs govern the implementation.
+14. If implementation breaks planned boundaries or introduces tight coupling, send the work back into planning or ADR refinement before completion.
+15. If harness behavior exceeds the documented tool, memory, or permission model, send the work back into planning or ADR refinement before completion.
+16. If AI design decisions (model, prompting, context management) are implemented differently from `## AI Design Decisions` in `plan.md`, send the work back into planning or ADR refinement before completion.
+17. If implementation changes the original intent or weakens the business case, send the work back into refinement by updating the spec or ADRs.
+18. Summarize what changed, which tests prove it, which evaluations passed, which acceptance criteria were satisfied, and which ADRs govern the implementation.

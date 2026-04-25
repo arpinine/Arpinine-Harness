@@ -53,6 +53,18 @@ Work through each question with the user. Ask concise, focused questions and rec
 - Were any approval events that contradicted the permission model?
 - Does the harness strategy need an ADR that does not exist yet?
 
+**Prod-readiness and deployment**
+- Were any secrets hardcoded or committed in source during implementation?
+- Was a deployment path defined before implementation started or added reactively after?
+- Were env vars documented and managed correctly, or discovered as missing at deploy time?
+- Did CI/CD run before shipping, or was code deployed without governance checks?
+- Was observability (logging, error tracking, health checks) in place before first deploy?
+
+**AI design fidelity**
+- Were the model, prompting strategy, and context management implemented as designed in `## AI Design Decisions`?
+- Were any AI-specific failure modes (hallucination, context overflow, tool misuse) encountered that the plan did not anticipate?
+- Did evaluation metrics for AI outputs match what was defined in the eval plan?
+
 **Rule candidates**
 - For each "yes" above: is this a pattern the team should prevent in future specs?
 - Would a rule have caught this earlier in the workflow (at PreToolUse, at audit, at planning)?
@@ -68,7 +80,7 @@ LESSON [N]:
   Attribution: PRECONDITION FAILURE (spec/plan was unclear) | POSTCONDITION FAILURE (deviated from clear spec)
   Rule candidate? YES | NO
   Proposed rule: [One sentence: "When X, require Y to prevent Z"]
-  Category: security | architecture | harness | spec-quality | evaluation | process
+  Category: security | architecture | harness | spec-quality | evaluation | process | devops | ai-design
   Severity: CRITICAL | HIGH | MEDIUM | LOW
 ```
 
