@@ -1,6 +1,6 @@
 # AgentAlign
 
-AgentAlign is a Claude plugin for governed vibe coding.
+AgentAlign is a governed AI workflow plugin with a shared core and assistant-specific implementations.
 
 It creates an agent-assisted governance layer for product and engineering teams: specialized agents, workflow commands, hooks, and evidence checks that keep AI-assisted product development aligned with shared specifications, architecture rules, evaluations, and runtime observations.
 
@@ -176,6 +176,20 @@ Each ADR has:
 - `governs:` to link it to a spec
 - `covers:` to link it to a concrete decision key or drift key
 
+## Implementation Layout
+
+AgentAlign now separates shared workflow assets from assistant-specific implementations:
+
+```text
+src/
+  agent-align-core/      # commands, agents, hooks, scripts, skills, templates
+  implementations/
+    claude/              # working Claude implementation
+    codex/               # Codex implementation placeholder and design notes
+```
+
+Each implementation overlays the same shared core. Today, Claude is the only working implementation in this repository. The Codex side is intentionally a placeholder until its runtime contract is defined.
+
 ## Installation
 
 From the root of this repo:
@@ -184,7 +198,7 @@ From the root of this repo:
 # 1. Install spec-kit
 uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai claude
 
-# 2. Build and install the plugin (runs build + marketplace add + plugin install)
+# 2. Build and install the Claude implementation (runs build + marketplace add + plugin install)
 make install
 
 # 3. Initialize the workflow (run inside a Claude Code session)
@@ -204,7 +218,14 @@ claude plugin install agent-align@agent-align-local
 For a session-only load without installing (dev/testing):
 
 ```bash
-claude --plugin-dir ./src/agent-align-v1.0.0
+make assemble IMPLEMENTATION=claude
+claude --plugin-dir ./dist/agent-align-claude-v1.4.0
+```
+
+Or build explicitly for an implementation:
+
+```bash
+make build IMPLEMENTATION=claude
 ```
 
 ## Dependency Handling
@@ -220,7 +241,7 @@ In practice:
 - if `## Harness Strategy` is `N/A`, the project does not need a harness runtime
 - if `## Harness Strategy` selects a runtime such as OpenHarness or an internal agent runtime, that runtime becomes a required dependency for that feature
 
-Use `src/agent-align-v1.0.0/scripts/check-dependencies.sh --json` for machine-readable readiness, or without flags for a text report.
+Use `src/agent-align-core/scripts/check-dependencies.sh --json` for machine-readable readiness, or without flags for a text report.
 
 ## License
 

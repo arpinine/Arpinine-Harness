@@ -1,12 +1,14 @@
-# AgentAlign Plugin
+# AgentAlign Core
 
-AgentAlign is a Claude plugin for governed vibe coding.
+AgentAlign is a governed AI workflow plugin with shared core assets and assistant-specific implementations.
 
 It creates an agent-assisted governance layer for product and engineering teams: specialized agents, workflow commands, hooks, and evidence checks that keep AI-assisted product development aligned with shared specifications, architecture rules, evaluations, and runtime observations.
 
 The goal is not to stop fast AI-assisted execution. The goal is to make it safe, repeatable, and team-aligned.
 
-The goal is a repeatable team workflow that keeps product intent, engineering execution, and AI assistance aligned.
+The goal is a repeatable team workflow that keeps product intent, engineering execution, and AI assistance aligned across different coding assistant implementations.
+
+The directories in this package are implementation-agnostic. Assistant-specific metadata belongs under `src/implementations/<assistant>/` and is overlaid during build time.
 
 ## Agent Team
 
