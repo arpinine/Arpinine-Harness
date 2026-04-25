@@ -234,8 +234,8 @@ To test the Codex implementation locally:
 
 ```bash
 make assemble IMPLEMENTATION=codex
-codex plugin marketplace add ./
-# restart Codex, then install `agent-align` from marketplace `agent-align-local`
+# this prepares ./plugins/agent-align-codex and ./.agents/plugins/marketplace.json
+# Codex CLI marketplace commands are not yet verified in this repo
 ```
 
 ## Dependency Handling

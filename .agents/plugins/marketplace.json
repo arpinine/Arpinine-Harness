@@ -8,7 +8,7 @@
       "name": "agent-align",
       "source": {
         "source": "local",
-        "path": "./dist/agent-align-codex-v1.4.0"
+        "path": "./plugins/agent-align-codex"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -9,22 +9,33 @@ BUILD_DIR    := $(DIST_DIR)/$(BUILD_NAME)
 ZIP_NAME     := $(BUILD_NAME).zip
 ZIP_PATH     := $(DIST_DIR)/$(ZIP_NAME)
 MARKETPLACE  := agent-align-local
+CODEX_PLUGIN_DIR := plugins/agent-align-codex
+CODEX_MARKETPLACE_FILE := .agents/plugins/marketplace.json
 
 .DEFAULT_GOAL := build
 
 .PHONY: assemble build clean install uninstall validate help
 
 assemble: clean
-	@test -d $(CORE_DIR) || (echo "Missing shared core directory: $(CORE_DIR)" && exit 1)
-	@test -d $(IMPLEMENTATION_DIR) || (echo "Missing implementation directory: $(IMPLEMENTATION_DIR)" && exit 1)
-	@echo "Assembling $(PLUGIN_NAME) v$(VERSION) for $(IMPLEMENTATION)..."
-	@mkdir -p $(DIST_DIR)
-	@cp -r $(CORE_DIR) $(BUILD_DIR)
-	@cp -r $(IMPLEMENTATION_DIR)/. $(BUILD_DIR)/
-	@chmod +x $(BUILD_DIR)/scripts/*.sh
-	@find $(BUILD_DIR) -type d -name "__pycache__" -prune -exec rm -rf {} +
-	@find $(BUILD_DIR) -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete
-	@find $(BUILD_DIR) -depth -type d -empty -delete
+	@set -e; \
+	trap 'rm -rf "$(BUILD_DIR)"' EXIT INT TERM; \
+	test -d $(CORE_DIR) || (echo "Missing shared core directory: $(CORE_DIR)" && exit 1); \
+	test -d $(IMPLEMENTATION_DIR) || (echo "Missing implementation directory: $(IMPLEMENTATION_DIR)" && exit 1); \
+	echo "Assembling $(PLUGIN_NAME) v$(VERSION) for $(IMPLEMENTATION)..."; \
+	mkdir -p $(BUILD_DIR); \
+	cp -r $(CORE_DIR)/. $(BUILD_DIR)/; \
+	cp -r $(IMPLEMENTATION_DIR)/. $(BUILD_DIR)/; \
+	chmod +x $(BUILD_DIR)/scripts/*.sh 2>/dev/null || true; \
+	find $(BUILD_DIR) -type d -name "__pycache__" -prune -exec rm -rf {} +; \
+	find $(BUILD_DIR) -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete; \
+	find $(BUILD_DIR) -depth -type d -empty -delete; \
+	if [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		echo "Warning: Codex currently wires 4/11 workflows: at-init, at-new, at-review, at-plan."; \
+		mkdir -p .agents/plugins plugins; \
+		rm -rf $(CODEX_PLUGIN_DIR); \
+		cp -r $(BUILD_DIR) $(CODEX_PLUGIN_DIR); \
+	fi; \
+	trap - EXIT
 
 ## Build deployable plugin zip
 build: assemble
@@ -35,17 +46,20 @@ build: assemble
 
 ## Remove dist/
 clean:
-	@rm -rf $(DIST_DIR)
+	@rm -rf $(DIST_DIR) $(CODEX_PLUGIN_DIR)
 
 ## Build + install plugin into Claude Code
-install: build
-	@if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+install:
+	@set -e; \
+	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+		$(MAKE) build IMPLEMENTATION=claude; \
 		claude plugin marketplace add ./; \
 		claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
 		$(MAKE) assemble IMPLEMENTATION=codex; \
-		codex plugin marketplace add ./; \
-		echo "Restart Codex and install $(PLUGIN_NAME) from marketplace '$(MARKETPLACE)'."; \
+		echo "Codex CLI install flow is not yet verified."; \
+		echo "Prepared local Codex plugin at $(CODEX_PLUGIN_DIR) and repo marketplace at $(CODEX_MARKETPLACE_FILE)."; \
+		echo "If your Codex version supports it, try manually: codex plugin marketplace add ./"; \
 	else \
 		echo "install target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
@@ -53,11 +67,13 @@ install: build
 
 ## Uninstall plugin and remove marketplace from Claude Code
 uninstall:
-	@if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+	@set -e; \
+	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
 		claude plugin uninstall $(PLUGIN_NAME); \
 		claude plugin marketplace remove $(MARKETPLACE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		codex plugin marketplace remove $(MARKETPLACE); \
+		echo "Codex CLI uninstall flow is not yet verified."; \
+		echo "Remove marketplace '$(MARKETPLACE)' manually if your Codex version supports marketplace removal."; \
 	else \
 		echo "uninstall target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
@@ -65,18 +81,18 @@ uninstall:
 
 ## Validate plugin structure (requires Claude Code CLI)
 validate: assemble
-	@if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+	@set -e; \
+	trap 'rm -rf "$(BUILD_DIR)"' EXIT INT TERM; \
+	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
 		claude plugin validate $(BUILD_DIR); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		test -f $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Missing .codex-plugin/plugin.json" && rm -rf $(BUILD_DIR) && exit 1); \
-		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && rm -rf $(BUILD_DIR) && exit 1); \
+		test -f $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Missing .codex-plugin/plugin.json" && exit 1); \
+		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
 		echo "Codex plugin structure looks valid."; \
 	else \
 		echo "validate target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
-		rm -rf $(BUILD_DIR); \
 		exit 1; \
 	fi
-	@rm -rf $(BUILD_DIR)
 
 ## Show available targets
 help:
