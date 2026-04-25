@@ -8,6 +8,7 @@
   "license": "MIT",
   "keywords": ["codex", "governance", "workflow", "spec-kit", "adr", "evaluation"],
   "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
   "interface": {
     "displayName": "AgentAlign",
     "shortDescription": "Governed workflow for product and engineering delivery",

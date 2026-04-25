@@ -31,7 +31,7 @@
         }]
       },
       {
-        "description": "Regenerate delivery backlog when a plan.md is updated",
+        "description": "Regenerate delivery matrix when a plan.md is updated",
         "matcher": "Edit|Write",
         "hooks": [{
           "type": "command",

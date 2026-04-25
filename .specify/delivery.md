@@ -18,36 +18,36 @@ Plan: [specs/001-plugin-abstraction/plan.md](specs/001-plugin-abstraction/plan.m
 
 | Task | Status |
 |------|--------|
-| [TASK-001](specs/001-plugin-abstraction/plan.md) | none |
-| [TASK-002](specs/001-plugin-abstraction/plan.md) | none |
-| [TASK-003](specs/001-plugin-abstraction/plan.md) | none |
-| [TASK-004](specs/001-plugin-abstraction/plan.md) | none |
-| [TASK-005](specs/001-plugin-abstraction/plan.md) | none |
-| [TASK-006](specs/001-plugin-abstraction/plan.md) | none |
-| [TASK-007](specs/001-plugin-abstraction/plan.md) | none |
-| [TASK-008](specs/001-plugin-abstraction/plan.md) | none |
-| [TASK-009](specs/001-plugin-abstraction/plan.md) | none |
+| [TASK-001](specs/001-plugin-abstraction/plan.md#L85) | none |
+| [TASK-002](specs/001-plugin-abstraction/plan.md#L86) | none |
+| [TASK-003](specs/001-plugin-abstraction/plan.md#L87) | none |
+| [TASK-004](specs/001-plugin-abstraction/plan.md#L88) | none |
+| [TASK-005](specs/001-plugin-abstraction/plan.md#L89) | none |
+| [TASK-006](specs/001-plugin-abstraction/plan.md#L90) | none |
+| [TASK-007](specs/001-plugin-abstraction/plan.md#L91) | none |
+| [TASK-008](specs/001-plugin-abstraction/plan.md#L94) | none |
+| [TASK-009](specs/001-plugin-abstraction/plan.md#L95) | none |
 
 ## [002-agent-align-core-workflow](specs/002-agent-align-core-workflow/spec.md)
 Plan: [specs/002-agent-align-core-workflow/plan.md](specs/002-agent-align-core-workflow/plan.md) &nbsp;|&nbsp; Progress: 0/13 full, 0 partial
 
 | Task | Status |
 |------|--------|
-| [TASK-001](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-002](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-003](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-004](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-005](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-006](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-007](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-008](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-009](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-010](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-011](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-012](specs/002-agent-align-core-workflow/plan.md) | none |
-| [TASK-013](specs/002-agent-align-core-workflow/plan.md) | none |
+| [TASK-001](specs/002-agent-align-core-workflow/plan.md#L86) | none |
+| [TASK-002](specs/002-agent-align-core-workflow/plan.md#L87) | none |
+| [TASK-003](specs/002-agent-align-core-workflow/plan.md#L88) | none |
+| [TASK-004](specs/002-agent-align-core-workflow/plan.md#L89) | none |
+| [TASK-005](specs/002-agent-align-core-workflow/plan.md#L90) | none |
+| [TASK-006](specs/002-agent-align-core-workflow/plan.md#L91) | none |
+| [TASK-007](specs/002-agent-align-core-workflow/plan.md#L92) | none |
+| [TASK-008](specs/002-agent-align-core-workflow/plan.md#L93) | none |
+| [TASK-009](specs/002-agent-align-core-workflow/plan.md#L96) | none |
+| [TASK-010](specs/002-agent-align-core-workflow/plan.md#L97) | none |
+| [TASK-011](specs/002-agent-align-core-workflow/plan.md#L100) | none |
+| [TASK-012](specs/002-agent-align-core-workflow/plan.md#L101) | none |
+| [TASK-013](specs/002-agent-align-core-workflow/plan.md#L102) | none |
 
 ---
-_Last updated: 2026-04-25 13:05_
+_Last updated: 2026-04-25 13:16_
 
 **Total tasks:** 22 &nbsp;|&nbsp; **Full:** 0 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 22

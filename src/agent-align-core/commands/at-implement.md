@@ -29,7 +29,7 @@ Execute the agreed work without drifting from intent.
       - minimal implementation
       - refactor with tests still green
    c. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`.
-   The `[~]` → `[x]` edit triggers the delivery matrix hook automatically.
+   The task-status edit refreshes `.specify/delivery.md` automatically through the shared hook configuration.
 8. Invoke the `product-owner` agent before completion to compare implementation evidence against the spec business case and acceptance criteria.
 9. Invoke the `security-reviewer` agent on the plan and code changes before concluding the task.
 10. Run `/agent-align:at-eval run <slug>` for any workflow whose plan declares required evaluation.

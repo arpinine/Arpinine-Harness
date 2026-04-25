@@ -1,5 +1,5 @@
 #!/bin/bash
-# PostToolUse hook: regenerate .specify/backlog.md when a plan.md is updated.
+# Regenerate .specify/delivery.md from .specify/specs/*/plan.md data.
 
 INPUT=$(cat)
 

@@ -15,7 +15,7 @@ CODEX_MARKETPLACE_FILE := .agents/plugins/marketplace.json
 
 .DEFAULT_GOAL := build
 
-.PHONY: assemble build clean install uninstall validate help
+.PHONY: assemble build clean delivery register validate-structure install uninstall validate help
 
 assemble: clean
 	@set -e; \
@@ -35,7 +35,6 @@ assemble: clean
 		rm -rf $(CLAUDE_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		echo "Warning: Codex currently wires 4/11 workflows: at-init, at-new, at-review, at-plan."; \
 		mkdir -p .agents/plugins plugins; \
 		rm -rf $(CODEX_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(CODEX_PLUGIN_DIR); \
@@ -53,49 +52,80 @@ build: assemble
 clean:
 	@rm -rf $(DIST_DIR) $(CLAUDE_PLUGIN_DIR) $(CODEX_PLUGIN_DIR)
 
-## Build + install plugin into Claude Code
-install:
+## Regenerate .specify/delivery.md from plan task status
+delivery:
+	@python3 $(CORE_DIR)/scripts/update_backlog.py
+
+## Register the assembled plugin marketplace entry for the selected implementation
+register:
 	@set -e; \
+	$(MAKE) assemble IMPLEMENTATION=$(IMPLEMENTATION); \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
-		$(MAKE) assemble IMPLEMENTATION=claude; \
 		claude plugin marketplace add ./; \
-		claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		$(MAKE) assemble IMPLEMENTATION=codex; \
-		echo "Codex CLI install flow is not yet verified."; \
-		echo "Prepared local Codex plugin at $(CODEX_PLUGIN_DIR) and repo marketplace at $(CODEX_MARKETPLACE_FILE)."; \
-		echo "If your Codex version supports it, try manually: codex plugin marketplace add ./"; \
+		codex marketplace add ./; \
+		echo "Codex marketplace registered from $(CODEX_MARKETPLACE_FILE)."; \
+		echo "Enable $(PLUGIN_NAME) from the Codex marketplace UI if your Codex client requires a separate confirmation step."; \
 	else \
-		echo "install target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
+		echo "register target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
 	fi
 
-## Uninstall plugin and remove marketplace from Claude Code
+## Validate assembled plugin structure for the selected implementation
+validate-structure: assemble
+	@set -e; \
+	trap 'rm -rf "$(BUILD_DIR)"' EXIT INT TERM; \
+	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+		test -f $(BUILD_DIR)/.claude-plugin/plugin.json || (echo "Missing .claude-plugin/plugin.json" && exit 1); \
+		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json" && exit 1); \
+		test -d $(BUILD_DIR)/commands || (echo "Missing commands directory" && exit 1); \
+		test -d $(BUILD_DIR)/scripts || (echo "Missing scripts directory" && exit 1); \
+		echo "Claude plugin structure looks valid."; \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		test -f $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Missing .codex-plugin/plugin.json" && exit 1); \
+		grep -q '"hooks"[[:space:]]*:[[:space:]]*"./hooks/hooks.json"' $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Codex plugin manifest must declare hooks at ./hooks/hooks.json" && exit 1); \
+		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json" && exit 1); \
+		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
+		for skill in at-init at-new at-review at-plan at-adr at-audit at-eval at-implement at-observe at-retro at-status; do \
+			test -f "$(BUILD_DIR)/skills/$$skill/SKILL.md" || (echo "Missing Codex workflow wrapper: $$skill" && exit 1); \
+		done; \
+		echo "Codex plugin structure looks valid."; \
+	else \
+		echo "validate-structure target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
+		exit 1; \
+	fi
+
+## Build + install plugin into Claude Code (Claude-only convenience target)
+install:
+	@set -e; \
+	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+		$(MAKE) register IMPLEMENTATION=claude; \
+		claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
+	else \
+		echo "install is Claude-only. Use 'make register IMPLEMENTATION=$(IMPLEMENTATION)' for the common cross-implementation flow."; \
+		exit 1; \
+	fi
+
+## Uninstall plugin and remove marketplace from Claude Code (Claude-only convenience target)
 uninstall:
 	@set -e; \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
 		claude plugin uninstall $(PLUGIN_NAME); \
 		claude plugin marketplace remove $(MARKETPLACE); \
-	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		echo "Codex CLI uninstall flow is not yet verified."; \
-		echo "Remove marketplace '$(MARKETPLACE)' manually if your Codex version supports marketplace removal."; \
 	else \
-		echo "uninstall target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
+		echo "uninstall is Claude-only. No common cross-implementation uninstall abstraction is available."; \
 		exit 1; \
 	fi
 
-## Validate plugin structure (requires Claude Code CLI)
-validate: assemble
+## Run native host validation when supported (Claude-only)
+validate:
 	@set -e; \
-	trap 'rm -rf "$(BUILD_DIR)"' EXIT INT TERM; \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
+		$(MAKE) assemble IMPLEMENTATION=claude; \
+		trap 'rm -rf "$(BUILD_DIR)"' EXIT INT TERM; \
 		claude plugin validate $(BUILD_DIR); \
-	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		test -f $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Missing .codex-plugin/plugin.json" && exit 1); \
-		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
-		echo "Codex plugin structure looks valid."; \
 	else \
-		echo "validate target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
+		echo "Native validate is Claude-only. Use 'make validate-structure IMPLEMENTATION=$(IMPLEMENTATION)' for the common cross-implementation flow."; \
 		exit 1; \
 	fi
 
@@ -103,5 +133,5 @@ validate: assemble
 help:
 	@grep -E '^##' Makefile | sed 's/## //'
 	@echo ""
-	@echo "Targets: build (default), clean, install, uninstall, validate"
+	@echo "Targets: build (default), clean, delivery, register, validate-structure, install, uninstall, validate"
 	@echo "Variables: IMPLEMENTATION=claude (default)"

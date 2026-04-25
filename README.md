@@ -188,10 +188,19 @@ src/
     codex/               # Codex plugin implementation in progress
 ```
 
-Each implementation overlays the same shared core. Today, Claude is the only working implementation in this repository. The Codex side is intentionally a placeholder until its runtime contract is defined.
-Claude remains the reference implementation from `main`. Codex is now an in-progress plugin implementation with an initial local marketplace setup and a first skill-based workflow slice.
+Each implementation overlays the same shared core.
 
-## Installation
+The real cross-implementation abstraction is the common-denominator workflow:
+- `make assemble IMPLEMENTATION=<name>`
+- `make build IMPLEMENTATION=<name>`
+- `make delivery`
+- `make register IMPLEMENTATION=<name>`
+- `make validate-structure IMPLEMENTATION=<name>`
+
+Claude also has native convenience targets for install, uninstall, and validator-backed validation.
+Codex uses the shared abstraction plus Codex marketplace registration.
+
+## Usage Model
 
 From the root of this repo:
 
@@ -199,22 +208,21 @@ From the root of this repo:
 # 1. Install spec-kit
 uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai claude
 
-# 2. Build and install the Claude implementation (runs build + marketplace add + plugin install)
+# 2. Register the Claude marketplace and install from Claude's native CLI
 make install
 
 # 3. Initialize the workflow (run inside a Claude Code session)
 /agent-align:at-init
 ```
 
-Or install manually step by step:
+Cross-implementation registration:
 
 ```bash
-# Register this repo as a local marketplace
-claude plugin marketplace add ./
-
-# Install the plugin from that marketplace
-claude plugin install agent-align@agent-align-local
+make register IMPLEMENTATION=claude
+make register IMPLEMENTATION=codex
 ```
+
+After Codex registration, enable `agent-align` from the Codex marketplace UI if your client requires a separate confirmation step.
 
 For a session-only load without installing (dev/testing):
 
@@ -230,12 +238,19 @@ make build IMPLEMENTATION=claude
 make assemble IMPLEMENTATION=codex
 ```
 
-To test the Codex implementation locally:
+Common structural validation:
 
 ```bash
-make assemble IMPLEMENTATION=codex
-# this prepares ./plugins/agent-align-codex and ./.agents/plugins/marketplace.json
-# Codex CLI marketplace commands are not yet verified in this repo
+make validate-structure IMPLEMENTATION=claude
+make validate-structure IMPLEMENTATION=codex
+```
+
+Claude-only native operations:
+
+```bash
+make install IMPLEMENTATION=claude
+make uninstall IMPLEMENTATION=claude
+make validate IMPLEMENTATION=claude
 ```
 
 ## Dependency Handling

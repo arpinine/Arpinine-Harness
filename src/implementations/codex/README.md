@@ -2,20 +2,36 @@
 
 This directory owns the Codex-specific implementation layer for AgentAlign.
 
+The intended abstraction is the common-denominator implementation contract:
+- `assemble`
+- `build`
+- `delivery`
+- `register`
+- `validate-structure`
+
+Codex participates in that shared contract. Claude-specific native operations such as plugin install/uninstall/native validate are not part of the common abstraction.
+
 ## Current Status
 
 Implemented now:
 - `.codex-plugin/plugin.json` manifest for Codex
 - initial repo marketplace entry at `.agents/plugins/marketplace.json`
+- shared hook wiring through `hooks/hooks.json`, including automatic delivery-matrix refresh on `plan.md` writes
+- real marketplace registration via `codex marketplace add ./`
 - first Codex skills that wrap the shared AgentAlign workflows:
+  - `at-adr`
+  - `at-audit`
+  - `at-eval`
+  - `at-implement`
   - `at-init`
   - `at-new`
+  - `at-observe`
   - `at-review`
+  - `at-retro`
+  - `at-status`
   - `at-plan`
 
 Not implemented yet:
-- remaining workflow commands
-- Codex-specific hook wiring
 - agent wrapper strategy for `product-owner`, `tech-architect`, `security-reviewer`, and `tdd-guide`
 - published plugin assets and richer install-surface metadata
 
@@ -44,7 +60,7 @@ Add a real Codex implementation without changing the shared AgentAlign core cont
    Add only Codex-specific files under this directory:
    - implementation metadata
    - command wiring
-   - install and validate docs
+   - register and validate docs
    - optional adapter files if Codex needs a different package shape
 
 4. Add build support for Codex.
@@ -74,6 +90,7 @@ Add a real Codex implementation without changing the shared AgentAlign core cont
 3. Minimal command set works in Codex.
 4. Remaining commands and hooks are ported or explicitly marked unsupported.
 5. Docs and install flow are complete.
+5. Docs and registration flow are complete.
 
 ## Key Decisions
 
