@@ -127,6 +127,7 @@ Create the shared governance structure for the repo.
 - `.specify/evals/`
 - `.specify/observations/`
 - `.specify/rules/`
+- `.specify/coordination/`
 - `ADR-INDEX.md` if missing
 
 **Expected Deliverable**
@@ -218,6 +219,9 @@ Convert the approved spec into an executable engineering plan.
 - testability
 - harness strategy if relevant
 - evaluation strategy if relevant
+- optional cross-assistant task ownership
+
+When multiple assistant instances will run concurrently, assign tasks in `plan.md` with optional tags such as `[team: claude]` and `[team: codex]`. Execution then claims tasks through `.specify/coordination/<slug>.json` so each runtime takes only eligible work that is not already leased by another team.
 
 **Manual**
 - inspect the generated plan
@@ -294,8 +298,10 @@ Execute the plan without drifting from the spec, architecture, or ADRs.
 - decide whether to accept a re-plan or ADR update when the plugin detects consequential drift
 
 **Automatic**
-- the plugin selects the next eligible task from `plan.md`
-- the plugin updates the task state in `plan.md` from `[ ]` to `[~]` when work starts
+- the plugin claims the next eligible task through `.specify/coordination/<slug>.json`
+- the plugin uses task tags such as `[team: claude]` and `[team: codex]` to restrict ownership when present
+- the PreToolUse task-claim gate blocks implementation-path edits until the current team identity owns an active claim
+- the plugin updates the task state in `plan.md` from `[ ]` to `[~]` after the claim succeeds
 - the plugin updates the task state in `plan.md` from `[~]` to `[x]` when work is complete
 - the `PostToolUse` delivery hook regenerates `.specify/delivery.md` after `plan.md` changes
 - the `PostToolUse` drift hook runs after file writes and surfaces lightweight alignment issues

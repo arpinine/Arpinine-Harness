@@ -15,9 +15,17 @@ from __future__ import annotations
 
 import json
 import pathlib
-import re
 import sys
 from datetime import datetime
+
+from task_coordination import (
+    find_project_root,
+    is_live_lease,
+    load_registry,
+    parse_plan_tasks,
+    registry_path,
+    sync_registry_with_plan,
+)
 
 payload = {}
 raw_input = sys.stdin.read()
@@ -32,53 +40,39 @@ if payload:
     file_path = tool_input.get("file_path", "")
     if not (file_path.endswith("plan.md") and ".specify/specs/" in file_path):
         sys.exit(0)
-
-
-def find_project_root(start: pathlib.Path) -> pathlib.Path:
-    for candidate in [start.resolve(), *start.resolve().parents]:
-        if (candidate / ".specify").exists():
-            return candidate
-    return pathlib.Path(".").resolve()
-
-
 repo = find_project_root(pathlib.Path.cwd())
 spec_root = repo / ".specify" / "specs"
 
 if not spec_root.exists():
     sys.exit(0)
 
-TASK_RE = re.compile(r"^-\s+\[([ ~xX])\]\s+(TASK-\d+):", re.IGNORECASE)
-
-STATUS_MAP = {
-    " ": "none",
-    "~": "partial",
-    "x": "full",
-}
-
-sections: list[tuple[str, list[tuple[str, str, int]]]] = []
+sections: list[tuple[str, list[dict]]] = []
 total = 0
 count_full = 0
 count_partial = 0
 
 for plan_file in sorted(spec_root.glob("*/plan.md")):
     slug = plan_file.parent.name
-    tasks: list[tuple[str, str, int]] = []
     try:
-        text = plan_file.read_text()
+        tasks = parse_plan_tasks(plan_file)
     except OSError:
         continue
-    for line_no, line in enumerate(text.splitlines(), start=1):
-        m = TASK_RE.match(line.strip())
-        if m:
-            mark = m.group(1).lower()
-            status = STATUS_MAP.get(mark, "none")
-            task_id = m.group(2)
-            tasks.append((task_id, status, line_no))
-            total += 1
-            if status == "full":
-                count_full += 1
-            elif status == "partial":
-                count_partial += 1
+
+    registry = load_registry(registry_path(repo, slug), slug)
+    sync_registry_with_plan(registry, tasks)
+
+    for task in tasks:
+        status = task["status"]
+        total += 1
+        if status == "full":
+            count_full += 1
+        elif status == "partial":
+            count_partial += 1
+
+        record = registry.get("tasks", {}).get(task["task_id"], {})
+        task["claimed_by"] = record.get("claimed_by") if is_live_lease(record) else None
+        task["lease_until"] = record.get("lease_until") if is_live_lease(record) else None
+
     sections.append((slug, tasks))
 
 remaining = total - count_full
@@ -114,8 +108,8 @@ if not sections:
 for slug, tasks in sections:
     plan_rel = f"specs/{slug}/plan.md"
     spec_rel = f"specs/{slug}/spec.md"
-    done = sum(1 for _, s, _ in tasks if s == "full")
-    partial = sum(1 for _, s, _ in tasks if s == "partial")
+    done = sum(1 for task in tasks if task["status"] == "full")
+    partial = sum(1 for task in tasks if task["status"] == "partial")
 
     lines.append(f"## [{slug}]({spec_rel})")
     lines.append(f"Plan: [{plan_rel}]({plan_rel}) &nbsp;|&nbsp; Progress: {done}/{len(tasks)} full, {partial} partial")
@@ -124,10 +118,16 @@ for slug, tasks in sections:
         lines.append("No `TASK-*` entries found in this plan yet.")
         lines.append("")
         continue
-    lines.append("| Task | Status |")
-    lines.append("|------|--------|")
-    for task_id, status, line_no in tasks:
-        lines.append(f"| [{task_id}]({plan_rel}#L{line_no}) | {status} |")
+    lines.append("| Task | Status | Assigned Team | Claimed By | Lease Until |")
+    lines.append("|------|--------|---------------|------------|-------------|")
+    for task in tasks:
+        assigned_team = task["assigned_team"] or "-"
+        claimed_by = task["claimed_by"] or "-"
+        lease_until = task["lease_until"] or "-"
+        lines.append(
+            f"| [{task['task_id']}]({plan_rel}#L{task['line_no']}) | {task['status']} | "
+            f"{assigned_team} | {claimed_by} | {lease_until} |"
+        )
     lines.append("")
 
 lines += [

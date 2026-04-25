@@ -105,6 +105,7 @@ Human ownership stays with the team. AgentAlign agents act as governed specialis
 | `observation artifacts` | Runtime evidence: how the system actually behaved under real or simulated execution                         |
 | `ADR-*.md`              | Decision record for choices that affect architecture, operations, security, or long-term maintainability    |
 | `ADR-INDEX.md`          | Global index of decisions and drift coverage                                                                |
+| `coordination/*.json`   | Multi-assistant task leases and ownership state for concurrent execution                                    |
 
 
 ## Commands
@@ -198,6 +199,22 @@ Automatic hooks fire on every file write:
 - **PreToolUse**: `check-constitution.sh` validates pending edits for tech leakage in `spec.md` and hardcoded secrets
 - **PreToolUse**: `check-architecture-readiness.sh` blocks implementation edits until the governing plan defines module boundaries, dependency rules, and testability by boundary
 - **PostToolUse**: `quick-drift-check.sh` performs a lightweight spec-alignment pass for missing file references, endpoint mismatch hints, and stale eval results
+
+## Multi-Assistant Coordination
+
+Claude and Codex can share the same governed workflow, but concurrent execution needs explicit task ownership.
+
+- `plan.md` remains the source of task intent and progress
+- `.specify/coordination/<slug>.json` stores machine-managed task claims and lease expiry
+- optional task tags such as `[team: claude]` or `[team: codex]` restrict which team may claim a task
+- `scripts/claim_task.py` atomically selects the next eligible task using a file lock
+- `scripts/release_task.py` marks a claimed task available again or completed after `[~] -> [x]`
+- `scripts/check-task-claim.sh` blocks implementation-path edits unless the current team identity owns an active claim
+- `.specify/delivery.md` shows assigned team, active claimer, and lease state alongside task progress
+
+This keeps one assistant instance from taking work already assigned or currently leased to the other.
+
+Set `AGENT_ALIGN_TEAM_ID` to `claude` or `codex` before `/agent-align:at-implement` when the host runtime does not provide a team identity automatically. Optionally set `AGENT_ALIGN_INSTANCE_ID` to tighten claims to one session.
 
 ## ADR Lifecycle
 

@@ -41,9 +41,11 @@ Delete this section or replace the table with `N/A` if no harness is needed.
 | Swap strategy | [how to replace the harness later] |
 
 ## Tasks
-- [ ] TASK-001: Write failing tests for [module]
-- [ ] TASK-002: Implement [module]
+- [ ] TASK-001: Write failing tests for [module] [team: codex]
+- [ ] TASK-002: Implement [module] [team: claude]
 - [ ] TASK-003: Integration test for [flow]
+
+Team tags are optional. When present, only that team may claim the task during `/agent-align:at-implement`.
 
 ## Evaluation Strategy
 | Dimension | Metric / Check | Threshold | Framework | Evidence |

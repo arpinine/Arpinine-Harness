@@ -18,6 +18,7 @@ Initialize the shared team workflow.
    - `.specify/evals/`
    - `.specify/observations/`
    - `.specify/rules/`
+   - `.specify/coordination/`
 5. If `ADR-INDEX.md` does not exist, create it with:
 
 ```md

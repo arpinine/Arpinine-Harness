@@ -23,13 +23,21 @@ Execute the agreed work without drifting from intent.
 5. Preserve the module boundaries and dependency direction defined in `plan.md`.
 6. If the feature uses a harness in the product application, preserve the harness abstraction boundary, tool model, memory model, and permission model defined in `## Harness Strategy`.
 7. For each task in `plan.md`:
-   a. Before starting work on the task: select the next eligible task and change its checkbox from `[ ]` to `[~]` in `plan.md`.
-   b. Enforce RED → GREEN → REFACTOR:
+   a. Before starting work on the task, claim the next eligible task through `scripts/claim_task.py --slug <slug> --team-id <team> --instance-id <instance>`.
+   b. Treat `.specify/coordination/<slug>.json` as the source of task ownership and lease state. `plan.md` remains the human-readable source of task intent and progress.
+   c. Resolve runtime identity through `AGENT_ALIGN_TEAM_ID` (`claude` or `codex`) and, when available, `AGENT_ALIGN_INSTANCE_ID`. The shared PreToolUse claim gate blocks implementation-path edits until that identity owns an active lease.
+   d. A task is eligible only when:
+      - its checkbox is `[ ]`
+      - its lease is absent or expired
+      - it is not tagged `[team: other-team]`
+   e. After a successful claim, change the claimed task checkbox from `[ ]` to `[~]` in `plan.md`.
+   f. Enforce RED → GREEN → REFACTOR:
       - failing test first
       - minimal implementation
       - refactor with tests still green
-   c. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`.
-   d. Perform those `plan.md` status edits directly as part of the command flow; do not ask the user to update task checkboxes manually.
+   g. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`, then release it with `scripts/release_task.py --slug <slug> --task-id <task> --team-id <team> --instance-id <instance> --state completed`.
+   h. If work on a claimed task is abandoned or re-planned, release it with `--state available`.
+   i. Perform those `plan.md` status edits directly as part of the command flow; do not ask the user to update task checkboxes manually.
    The task-status edit refreshes `.specify/delivery.md` automatically through the shared `PostToolUse` delivery hook, and the shared `PostToolUse` drift hook also runs after the write.
 8. Invoke the `product-owner` agent before completion to compare implementation evidence against the spec business case and acceptance criteria.
 9. Invoke the `security-reviewer` agent on the plan and code changes before concluding the task.

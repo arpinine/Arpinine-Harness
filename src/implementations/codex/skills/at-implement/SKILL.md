@@ -7,6 +7,7 @@ Follow `commands/at-implement.md` from the assembled AgentAlign plugin root.
 
 When using this skill in Codex:
 - execute the same implementation workflow defined in `commands/at-implement.md`
+- treat `codex` as the team identity for task claims; set `AGENT_ALIGN_TEAM_ID=codex` when the host does not inject it automatically
 - update `plan.md` task checkboxes as work starts and completes
 - preserve boundary, harness, evaluation, and security requirements from the shared workflow
 

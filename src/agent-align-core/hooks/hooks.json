@@ -18,6 +18,15 @@
           "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-architecture-readiness.sh",
           "timeout": 5
         }]
+      },
+      {
+        "description": "Block implementation edits unless the current team has an active task claim",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-task-claim.sh",
+          "timeout": 5
+        }]
       }
     ],
     "PostToolUse": [
