@@ -22,10 +22,14 @@ Execute the agreed work without drifting from intent.
 4. Run `/speckit.implement`.
 5. Preserve the module boundaries and dependency direction defined in `plan.md`.
 6. If the feature uses a harness in the product application, preserve the harness abstraction boundary, tool model, memory model, and permission model defined in `## Harness Strategy`.
-7. Enforce RED → GREEN → REFACTOR for each task:
-   - failing test first
-   - minimal implementation
-   - refactor with tests still green
+7. For each task in `plan.md`:
+   a. Before starting work on the task: change its checkbox from `[ ]` to `[~]` in `plan.md`.
+   b. Enforce RED → GREEN → REFACTOR:
+      - failing test first
+      - minimal implementation
+      - refactor with tests still green
+   c. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`.
+   The `[~]` → `[x]` edit triggers the delivery matrix hook automatically.
 8. Invoke the `product-owner` agent before completion to compare implementation evidence against the spec business case and acceptance criteria.
 9. Invoke the `security-reviewer` agent on the plan and code changes before concluding the task.
 10. Run `/agent-align:at-eval run <slug>` for any workflow whose plan declares required evaluation.
