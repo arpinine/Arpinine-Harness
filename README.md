@@ -1,183 +1,175 @@
 # AgentAlign
 
-AgentAlign is a governed AI workflow plugin with a shared core and assistant-specific implementations.
+AgentAlign is a plugin for vibe coders who want to ship real software, not just ship code.
 
-It creates an agent-assisted governance layer for product and engineering teams: specialized agents, workflow commands, hooks, and evidence checks that keep AI-assisted product development aligned with shared specifications, architecture rules, evaluations, and runtime observations.
+When you build with AI, things move fast. Too fast to track whether what you're building still matches what you intended. Specs drift. Architecture decisions get made by accident. Secrets end up hardcoded. There's no deployment plan. The code works locally and nowhere else.
 
-The goal is not to stop fast AI-assisted execution. The goal is to make it safe, repeatable, and team-aligned.
+AgentAlign gives you a team to work with — not a prompt bundle, a team. Specialized agents that each own a slice of the work: your product intent, your architecture, your tests, your security, your deployment. They show up at the right moments and block the wrong ones.
 
-It standardizes how work moves from idea to specification, from specification to evaluation and execution, and from execution back into refinement when reality diverges from intent.
+The goal isn't to slow you down. It's to make sure that what you ship is what you meant to build.
 
 ## One Plugin, Team Of Agents
 
-AgentAlign should be understood as a virtual delivery team, not as a single assistant with a prompt bundle.
+When you run a command, you're not talking to one assistant. You're talking to a team.
 
-The user interacts with one plugin entrypoint, but each workflow command activates a coordinated set of specialized agent roles. In practice, the plugin behaves like:
+Each command routes to the specialists that matter for that stage of work:
 
-- a `product-owner` that clarifies intent, scope, and acceptance criteria
-- a `tech-architect` that shapes boundaries, dependencies, and ADR-worthy decisions
-- a `tdd-guide` that keeps execution task-aligned and test-first
-- a `security-reviewer` that challenges risky or underspecified changes
-- an `ai-engineer` that owns model selection, prompting strategy, and AI-specific failure modes — active when spec uses AI or LLMs
-- a `devops` that closes the prod-readiness gap: deployment, secrets, CI/CD, and infrastructure — active when spec involves deployed services or secrets
-- a `data-engineer` that owns data pipelines, RAG design, schema, and vector stores — active when spec involves pipelines or RAG
-- an `evaluation-governor` that pushes for measurable quality gates
-- a `drift-detector` that checks whether code, plans, ADRs, and runtime evidence still agree
+- a `product-owner` that keeps your spec honest — scope, intent, and acceptance criteria
+- a `tech-architect` that catches architecture decisions before they become accidental code structure
+- a `tdd-guide` that keeps implementation test-first and task-aligned
+- a `security-reviewer` that challenges anything risky or underspecified
+- an `ai-engineer` that owns your model choices, prompting strategy, and AI-specific failure modes — active when your feature uses AI or LLMs
+- a `devops` that closes the prod-readiness gap: deployment, secrets, CI/CD, infrastructure — active when your feature involves a deployed service or secrets
+- a `data-engineer` that owns your data pipelines, RAG design, schema, and vector stores — active when your feature involves pipelines or RAG
+- an `evaluation-governor` that pushes for measurable quality gates before you call something done
+- a `drift-detector` that checks whether your code, plans, ADRs, and runtime evidence still agree
 
-This is the core operating model: one plugin surface, many specialized agent responsibilities.
+One command. Many responsibilities. No one agent carrying the whole load.
 
 ## Multi-Team Operating Model
 
-AgentAlign also supports multiple assistant teams sharing the same governed repository at the same time.
+AgentAlign also supports multiple AI coding assistants working on the same repo at the same time.
 
-Typical example:
+A typical setup:
 
 - one delivery lane runs in Claude
 - one delivery lane runs in Codex
-- both teams use the same `spec.md`, `plan.md`, ADRs, eval artifacts, and delivery matrix
-- implementation ownership is coordinated through shared task claims and optional team tags in `plan.md`
+- both use the same `spec.md`, `plan.md`, ADRs, eval artifacts, and delivery matrix
+- task ownership is coordinated through shared claims so they don't step on each other
 
-So the operating model has two layers:
-
-- specialist roles inside one assistant session
-- multiple assistant teams coordinated through one governed workflow
+So there are two layers: specialist roles inside one session, and multiple assistant teams coordinated through one shared workflow.
 
 ## Start Here
 
-If you want to use AgentAlign as an operator rather than just inspect its files, start with the vibe-coder operating guide:
+If you want to use AgentAlign rather than just read its files, start here:
 
 - [Vibe Coder Process](docs/vibe-coder-process.md)
 
-Use the process guide for day-to-day operation of the plugin.
+That guide covers day-to-day operation.
 
 ## Agent Team
 
-AgentAlign coordinates a small team of focused AI roles and governance skills:
+| Capability | Role |
+| --- | --- |
+| Product alignment | `product-owner` keeps business cases, acceptance criteria, and execution aligned with `spec.md` |
+| Architecture | `tech-architect` and `architecture-governor` define modular boundaries and surface consequential decisions |
+| Delivery | `tdd-guide` keeps implementation test-first and task-aligned |
+| Security | `security-reviewer` checks implementation risk before completion |
+| AI design | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes — scoped to AI/LLM features |
+| Prod-readiness | `devops` owns deployment, secrets hygiene, CI/CD, and infrastructure — scoped to deployed services, secrets, or CI/CD |
+| Data architecture | `data-engineer` owns data pipelines, RAG design, schema, vector stores, and data quality — scoped to pipeline or RAG features |
+| Evaluation | `evaluation-governor` enforces quality metrics, thresholds, and evidence |
+| Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries |
+| Realignment | `drift-detector`, ADRs, observations, and rules catch when code diverges from intent |
 
-
-| Capability         | Role                                                                                                    |
-| ------------------ | ------------------------------------------------------------------------------------------------------- |
-| Product alignment  | `product-owner` keeps business cases, acceptance criteria, and execution aligned with `spec.md`         |
-| Architecture       | `tech-architect` and `architecture-governor` help define modular boundaries and consequential decisions |
-| Delivery           | `tdd-guide` keeps implementation test-first and task-aligned                                            |
-| Security           | `security-reviewer` checks implementation risk before completion                                        |
-| AI design          | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes — scoped to AI/LLM features        |
-| Prod-readiness     | `devops` owns deployment, secrets hygiene, CI/CD, and infrastructure — scoped to deployed services, secrets, or CI/CD                    |
-| Data architecture  | `data-engineer` owns data pipelines, RAG design, schema, vector stores, and data quality — scoped to pipeline or RAG features            |
-| Evaluation         | `evaluation-governor` enforces quality metrics, thresholds, and evidence                                |
-| Harness governance | `harness-governor` keeps product agent runtimes behind explicit boundaries                              |
-| Realignment        | `drift-detector`, ADRs, observations, and rules detect when code diverges from intent                   |
-
-
-These agents do not replace team ownership. They help the team govern vibe-coded work through explicit artifacts and automated checks.
+These agents don't replace your team. They help you govern AI-assisted work through explicit artifacts and automated checks so that "it looked right in the session" doesn't become the only quality gate you have.
 
 ## Agent Activation Model
 
-Not every agent fires on every spec. AgentAlign uses two activation modes to keep governance proportional to what the feature actually requires.
+Not every specialist shows up for every feature — that would be noise. Security review matters on every spec. But you don't need a data engineer reviewing a settings page.
+
+AgentAlign splits the team into two groups.
 
 ### Always-On
 
-These agents activate on every spec, regardless of content. They govern concerns that every feature shares.
+These agents activate on every spec, no matter what. They cover concerns that every feature shares.
 
-| Agent | Fires because |
-|-------|---------------|
-| `product-owner` | Every spec has a business case and acceptance criteria to protect |
+| Agent | Why it always fires |
+|-------|---------------------|
+| `product-owner` | Every spec has a business case and acceptance criteria worth protecting |
 | `tech-architect` | Every plan has architectural decisions worth surfacing |
 | `architecture-governor` | Every plan needs module boundary and dependency enforcement |
-| `tdd-guide` | Every implementation requires test-first discipline |
+| `tdd-guide` | Every implementation needs test-first discipline |
 | `security-reviewer` | Every feature has a security surface |
 
 ### Scoped
 
-These agents activate only when the spec signals their domain. Invoking them unconditionally would create noise and irrelevant blockers on features that don't need them.
+These agents activate only when the spec signals their domain. They stay quiet otherwise.
 
 | Agent | Activates when spec involves |
 |-------|------------------------------|
 | `harness-governor` | An agent harness or runtime in the product |
-| `evaluation-governor` | Agentic or AI-assisted workflows requiring quality gates |
+| `evaluation-governor` | Agentic or AI-assisted workflows needing quality gates |
 | `ai-engineer` | AI, LLMs, agent runtimes, or prompt-driven behavior |
 | `devops` | A deployed service, external API keys, secrets, or CI/CD pipeline |
 | `data-engineer` | Data pipelines, RAG, vector stores, ETL, or multi-source ingestion |
 
-The scope condition is evaluated during `/at-plan` by reading the spec and plan content. When a scoped agent activates, it also requires its corresponding section in `plan.md` — `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` — ensuring the plan is complete for the feature's domain before implementation begins.
+Scope is evaluated during `/at-plan` by reading what the spec and plan actually describe. When a scoped agent activates, it also requires a corresponding section in `plan.md` — `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` — so the plan is complete for that domain before implementation starts.
 
 ## Team Workflow
 
-The plugin is built around a shared delivery loop:
+The plugin is built around a delivery loop that repeats, not a linear checklist:
 
-1. Define: capture product intent in `spec.md`
-2. Refine: review and tighten requirements before implementation
-3. Plan: turn approved intent into an engineering plan and tasks
-4. Architect: define module boundaries, dependency rules, harness strategy, and clean separation of concerns
-5. Decide: record consequential architecture and implementation choices in ADRs
-6. Evaluate: define how the team will measure quality and readiness
-7. Execute: implement with test-first discipline
-8. Realign: audit drift between spec, decisions, code, and evaluation results
-9. Refine again: update the spec, plan, ADRs, or eval plan when learning changes the work
+1. **Define** — capture product intent in `spec.md`
+2. **Refine** — tighten requirements before engineering starts
+3. **Plan** — turn the approved spec into an engineering plan and task list
+4. **Architect** — define module boundaries, dependency rules, harness strategy
+5. **Decide** — record consequential choices in ADRs before they become implicit
+6. **Evaluate** — define how you'll measure quality and readiness
+7. **Execute** — implement with test-first discipline
+8. **Realign** — audit drift between spec, decisions, code, and evaluation results
+9. **Refine again** — update spec, plan, ADRs, or eval plan when what you learn changes the work
 
-This is the core value of the plugin: not just generating files, but giving the team a stable operating model.
-
-When multiple assistant teams are active, the same workflow still applies, but implementation work is lease-based rather than first-come/first-served.
+When multiple assistant teams are active, the same loop applies — but task ownership is lease-based so teams don't collide.
 
 ## Team Contract
 
+| Role | Owns |
+|------|------|
+| Product | The problem, user value, scope, business case, and acceptance criteria in `spec.md` |
+| Engineering | `plan.md`, task breakdown, and implementation approach |
+| Engineering | Module boundaries, dependency rules, and testability by boundary |
+| Engineering | Harness strategy when product features depend on an agent runtime |
+| Engineering | Evaluation strategy, release thresholds, and runtime evidence expectations for agentic systems |
+| Engineering | AI design decisions — when the feature uses AI or LLMs |
+| Engineering | Prod-readiness — when the feature involves deployed services or secrets |
+| Engineering | Data architecture — when the feature involves data pipelines or RAG |
+| Tech Leads | Consequential decisions; ADR approval when needed |
+| AI Agents | Execution within the rules set by the spec, plan, ADRs, eval plan, and observation evidence |
 
-| Team Role   | Responsibility                                                                                      |
-| ----------- | --------------------------------------------------------------------------------------------------- |
-| Product     | Owns the problem, user value, scope, business case, and acceptance criteria in `spec.md`            |
-| Engineering | Owns `plan.md`, task breakdown, and implementation approach                                         |
-| Engineering | Owns module boundaries, dependency rules, and testability by boundary                               |
-| Engineering | Owns evaluation strategy, release thresholds, and runtime evidence expectations for agentic systems |
-| Tech Leads  | Own consequential decisions and approve ADRs when needed                                            |
-| AI Agents   | Help execute within the rules set by the spec, plan, ADRs, eval plan, and observation evidence      |
-
-
-Human ownership stays with the team. AgentAlign agents act as governed specialists inside that contract.
+The agents don't own anything on this list. Your team does. The agents help you hold the line.
 
 ## Agent Responsibilities
 
-
-| Agent               | Responsibility In The Governed Codebase                                                                                                              | Primary Skills Used                                                                                                 |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `product-owner`     | Keeps the business case, scope, and acceptance criteria aligned from `spec.md` through planning, implementation, evaluation, and audit               | `constitution-enforcer`, `evaluation-governor`, `drift-detector`                                                    |
-| `tech-architect`    | Protects modular design, identifies consequential decisions, and pushes architecture changes into ADRs before they become accidental code structure  | `architecture-governor`, `adr-manager`                                                                              |
-| `tdd-guide`         | Keeps implementation task-aligned and test-first so code changes stay traceable to planned work and verifiable by tests                              | `constitution-enforcer`                                                                                             |
-| `security-reviewer` | Reviews plans and implementation for security-sensitive gaps and blocks completion when risky behavior is undocumented or unsafe                     | `constitution-enforcer`, `rule-manager`                                                                             |
-| Governance skills   | Provide the codebase-wide enforcement layer for architecture, harness boundaries, evaluation, drift detection, ADR discipline, and compounding rules | `architecture-governor`, `harness-governor`, `evaluation-governor`, `drift-detector`, `adr-manager`, `rule-manager` |
-
+| Agent | What it does | Primary skills |
+|-------|-------------|----------------|
+| `product-owner` | Keeps business case, scope, and acceptance criteria aligned through planning, implementation, evaluation, and audit | `constitution-enforcer`, `evaluation-governor`, `drift-detector` |
+| `tech-architect` | Catches architecture decisions early and pushes them into ADRs before they become accidental code structure | `architecture-governor`, `adr-manager` |
+| `tdd-guide` | Keeps implementation task-aligned and test-first so changes stay traceable and verifiable | `constitution-enforcer` |
+| `security-reviewer` | Reviews plans and code for security gaps; blocks completion when risky behavior is undocumented or unsafe | `constitution-enforcer`, `rule-manager` |
+| `ai-engineer` | Owns LLM design: model selection, prompting strategy, context management, agent topology, failure modes, and AI-specific eval metrics. Fires only on AI/LLM features | `evaluation-governor`, `adr-manager` |
+| `devops` | Owns prod-readiness: deployment, secrets hygiene, CI/CD, env config, infrastructure. Fires only when the spec involves deployed services, secrets, or CI/CD | `adr-manager`, `rule-manager` |
+| `data-engineer` | Owns data architecture: pipelines, RAG design, schema and migrations, vector store selection, data quality. Fires only on pipeline or RAG features | `adr-manager`, `rule-manager` |
+| Governance skills | Codebase-wide enforcement: architecture, harness boundaries, evaluation, drift detection, ADR discipline, compounding rules | `architecture-governor`, `harness-governor`, `evaluation-governor`, `drift-detector`, `adr-manager`, `rule-manager` |
 
 ## Shared Artifacts
 
-
-| Artifact                | Purpose                                                                                                     |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `spec.md`               | Product intent: what problem is being solved, for whom, and how success is measured                         |
-| `plan.md`               | Engineering approach: how the team intends to implement the work                                            |
-| `harness strategy`      | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
-| `module boundaries`     | Architectural contract for responsibilities, dependency direction, and replaceable seams                    |
-| `eval-plan.md`          | Quality gate: how the team measures readiness, regressions, and release fitness                             |
-| `observation artifacts` | Runtime evidence: how the system actually behaved under real or simulated execution                         |
-| `ADR-*.md`              | Decision record for choices that affect architecture, operations, security, or long-term maintainability    |
-| `ADR-INDEX.md`          | Global index of decisions and drift coverage                                                                |
-| `coordination/*.json`   | Multi-assistant task leases and ownership state for concurrent execution                                    |
-| `tools/style/`          | Canonical repository style standards shared by all teams and plugin implementations                         |
-
+| Artifact | Purpose |
+|----------|---------|
+| `spec.md` | What problem is being solved, for whom, and how success is measured |
+| `plan.md` | How the team intends to implement the work |
+| `harness strategy` | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
+| `module boundaries` | Architectural contract for responsibilities, dependency direction, and replaceable seams |
+| `eval-plan.md` | Quality gate: how you measure readiness, regressions, and release fitness |
+| `observation artifacts` | Runtime evidence: how the system actually behaved |
+| `ADR-*.md` | Why key decisions were made |
+| `ADR-INDEX.md` | Global index of decisions and drift coverage |
+| `coordination/*.json` | Multi-assistant task leases and ownership state for concurrent execution |
+| `tools/style/` | Canonical style standards shared by all teams and implementations |
 
 ## Commands
 
-
-| Command                     | Stage    | Purpose                                                          |
-| --------------------------- | -------- | ---------------------------------------------------------------- |
-| `/agent-align:at-init`      | Setup    | Initialize the shared workflow and ADR structure                 |
-| `/agent-align:at-new`       | Define   | Create a new specification from a product request                |
-| `/agent-align:at-review`    | Refine   | Improve clarity, measurability, and alignment before execution   |
-| `/agent-align:at-plan`      | Plan     | Produce plan and tasks from an approved spec                     |
-| `/agent-align:at-adr`       | Decide   | Create and manage Architecture Decision Records                  |
-| `/agent-align:at-eval`      | Evaluate | Define and run framework-agnostic evaluation                     |
-| `/agent-align:at-observe`   | Evaluate | Record and review runtime observations                           |
-| `/agent-align:at-implement` | Execute  | Implement the plan with TDD and security review                  |
-| `/agent-align:at-audit`     | Realign  | Detect drift and trigger refinement, ADR updates, or eval reruns |
-
+| Command | Stage | Purpose |
+|---------|-------|---------|
+| `/agent-align:at-init` | Setup | Initialize the shared workflow and ADR structure |
+| `/agent-align:at-new` | Define | Create a new specification from a product request |
+| `/agent-align:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
+| `/agent-align:at-plan` | Plan | Produce plan and tasks from an approved spec |
+| `/agent-align:at-adr` | Decide | Create and manage Architecture Decision Records |
+| `/agent-align:at-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/agent-align:at-observe` | Evaluate | Record and review runtime observations |
+| `/agent-align:at-implement` | Execute | Implement the plan with TDD and security review |
+| `/agent-align:at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
 
 ## Example Flow
 
@@ -212,23 +204,13 @@ Human ownership stays with the team. AgentAlign agents act as governed specialis
 
 ## End-to-End Demo
 
-The repository includes a complete runnable demo product:
+There's a complete runnable demo product in the repo:
 
 ```text
 examples/end-to-end/support-agent-demo/
 ```
 
-It shows the full AgentAlign loop on a small support triage agent:
-
-- product request and governed `spec.md`
-- `plan.md` with module boundaries, dependency rules, harness strategy, and eval strategy
-- fake harness adapter so no external runtime is required
-- runnable tests and evaluation script
-- observation trace
-- ADR and rule examples
-- intentional drift example for audit discussion
-
-Start with:
+It covers the full AgentAlign loop on a small support triage agent: product request, governed `spec.md`, `plan.md` with module boundaries and harness strategy, fake harness adapter (no external runtime needed), runnable tests and evaluation script, observation trace, ADR and rule examples, and an intentional drift example for audit discussion.
 
 ```bash
 cd examples/end-to-end/support-agent-demo
@@ -240,7 +222,7 @@ PYTHONPATH=app python3 app/eval/run_eval.py
 
 - `spec.md` stays product-facing and measurable
 - `plan.md` captures implementation detail and delivery steps
-- architecture rules enforce modularity and clean separation of concerns before coding starts
+- architecture rules enforce modularity before coding starts
 - harness rules enforce how product applications depend on agent runtimes and how those runtimes are isolated
 - eval plans define metrics, thresholds, scenarios, and execution commands
 - observation artifacts show whether actual runtime behavior matches the planned harness model
@@ -251,36 +233,34 @@ PYTHONPATH=app python3 app/eval/run_eval.py
 
 Automatic hooks fire on every file write:
 
-- **PreToolUse**: `check-constitution.sh` validates pending edits for tech leakage in `spec.md` and hardcoded secrets
-- **PreToolUse**: `check-architecture-readiness.sh` blocks implementation edits until the governing plan defines module boundaries, dependency rules, and testability by boundary
-- **PreToolUse**: `check-style-governance.sh` blocks implementation edits when the repository has no declared style standard for that language
-- **PreToolUse**: `check-task-claim.sh` blocks implementation edits unless the current team identity owns an active task claim
-- **PostToolUse**: `quick-drift-check.sh` performs a lightweight spec-alignment pass for missing file references, endpoint mismatch hints, and stale eval results
+- **PreToolUse**: `check-constitution.sh` — catches tech leakage in `spec.md` and hardcoded secrets
+- **PreToolUse**: `check-architecture-readiness.sh` — blocks implementation edits until the plan defines module boundaries, dependency rules, and testability by boundary
+- **PreToolUse**: `check-style-governance.sh` — blocks implementation edits when no declared style standard exists for that language
+- **PreToolUse**: `check-task-claim.sh` — blocks implementation edits unless the current team identity owns an active task claim
+- **PostToolUse**: `quick-drift-check.sh` — lightweight spec-alignment pass after every write
 
 ## Multi-Assistant Coordination
 
-Claude and Codex can share the same governed workflow, but concurrent execution needs explicit task ownership.
+Claude and Codex can share the same governed workflow. Concurrent execution needs explicit task ownership or they'll collide.
 
-- `plan.md` remains the source of task intent and progress
+- `plan.md` stays the source of task intent and progress
 - `.specify/coordination/<slug>.json` stores machine-managed task claims and lease expiry
-- optional task tags such as `[team: claude]` or `[team: codex]` restrict which team may claim a task
+- optional task tags (`[team: claude]`, `[team: codex]`) restrict which team may claim a task
 - `scripts/claim_task.py` atomically selects the next eligible task using a file lock
-- `scripts/release_task.py` marks a claimed task available again or completed after `[~] -> [x]`
+- `scripts/release_task.py` marks a task available again or completed
 - `scripts/check-task-claim.sh` blocks implementation-path edits unless the current team identity owns an active claim
-- `.specify/delivery.md` shows assigned team, active claimer, and lease state alongside task progress
+- `.specify/delivery.md` shows assigned team, active claimer, and lease state
 
-This keeps one assistant instance from taking work already assigned or currently leased to the other.
-
-By default the scripts derive team identity from the host plugin environment and derive a stable per-session instance id from the current host/session fingerprint. Set `AGENT_ALIGN_TEAM_ID` or `AGENT_ALIGN_INSTANCE_ID` only when you need to override that automatic identity resolution.
+Set `AGENT_ALIGN_TEAM_ID` or `AGENT_ALIGN_INSTANCE_ID` only when you need to override automatic identity resolution. By default the scripts derive both from the host plugin environment.
 
 ## Multi-Team Style Governance
 
-Multiple teams only stay interchangeable if they follow the same repository-owned style rules.
+Multiple teams only stay interchangeable if they follow the same style rules.
 
-- `.specify/CONSTITUTION.md` declares shared style standards mandatory across teams and plugins
+- `.specify/CONSTITUTION.md` declares style standards that are mandatory across all teams and plugins
 - `tools/style/` is the canonical location for checked-in language-specific style configs
 - `check-style-governance.sh` blocks implementation edits for supported languages when no canonical style config exists
-- all teams must use the same repo-defined config paths rather than assistant-local defaults
+- all teams must use the same repo-defined config paths, not assistant-local defaults
 
 ## ADR Lifecycle
 
@@ -289,15 +269,9 @@ Proposed -> Accepted -> Implemented -> Superseded
                     -> Rejected
 ```
 
-All ADRs live in `.specify/adr/`.
-Each ADR has:
-
-- `governs:` to link it to a spec
-- `covers:` to link it to a concrete decision key or drift key
+All ADRs live in `.specify/adr/`. Each one links to its governing spec via `governs:` and to a concrete decision or drift key via `covers:`.
 
 ## Implementation Layout
-
-AgentAlign now separates shared workflow assets from assistant-specific implementations:
 
 ```text
 src/
@@ -309,29 +283,25 @@ tools/
   style/                 # canonical cross-team style standards by language
 ```
 
-Each implementation overlays the same shared core.
+Build and registration targets work across implementations:
 
-The real cross-implementation abstraction is the common-denominator workflow:
+```bash
+make assemble IMPLEMENTATION=<name>
+make build IMPLEMENTATION=<name>
+make delivery
+make register IMPLEMENTATION=<name>
+make validate-structure IMPLEMENTATION=<name>
+```
 
-- `make assemble IMPLEMENTATION=<name>`
-- `make build IMPLEMENTATION=<name>`
-- `make delivery`
-- `make register IMPLEMENTATION=<name>`
-- `make validate-structure IMPLEMENTATION=<name>`
-
-
-Claude also has native convenience targets for install, uninstall, and validator-backed validation.
-Codex uses the shared abstraction plus Codex marketplace registration.
+Claude also has native targets for install, uninstall, and validator-backed validation. Codex uses the shared abstraction plus marketplace registration.
 
 ## Usage Model
-
-From the root of this repo:
 
 ```bash
 # 1. Install spec-kit
 uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai claude
 
-# 2. Register the Claude marketplace and install from Claude's native CLI
+# 2. Install from Claude's native CLI
 make install
 
 # 3. Initialize the workflow (run inside a Claude Code session)
@@ -347,49 +317,19 @@ make register IMPLEMENTATION=codex
 
 After Codex registration, enable `agent-align` from the Codex marketplace UI if your client requires a separate confirmation step.
 
-For a session-only load without installing (dev/testing):
+Session-only load without installing (dev/testing):
 
 ```bash
 make assemble IMPLEMENTATION=claude
 claude --plugin-dir ./plugins/agent-align-claude
 ```
 
-Or build explicitly for an implementation:
-
-```bash
-make build IMPLEMENTATION=claude
-make assemble IMPLEMENTATION=codex
-```
-
-The versioned zip artifact under `dist/` always uses the current plugin version from the Claude manifest, so commands and docs should refer to the stable plugin directories under `plugins/` for local usage rather than a hardcoded versioned path.
-
-Common structural validation:
-
-```bash
-make validate-structure IMPLEMENTATION=claude
-make validate-structure IMPLEMENTATION=codex
-```
-
-Claude-only native operations:
-
-```bash
-make install IMPLEMENTATION=claude
-make uninstall IMPLEMENTATION=claude
-make validate IMPLEMENTATION=claude
-```
-
 ## Dependency Handling
 
-AgentAlign does not try to install `spec-kit`, harness runtimes, or eval frameworks during plugin installation.
-Instead, it validates them during setup and before the relevant workflow stage:
+AgentAlign doesn't install `spec-kit`, harness runtimes, or eval frameworks during plugin installation. It validates them during setup and before the relevant workflow stage:
 
 - `spec-kit` is required for automated generation and planning
-- harness runtimes are required only for features whose `## Harness Strategy` explicitly selects one
+- harness runtimes are required only when `## Harness Strategy` explicitly selects one
 - eval tools are required only when `eval-plan.md` selects them
 
-In practice:
-
-- if `## Harness Strategy` is `N/A`, the project does not need a harness runtime
-- if `## Harness Strategy` selects a runtime such as OpenHarness or an internal agent runtime, that runtime becomes a required dependency for that feature
-
-Use `src/agent-align-core/scripts/check-dependencies.sh --json` for machine-readable readiness, or without flags for a text report.
+Run `src/agent-align-core/scripts/check-dependencies.sh --json` for a machine-readable readiness report.
