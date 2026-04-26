@@ -1,4 +1,3 @@
-$schema: "https://agentk.io/schemas/observation/v1"
 type: object
 required:
   - spec

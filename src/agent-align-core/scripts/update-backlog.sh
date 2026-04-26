@@ -1,5 +1,6 @@
 #!/bin/bash
 # Regenerate .specify/delivery.md from .specify/specs/*/plan.md data.
+set -uo pipefail
 
 INPUT=$(cat)
 

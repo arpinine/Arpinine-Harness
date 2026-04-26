@@ -3,3 +3,5 @@
 dist/
 plugins/
 __pycache__/
+.specify/coordination/.coordination.lock
+.specify/coordination/.security-tooling-cache.json

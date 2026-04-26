@@ -11,6 +11,12 @@ The shared core also owns the cross-team coordination model. When multiple assis
 - shared pre-edit claim enforcement
 - shared style-governance hooks and canonical style-config discovery
 
+## Platform Requirements
+
+- **Python 3.10+** is required for all governance scripts.
+- **Unix/macOS**: fully supported. Task coordination uses `fcntl` file locking.
+- **Windows**: not currently supported. Task coordination requires Unix file locking (`fcntl`). A future version will migrate to the cross-platform `filelock` package.
+
 ## Agent Team
 
 | Capability | Role |

@@ -36,6 +36,15 @@
           "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-task-claim.sh",
           "timeout": 5
         }]
+      },
+      {
+        "description": "Verify pre-commit security hooks are installed and active (cached, 5-min TTL)",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-security-setup.sh",
+          "timeout": 5
+        }]
       }
     ],
     "PostToolUse": [

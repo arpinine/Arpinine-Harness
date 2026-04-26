@@ -1,6 +1,7 @@
 #!/bin/bash
 # Pre-edit architecture readiness gate.
 # Block implementation edits until the governing plan defines architecture boundaries.
+set -euo pipefail
 
 INPUT=$(cat)
 
@@ -134,8 +135,17 @@ if violations:
         print(f"- {item}")
     print("Run /at-plan and complete the architecture sections before editing implementation files.")
     raise SystemExit(1)
-' 2>/dev/null
+'
 )
+PYTHON_EXIT=$?
+if [[ $PYTHON_EXIT -ne 0 && -z "$RESULT" ]]; then
+  echo "AgentAlign governance check failed: Python error (exit code $PYTHON_EXIT)."
+  echo "Ensure your environment is set up correctly:"
+  echo "  - Activate your virtual environment: source .venv/bin/activate"
+  echo "  - Install dependencies: uv sync (or pip install -r requirements.txt)"
+  echo "  - For Node.js projects: nvm use && npm install"
+  exit 1
+fi
 
 if [[ -n "$RESULT" ]]; then
   printf '%s\n' "$RESULT"
