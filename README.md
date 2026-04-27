@@ -1,10 +1,10 @@
 # AgentAlign
 
-AgentAlign is a plugin for vibe coders who want to ship real software, not just ship code.
+AgentAlign is a plugin for anyone building software with AI coding assistants and who wants to ship real software, not just ship code.
 
-When you build with AI, things move fast. Too fast to track whether what you're building still matches what you intended. Specs drift. Architecture decisions get made by accident. Secrets end up hardcoded. There's no deployment plan. The code works locally and nowhere else.
+When you build with AI coding assistants, things move fast. Too fast to track whether what you're building still matches what you intended. Specs drift. Architecture decisions get made by accident. Secrets end up hardcoded. There's no deployment plan. The code works locally and nowhere else.
 
-AgentAlign gives you a team to work with — not a prompt bundle, a team. Specialized agents that each own a slice of the work: your product intent, your architecture, your tests, your security, your deployment. They show up at the right moments and block the wrong ones.
+AgentAlign gives you a team to work with, not a prompt bundle. Specialized agents each own a slice of the work: product intent, architecture, tests, security, deployment, and evaluation. They show up at the right moments and block the wrong ones.
 
 The goal isn't to slow you down. It's to make sure that what you ship is what you meant to build.
 
@@ -45,7 +45,7 @@ If you want to use AgentAlign rather than just read its files, start here:
 
 - [Vibe Coder Process](docs/vibe-coder-process.md)
 
-That guide covers day-to-day operation.
+That guide covers the day-to-day operating model for anyone using AgentAlign with an AI coding assistant.
 
 ## Agent Team
 
