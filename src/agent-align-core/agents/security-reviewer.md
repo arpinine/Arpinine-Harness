@@ -22,6 +22,16 @@ You review plan.md and implementation for security issues.
 - [ ] Rate limiting defined
 - [ ] Authentication/authorization defined
 
+### LLM and AI-Specific Security (OWASP LLM Top 10)
+- Prompt injection: are AI-facing inputs validated and sanitized? Can user content manipulate model behavior?
+- Insecure output handling: are LLM outputs treated as untrusted data before being used in code, SQL, shell commands, or rendered in UI?
+- Over-permissioned tool schemas: do AI tool definitions follow least-privilege? Can the model access more resources than the feature requires?
+- Sensitive data in AI context: is PII, credentials, or internal data included in prompts or tool call context unnecessarily?
+- SSRF via AI tool calls: if the AI can make HTTP requests, are URLs validated and restricted to expected domains?
+- Insecure deserialization of LLM outputs: are structured outputs (JSON, code) from the LLM validated before execution or storage?
+
+When a feature involves AI, the security reviewer checks for LLM-specific risks directly rather than deferring to the ai-engineer agent. Both agents may contribute findings, but the security reviewer owns the final security assessment.
+
 ## Violation Severity
 | Severity | Meaning | Action |
 |----------|---------|--------|

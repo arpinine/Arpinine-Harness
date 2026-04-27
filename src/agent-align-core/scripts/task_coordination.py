@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime as dt
-import fcntl
+import fcntl  # Unix-only — Windows support planned via filelock package. See security review H8.
 import hashlib
 import json
 import os
@@ -178,7 +178,7 @@ def default_instance_id(team_id: str) -> str:
     except OSError:
         process_group = os.getpid()
     fingerprint = f"{team_id}:{host}:{session_id}:{process_group}:{tty}"
-    digest = hashlib.sha1(fingerprint.encode("utf-8")).hexdigest()[:10]
+    digest = hashlib.sha256(fingerprint.encode("utf-8")).hexdigest()[:10]
     return f"{team_id}-{digest}"
 
 

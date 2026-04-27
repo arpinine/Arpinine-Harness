@@ -1,10 +1,10 @@
 ---
 name: reverse-diff-audit
-description: DEPRECATED — consolidated into drift-detector
+description: DEPRECATED — all functionality merged into drift-detector. Do not use directly.
 ---
 
-# Reverse Diff Audit Skill
+# Reverse Diff Audit (Deprecated)
 
-**Deprecated.** All functionality merged into `drift-detector` skill.
+This skill is deprecated. All functionality has been merged into the `drift-detector` skill.
 
-Use `drift-detector` for all spec-code drift detection.
+**If this skill is invoked, redirect to the `drift-detector` skill instead.**

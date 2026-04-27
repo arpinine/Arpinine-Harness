@@ -2,7 +2,6 @@
 # Describes the expected structure of a spec.md file for machine validation.
 # Tools can load this schema to check completeness and surface missing sections.
 
-$schema: "https://agentk.io/schemas/spec/v1"
 type: object
 
 required:

@@ -5,7 +5,8 @@ from support_triage.application.triage_service import SupportTriageService
 from support_triage.domain.ticket import Ticket
 
 
-RESULTS_PATH = pathlib.Path(".specify/evals/001-support-triage-agent/latest-results.md")
+_SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
+RESULTS_PATH = _SCRIPT_DIR.parent.parent / ".specify" / "evals" / "001-support-triage-agent" / "latest-results.md"
 
 SCENARIOS = [
     {
@@ -30,6 +31,12 @@ SCENARIOS = [
 
 
 def run():
+    if not pathlib.Path(".specify").is_dir():
+        raise SystemExit("run_eval.py must be run from the support-agent-demo directory")
+
+    if not SCENARIOS:
+        raise SystemExit("No scenarios defined in SCENARIOS list")
+
     passed = 0
     failures = []
     events_per_scenario = {}

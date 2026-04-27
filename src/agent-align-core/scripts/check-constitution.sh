@@ -1,6 +1,7 @@
 #!/bin/bash
 # Pre-edit constitution check: fires before every Edit/Write via PreToolUse hook.
 # Validate the pending content from stdin, not only the file currently on disk.
+set -euo pipefail
 
 INPUT=$(cat)
 
@@ -22,6 +23,14 @@ except Exception:
 
 tool_input = payload.get("tool_input", {})
 file_path = tool_input.get("file_path", "")
+
+if file_path:
+    resolved = str(pathlib.Path(file_path).resolve())
+    cwd = str(pathlib.Path.cwd().resolve())
+    if not resolved.startswith(cwd + "/") and resolved != cwd:
+        print("")
+        raise SystemExit(0)
+
 content = tool_input.get("content")
 new_string = tool_input.get("new_string")
 old_string = tool_input.get("old_string")
@@ -58,8 +67,17 @@ if candidate is None:
 print(file_path)
 print("<<<CONTENT>>>")
 print(candidate)
-' 2>/dev/null
+'
 )
+PYTHON_EXIT=$?
+if [[ $PYTHON_EXIT -ne 0 && -z "$RESULT" ]]; then
+  echo "AgentAlign governance check failed: Python error (exit code $PYTHON_EXIT)."
+  echo "Ensure your environment is set up correctly:"
+  echo "  - Activate your virtual environment: source .venv/bin/activate"
+  echo "  - Install dependencies: uv sync (or pip install -r requirements.txt)"
+  echo "  - For Node.js projects: nvm use && npm install"
+  exit 1
+fi
 
 FILE_PATH=$(printf '%s\n' "$RESULT" | awk 'BEGIN{seen=0} /^<<<CONTENT>>>$/{seen=1; exit} !seen {print}')
 PENDING_CONTENT=$(printf '%s\n' "$RESULT" | awk 'BEGIN{seen=0} /^<<<CONTENT>>>$/{seen=1; next} seen {print}')
@@ -80,11 +98,14 @@ if [[ "$FILE_PATH" == *"spec.md" ]] && printf '%s' "$PENDING_CONTENT" | grep -q 
   exit 1
 fi
 
-if printf '%s' "$PENDING_CONTENT" | grep -q -iE \
-  "(api_key|api_secret|secret|password|passwd|token|auth_token|access_key|private_key)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{3,}"; then
-  echo "VIOLATION: Hardcoded secret detected in pending changes for $FILE_PATH"
-  echo "Use environment variables or a secret manager reference."
-  exit 1
-fi
+# Secret detection moved to gitleaks pre-commit hook. See setup_security_tooling.py.
+# The following check has been retired in favor of gitleaks, which provides
+# comprehensive secret scanning at commit time.
+# if printf '%s' "$PENDING_CONTENT" | grep -q -iE \
+#   "(api_key|api_secret|secret|password|passwd|token|auth_token|access_key|private_key)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{3,}"; then
+#   echo "VIOLATION: Hardcoded secret detected in pending changes for $FILE_PATH"
+#   echo "Use environment variables or a secret manager reference."
+#   exit 1
+# fi
 
 exit 0

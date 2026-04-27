@@ -12,9 +12,13 @@ import sys
 
 
 SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
-sys.path.insert(0, str(SCRIPT_DIR))
 
-import quick_drift_check as qdc  # noqa: E402
+import importlib.util
+
+_spec = importlib.util.spec_from_file_location("quick_drift_check", SCRIPT_DIR / "quick_drift_check.py")
+_module = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_module)
+qdc = _module
 
 
 def find_project_root(start: pathlib.Path) -> pathlib.Path | None:

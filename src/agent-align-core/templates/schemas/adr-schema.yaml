@@ -2,7 +2,6 @@
 # Describes the expected frontmatter and section structure of an ADR-NNNN-*.md file.
 # Used by adr-manager skill to validate completeness and linkage before acceptance.
 
-$schema: "https://agentk.io/schemas/adr/v1"
 type: object
 
 required:
