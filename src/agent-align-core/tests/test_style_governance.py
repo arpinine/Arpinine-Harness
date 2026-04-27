@@ -23,6 +23,10 @@ class StyleGovernanceTests(unittest.TestCase):
         (self.repo / "tools" / "style" / "java").mkdir(parents=True)
         (self.repo / "tools" / "style" / "rust").mkdir(parents=True)
         (self.repo / "tools" / "style" / "shared").mkdir(parents=True)
+        (self.repo / "tools" / "style" / "swift").mkdir(parents=True)
+        (self.repo / "tools" / "style" / "lua").mkdir(parents=True)
+        (self.repo / "tools" / "style" / "cpp").mkdir(parents=True)
+        (self.repo / "tools" / "style" / "erlang").mkdir(parents=True)
 
     def tearDown(self) -> None:
         self.tempdir.cleanup()
@@ -87,6 +91,61 @@ class StyleGovernanceTests(unittest.TestCase):
             encoding="utf-8",
         )
         result = self.run_hook("src/demo.rs")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_swift_edit_is_blocked_without_style_config(self) -> None:
+        result = self.run_hook("src/Demo.swift")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("no repository-defined style standard found for Swift", result.stdout)
+
+    def test_swift_edit_is_allowed_with_swift_format(self) -> None:
+        (self.repo / "tools" / "style" / "swift" / ".swift-format").write_text(
+            "{\n  \"version\": 1\n}\n",
+            encoding="utf-8",
+        )
+        result = self.run_hook("src/Demo.swift")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_objective_c_edit_is_blocked_without_style_config(self) -> None:
+        result = self.run_hook("src/Demo.m")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("no repository-defined style standard found for Objective-C", result.stdout)
+
+    def test_objective_c_edit_is_allowed_with_clang_format(self) -> None:
+        (self.repo / "tools" / "style" / "cpp" / ".clang-format").write_text(
+            "BasedOnStyle: LLVM\n",
+            encoding="utf-8",
+        )
+        result = self.run_hook("src/Demo.mm")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_lua_edit_is_allowed_with_stylua_config(self) -> None:
+        (self.repo / "tools" / "style" / "lua" / "stylua.toml").write_text(
+            "indent_type = \"Spaces\"\n",
+            encoding="utf-8",
+        )
+        result = self.run_hook("src/demo.lua")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_c_edit_is_allowed_with_clang_format(self) -> None:
+        (self.repo / "tools" / "style" / "cpp" / ".clang-format").write_text(
+            "BasedOnStyle: LLVM\n",
+            encoding="utf-8",
+        )
+        result = self.run_hook("src/demo.c")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_erlang_edit_is_blocked_without_style_config(self) -> None:
+        result = self.run_hook("src/demo.erl")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("no repository-defined style standard found for Erlang", result.stdout)
+
+    def test_erlang_edit_is_allowed_with_elvis_config(self) -> None:
+        (self.repo / "tools" / "style" / "erlang" / "elvis.config").write_text(
+            "[{elvis_project, []}].\n",
+            encoding="utf-8",
+        )
+        result = self.run_hook("src/demo.hrl")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_constitution_edit_is_allowed_without_style_config(self) -> None:

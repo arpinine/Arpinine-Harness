@@ -57,6 +57,10 @@ LANGUAGE_RULES: dict[str, dict[str, object]] = {
         "language": "Rust",
         "configs": [f"{STYLE_ROOT}/rust/rustfmt.toml", f"{STYLE_ROOT}/shared/.editorconfig"],
     },
+    ".swift": {
+        "language": "Swift",
+        "configs": [f"{STYLE_ROOT}/swift/.swift-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+    },
     ".sh": {
         "language": "Shell",
         "configs": [f"{STYLE_ROOT}/shared/.editorconfig", ".shfmt.conf"],
@@ -71,27 +75,43 @@ LANGUAGE_RULES: dict[str, dict[str, object]] = {
     },
     ".lua": {
         "language": "Lua",
-        "configs": [".stylua.toml", "stylua.toml", f"{STYLE_ROOT}/shared/.editorconfig"],
+        "configs": [f"{STYLE_ROOT}/lua/stylua.toml", f"{STYLE_ROOT}/shared/.editorconfig"],
     },
     ".c": {
         "language": "C/C++",
-        "configs": [".clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+        "configs": [f"{STYLE_ROOT}/cpp/.clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+    },
+    ".m": {
+        "language": "Objective-C",
+        "configs": [f"{STYLE_ROOT}/cpp/.clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+    },
+    ".mm": {
+        "language": "Objective-C",
+        "configs": [f"{STYLE_ROOT}/cpp/.clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
     },
     ".cc": {
         "language": "C/C++",
-        "configs": [".clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+        "configs": [f"{STYLE_ROOT}/cpp/.clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
     },
     ".cpp": {
         "language": "C/C++",
-        "configs": [".clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+        "configs": [f"{STYLE_ROOT}/cpp/.clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
     },
     ".h": {
         "language": "C/C++",
-        "configs": [".clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+        "configs": [f"{STYLE_ROOT}/cpp/.clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
     },
     ".hpp": {
         "language": "C/C++",
-        "configs": [".clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+        "configs": [f"{STYLE_ROOT}/cpp/.clang-format", f"{STYLE_ROOT}/shared/.editorconfig"],
+    },
+    ".erl": {
+        "language": "Erlang",
+        "configs": [f"{STYLE_ROOT}/erlang/elvis.config", f"{STYLE_ROOT}/erlang/rebar.config", f"{STYLE_ROOT}/shared/.editorconfig"],
+    },
+    ".hrl": {
+        "language": "Erlang",
+        "configs": [f"{STYLE_ROOT}/erlang/elvis.config", f"{STYLE_ROOT}/erlang/rebar.config", f"{STYLE_ROOT}/shared/.editorconfig"],
     },
 }
 
@@ -106,10 +126,12 @@ STYLE_CONFIG_EDIT_PATHS = {
     "go.mod",
     "Cargo.toml",
     f"{STYLE_ROOT}/rust/rustfmt.toml",
+    f"{STYLE_ROOT}/swift/.swift-format",
     ".shfmt.conf",
-    ".stylua.toml",
-    "stylua.toml",
-    ".clang-format",
+    f"{STYLE_ROOT}/lua/stylua.toml",
+    f"{STYLE_ROOT}/cpp/.clang-format",
+    f"{STYLE_ROOT}/erlang/elvis.config",
+    f"{STYLE_ROOT}/erlang/rebar.config",
 }
 
 
