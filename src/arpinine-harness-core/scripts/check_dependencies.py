@@ -126,8 +126,8 @@ def build_report() -> dict[str, object]:
 
 def render_text(report: dict[str, object]) -> str:
     lines = [
-        "AGENTALIGN DEPENDENCY CHECK",
-        "---------------------------",
+        "ARPININE HARNESS DEPENDENCY CHECK",
+        "----------------------------------",
     ]
 
     for item in report["global"]:
