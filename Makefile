@@ -1,16 +1,16 @@
-PLUGIN_NAME  := agent-align
+PLUGIN_NAME  := arpinine-harness
 VERSION      := $(shell python3 -c 'import json; print(json.load(open("src/implementations/claude/.claude-plugin/plugin.json"))["version"])')
 IMPLEMENTATION ?= claude
-CORE_DIR     := src/agent-align-core
+CORE_DIR     := src/arpinine-harness-core
 IMPLEMENTATION_DIR := src/implementations/$(IMPLEMENTATION)
 DIST_DIR     := dist
 BUILD_NAME   := $(PLUGIN_NAME)-$(IMPLEMENTATION)-v$(VERSION)
 BUILD_DIR    := $(DIST_DIR)/$(BUILD_NAME)
 ZIP_NAME     := $(BUILD_NAME).zip
 ZIP_PATH     := $(DIST_DIR)/$(ZIP_NAME)
-MARKETPLACE  := agent-align-local
-CLAUDE_PLUGIN_DIR := plugins/agent-align-claude
-CODEX_PLUGIN_DIR := plugins/agent-align-codex
+MARKETPLACE  := arpinine-harness-local
+CLAUDE_PLUGIN_DIR := plugins/arpinine-harness-claude
+CODEX_PLUGIN_DIR := plugins/arpinine-harness-codex
 CODEX_MARKETPLACE_FILE := .agents/plugins/marketplace.json
 
 .DEFAULT_GOAL := build

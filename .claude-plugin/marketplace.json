@@ -1,15 +1,15 @@
 {
-  "name": "agent-align-local",
+  "name": "arpinine-harness-local",
   "owner": {
     "name": "Arpinine"
   },
   "metadata": {
-    "description": "Local marketplace for installing the AgentAlign Claude Code plugin from this repository"
+    "description": "Local marketplace for installing the Arpinine Harness Claude Code plugin from this repository"
   },
   "plugins": [
     {
-      "name": "agent-align",
-      "source": "./plugins/agent-align-claude",
+      "name": "arpinine-harness",
+      "source": "./plugins/arpinine-harness-claude",
       "description": "Shared product-engineering workflow with ADRs, drift detection, evaluation, and compounding rule learning"
     }
   ]

@@ -1,9 +1,9 @@
 ---
 name: at-retro
-description: Run an AgentAlign retrospective in Codex using the shared at-retro workflow.
+description: Run an Arpinine Harness retrospective in Codex using the shared at-retro workflow.
 ---
 
-Follow `commands/at-retro.md` from the assembled AgentAlign plugin root.
+Follow `commands/at-retro.md` from the assembled Arpinine Harness plugin root.
 
 When using this skill in Codex:
 - execute the same retrospective workflow defined in `commands/at-retro.md`

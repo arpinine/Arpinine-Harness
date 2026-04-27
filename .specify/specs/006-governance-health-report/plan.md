@@ -51,7 +51,7 @@ Not applicable. This is status aggregation for governance artifacts, not harness
 ## Tasks
 
 - [ ] TASK-001: Document the deterministic EP scoring formula in shared docs/code comments
-- [ ] TASK-002: Extend `src/agent-align-core/scripts/spec_status.py` to include validation state
+- [ ] TASK-002: Extend `src/arpinine-harness-core/scripts/spec_status.py` to include validation state
 - [ ] TASK-003: Add AIN target and readiness columns
 - [ ] TASK-004: Add rule count and recent rule violation summary
 - [ ] TASK-005: Add observation and eval freshness/coverage signals

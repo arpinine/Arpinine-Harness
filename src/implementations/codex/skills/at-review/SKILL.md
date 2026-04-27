@@ -1,9 +1,9 @@
 ---
 name: at-review
-description: Refine and realign an AgentAlign spec in Codex using the shared at-review workflow.
+description: Refine and realign an Arpinine Harness spec in Codex using the shared at-review workflow.
 ---
 
-Follow `commands/at-review.md` from the assembled AgentAlign plugin root.
+Follow `commands/at-review.md` from the assembled Arpinine Harness plugin root.
 
 When using this skill in Codex:
 - execute the same review workflow defined in `commands/at-review.md`

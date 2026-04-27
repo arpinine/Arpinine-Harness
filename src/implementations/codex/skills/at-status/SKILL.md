@@ -1,9 +1,9 @@
 ---
 name: at-status
-description: Show AgentAlign governance status in Codex using the shared at-status workflow.
+description: Show Arpinine Harness governance status in Codex using the shared at-status workflow.
 ---
 
-Follow `commands/at-status.md` from the assembled AgentAlign plugin root.
+Follow `commands/at-status.md` from the assembled Arpinine Harness plugin root.
 
 When using this skill in Codex:
 - execute the same status workflow defined in `commands/at-status.md`

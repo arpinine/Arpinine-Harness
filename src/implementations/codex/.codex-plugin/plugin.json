@@ -1,7 +1,7 @@
 {
-  "name": "agent-align",
+  "name": "arpinine-harness",
   "version": "1.4.0",
-  "description": "Governed product-engineering workflow for Codex using shared AgentAlign artifacts",
+  "description": "Governed product-engineering workflow for Codex using shared Arpinine Harness artifacts",
   "author": {
     "name": "Arpinine"
   },
@@ -10,15 +10,15 @@
   "skills": "./skills/",
   "hooks": "./hooks/hooks.json",
   "interface": {
-    "displayName": "AgentAlign",
+    "displayName": "Arpinine Harness",
     "shortDescription": "Governed workflow for product and engineering delivery",
-    "longDescription": "Adds shared specification, planning, review, and governance workflows to Codex using the AgentAlign core.",
+    "longDescription": "Adds shared specification, planning, review, and governance workflows to Codex using the Arpinine Harness core.",
     "developerName": "Arpinine",
     "category": "Productivity",
     "capabilities": ["Read", "Write", "Execute"],
     "defaultPrompt": [
-      "Use AgentAlign to initialize a governed delivery workflow for this repository.",
-      "Use AgentAlign to create or refine a spec before implementation starts."
+      "Use Arpinine Harness to initialize a governed delivery workflow for this repository.",
+      "Use Arpinine Harness to create or refine a spec before implementation starts."
     ]
   }
 }

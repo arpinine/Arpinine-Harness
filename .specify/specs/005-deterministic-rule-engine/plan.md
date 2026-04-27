@@ -51,7 +51,7 @@ Not applicable. Rule execution governs repository artifacts and code layout, not
 
 - [ ] TASK-001: Define the executable rule field schema
 - [ ] TASK-002: Update templates or examples to use the executable schema
-- [ ] TASK-003: Implement `src/agent-align-core/scripts/check_rules.py`
+- [ ] TASK-003: Implement `src/arpinine-harness-core/scripts/check_rules.py`
 - [ ] TASK-004: Implement stable `--json` output contract
 - [ ] TASK-005: Add file-matching and rule-fixture tests
 - [ ] TASK-006: Integrate rule checks into shared audit/status paths

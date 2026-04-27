@@ -2,7 +2,7 @@
 
 ## Business Case
 
-AgentAlign needs a single view of governance health that product, engineering, and onboarding teammates can trust. The current status output is useful, but it does not yet fully reflect artifact validity, AIN readiness, rules, observations, and evaluation freshness in one coherent surface.
+Arpinine Harness needs a single view of governance health that product, engineering, and onboarding teammates can trust. The current status output is useful, but it does not yet fully reflect artifact validity, AIN readiness, rules, observations, and evaluation freshness in one coherent surface.
 
 A stronger governance health report turns the workflow into an inspectable operating system for delivery rather than a collection of isolated commands.
 

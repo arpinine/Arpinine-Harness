@@ -1,10 +1,10 @@
 # Bootstrapping Governance for Existing Work
 
-Use this when the codebase already exists and you want to retrofit AgentAlign governance retroactively.
+Use this when the codebase already exists and you want to retrofit Arpinine Harness governance retroactively.
 
 ## Prerequisites
 
-- AgentAlign plugin installed (`make install`)
+- Arpinine Harness plugin installed (`make install`)
 - spec-kit installed (`specify --version`)
 - Open a Claude Code session in this repo
 
@@ -13,7 +13,7 @@ Use this when the codebase already exists and you want to retrofit AgentAlign go
 ## Step 1 — Initialize the structure
 
 ```
-/agent-align:at-init
+/arpinine-harness:at-init
 ```
 
 Creates `.specify/specs/`, `.specify/adr/`, `.specify/evals/`, `.specify/observations/`, `.specify/rules/`, and `ADR-INDEX.md`.
@@ -21,7 +21,7 @@ Creates `.specify/specs/`, `.specify/adr/`, `.specify/evals/`, `.specify/observa
 Verify with:
 
 ```
-/agent-align:at-status
+/arpinine-harness:at-status
 ```
 
 ---
@@ -31,7 +31,7 @@ Verify with:
 For each piece of existing work, run:
 
 ```
-/agent-align:at-new <feature name>
+/arpinine-harness:at-new <feature name>
 ```
 
 The plugin reads the existing code and generates a spec from what was built. Review the output and:
@@ -45,8 +45,8 @@ The plugin reads the existing code and generates a spec from what was built. Rev
 Run these in order:
 
 ```
-/agent-align:at-new agent-align core workflow
-/agent-align:at-new plugin platform abstraction
+/arpinine-harness:at-new arpinine-harness core workflow
+/arpinine-harness:at-new plugin platform abstraction
 ```
 
 Each creates `.specify/specs/NNN-<slug>/spec.md`.
@@ -58,7 +58,7 @@ Each creates `.specify/specs/NNN-<slug>/spec.md`.
 For each major technical decision already made, run:
 
 ```
-/agent-align:at-adr new "<decision title>"
+/arpinine-harness:at-adr new "<decision title>"
 ```
 
 Link each ADR to the relevant spec via the `governs:` field.
@@ -66,17 +66,17 @@ Link each ADR to the relevant spec via the `governs:` field.
 ### ADRs to create for this repo
 
 ```
-/agent-align:at-adr new "Separate shared core from assistant-specific implementations"
+/arpinine-harness:at-adr new "Separate shared core from assistant-specific implementations"
 ```
 → governs: `002-plugin-platform-abstraction`
 
 ```
-/agent-align:at-adr new "Stable plugins/ dir as local marketplace registration target"
+/arpinine-harness:at-adr new "Stable plugins/ dir as local marketplace registration target"
 ```
 → governs: `002-plugin-platform-abstraction`
 
 ```
-/agent-align:at-adr new "assemble target as composition primitive for build and install"
+/arpinine-harness:at-adr new "assemble target as composition primitive for build and install"
 ```
 → governs: `002-plugin-platform-abstraction`
 
@@ -89,7 +89,7 @@ Each ADR lives at `.specify/adr/ADR-NNNN-<title>.md`.
 For each spec, run:
 
 ```
-/agent-align:at-plan <slug>
+/arpinine-harness:at-plan <slug>
 ```
 
 The plugin derives a `plan.md` from the existing code. Review and confirm:
@@ -105,7 +105,7 @@ Each creates `.specify/specs/NNN-<slug>/plan.md`.
 ## Step 5 — Verify governance state
 
 ```
-/agent-align:at-status
+/arpinine-harness:at-status
 ```
 
 Expected at this point:
@@ -122,10 +122,10 @@ Expected at this point:
 
 | Command | Why skip |
 |---|---|
-| `/agent-align:at-eval` | Needs a running system with measurable outputs |
-| `/agent-align:at-observe` | Needs runtime traces from actual executions |
-| `/agent-align:at-audit` | Run after first implementation cycle completes |
-| `/agent-align:at-retro` | Run after first delivery milestone |
+| `/arpinine-harness:at-eval` | Needs a running system with measurable outputs |
+| `/arpinine-harness:at-observe` | Needs runtime traces from actual executions |
+| `/arpinine-harness:at-audit` | Run after first implementation cycle completes |
+| `/arpinine-harness:at-retro` | Run after first delivery milestone |
 
 ---
 
@@ -134,7 +134,7 @@ Expected at this point:
 For any new work after governance is bootstrapped, use the full forward flow:
 
 ```
-/agent-align:at-new → /agent-align:at-plan → /agent-align:at-implement → /agent-align:at-eval → /agent-align:at-observe → /agent-align:at-retro
+/arpinine-harness:at-new → /arpinine-harness:at-plan → /arpinine-harness:at-implement → /arpinine-harness:at-eval → /arpinine-harness:at-observe → /arpinine-harness:at-retro
 ```
 
-Do not skip `/agent-align:at-plan` before implementation — hooks will block you if architecture sections are missing.
+Do not skip `/arpinine-harness:at-plan` before implementation — hooks will block you if architecture sections are missing.

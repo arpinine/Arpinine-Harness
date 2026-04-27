@@ -1,6 +1,6 @@
-# AgentAlign Vibe Coder Process
+# Arpinine Harness Operating Process
 
-This document defines the operating process a vibe coder should follow to use AgentAlign successfully.
+This document defines the operating process teams should follow to use Arpinine Harness successfully.
 
 It is written as an execution playbook:
 - each step has a clear scope
@@ -8,16 +8,16 @@ It is written as an execution playbook:
 - each step states what is manual and what is automatic
 
 The process assumes:
-- AgentAlign is registered for the current assistant implementation
+- Arpinine Harness is registered for the current assistant implementation
 - the repository uses the `.specify/` artifact model
 - the user wants fast AI-assisted delivery without losing control of scope, architecture, or quality
 
 ## You Are Working With A Virtual Delivery Team
 
-AgentAlign is not a single assistant command wrapper.
+Arpinine Harness is not a single assistant command wrapper.
 It is a coordinated team of agent roles operating through one plugin interface.
 
-When the vibe coder runs an AgentAlign command, the plugin should behave like a delivery team:
+When a user runs an Arpinine Harness command, the plugin should behave like a delivery team:
 - `product-owner`: clarifies user value, scope, constraints, and acceptance criteria
 - `tech-architect`: defines boundaries, dependencies, sequencing, and ADR-worthy decisions
 - `tdd-guide`: keeps implementation task-aligned, incremental, and test-first
@@ -25,11 +25,11 @@ When the vibe coder runs an AgentAlign command, the plugin should behave like a 
 - `evaluation-governor`: makes quality expectations explicit and measurable
 - `drift-detector`: checks that spec, plan, ADRs, implementation, and observations still agree
 
-The vibe coder should experience one conversation, but behind that conversation the plugin is expected to apply the right specialist posture for the current step.
+The user should experience one conversation, but behind that conversation the plugin is expected to apply the right specialist posture for the current step.
 
 ## You May Also Be Working Alongside Another Assistant Team
 
-AgentAlign supports multiple assistant teams sharing the same governed repository at the same time.
+Arpinine Harness supports multiple assistant teams sharing the same governed repository at the same time.
 
 Typical example:
 
@@ -45,7 +45,7 @@ So the operating model has two layers:
 
 ## Operating Principle
 
-AgentAlign is not a prompt pack for "just build it".
+Arpinine Harness is not a prompt pack for "just build it".
 It is a governed delivery loop:
 
 1. define intent
@@ -58,18 +58,18 @@ It is a governed delivery loop:
 8. audit drift
 9. extract reusable lessons
 
-The vibe coder should never skip directly from idea to code when the work is non-trivial.
+The user should never skip directly from idea to code when the work is non-trivial.
 
 ## Manual Means "Answer Questions", Not "Edit Artifacts"
 
-AgentAlign should minimize document editing by the vibe coder.
+Arpinine Harness should minimize document editing by the user.
 
 Default rule:
 - the plugin asks focused questions when information is missing
-- the vibe coder answers in chat
+- the user answers in chat
 - the plugin updates the correct artifact directly
 
-The vibe coder should only edit `spec.md`, `plan.md`, ADRs, eval files, or rule files manually when they explicitly want to override or fine-tune the generated content.
+The user should only edit `spec.md`, `plan.md`, ADRs, eval files, or rule files manually when they explicitly want to override or fine-tune the generated content.
 
 ## Role Posture By Step
 
@@ -118,12 +118,12 @@ Make the plugin available in the current assistant and confirm the repo can use 
 
 **Expected Deliverable**
 - plugin available in the assistant
-- repo ready to run `/agent-align:*` workflow commands
+- repo ready to run `/arpinine-harness:*` workflow commands
 
 ## Step 1: Initialize Governance
 
 **Command**
-- `/agent-align:at-init`
+- `/arpinine-harness:at-init`
 
 **Goal**
 Create the shared governance structure for the repo.
@@ -153,7 +153,7 @@ Create the shared governance structure for the repo.
 ## Step 2: Define The Feature
 
 **Command**
-- `/agent-align:at-new <feature name>`
+- `/arpinine-harness:at-new <feature name>`
 
 **Goal**
 Turn an idea or request into a product-facing specification.
@@ -188,7 +188,7 @@ Turn an idea or request into a product-facing specification.
 ## Step 3: Refine The Spec
 
 **Command**
-- `/agent-align:at-review <slug>`
+- `/arpinine-harness:at-review <slug>`
 
 **Goal**
 Make the spec safe to implement.
@@ -222,7 +222,7 @@ Make the spec safe to implement.
 ## Step 4: Plan The Work
 
 **Command**
-- `/agent-align:at-plan <slug>`
+- `/arpinine-harness:at-plan <slug>`
 
 **Goal**
 Convert the approved spec into an executable engineering plan.
@@ -264,7 +264,7 @@ When multiple assistant instances will run concurrently, assign tasks in `plan.m
 ## Step 5: Record Consequential Decisions
 
 **Command**
-- `/agent-align:at-adr new "<decision title>"`
+- `/arpinine-harness:at-adr new "<decision title>"`
 
 **Goal**
 Capture decisions that should not remain implicit in code.
@@ -297,7 +297,7 @@ Capture decisions that should not remain implicit in code.
 ## Step 6: Implement Task By Task
 
 **Command**
-- `/agent-align:at-implement <slug>`
+- `/arpinine-harness:at-implement <slug>`
 
 **Goal**
 Execute the plan without drifting from the spec, architecture, or ADRs.
@@ -337,9 +337,9 @@ Execute the plan without drifting from the spec, architecture, or ADRs.
 ## Step 7: Evaluate Where Required
 
 **Command**
-- `/agent-align:at-eval plan <slug>`
-- `/agent-align:at-eval run <slug>`
-- `/agent-align:at-eval review <slug>`
+- `/arpinine-harness:at-eval plan <slug>`
+- `/arpinine-harness:at-eval run <slug>`
+- `/arpinine-harness:at-eval review <slug>`
 
 **Goal**
 Prove quality with explicit metrics when the feature needs more than conventional tests.
@@ -371,8 +371,8 @@ Prove quality with explicit metrics when the feature needs more than conventiona
 ## Step 8: Observe Runtime Behavior Where Relevant
 
 **Command**
-- `/agent-align:at-observe record <slug>`
-- `/agent-align:at-observe review <slug>`
+- `/arpinine-harness:at-observe record <slug>`
+- `/arpinine-harness:at-observe review <slug>`
 
 **Goal**
 Capture what the system actually did at runtime and compare that to the plan.
@@ -405,7 +405,7 @@ Capture what the system actually did at runtime and compare that to the plan.
 ## Step 9: Audit Drift
 
 **Command**
-- `/agent-align:at-audit <slug>`
+- `/arpinine-harness:at-audit <slug>`
 
 **Goal**
 Detect where implementation, spec, plan, ADRs, evals, and observations no longer agree.
@@ -441,7 +441,7 @@ Detect where implementation, spec, plan, ADRs, evals, and observations no longer
 ## Step 10: Capture Lessons
 
 **Command**
-- `/agent-align:at-retro <slug>`
+- `/arpinine-harness:at-retro <slug>`
 
 **Goal**
 Turn one feature's learning into reusable team rules.
@@ -471,10 +471,10 @@ Turn one feature's learning into reusable team rules.
 ## Step 11: Use Status As The Daily Control Surface
 
 **Command**
-- `/agent-align:at-status`
+- `/arpinine-harness:at-status`
 
 **Goal**
-Give the vibe coder one safe place to understand project state before making changes.
+Give the user one safe place to understand project state before making changes.
 
 **Scope**
 - spec coverage
@@ -502,21 +502,21 @@ Give the vibe coder one safe place to understand project state before making cha
 
 For a new feature:
 
-1. `/agent-align:at-new`
-2. `/agent-align:at-review`
-3. `/agent-align:at-plan`
-4. `/agent-align:at-adr new ...` when a decision is consequential
-5. `/agent-align:at-implement`
-6. `/agent-align:at-eval ...` if needed
-7. `/agent-align:at-observe ...` if runtime evidence matters
-8. `/agent-align:at-audit`
-9. `/agent-align:at-retro`
+1. `/arpinine-harness:at-new`
+2. `/arpinine-harness:at-review`
+3. `/arpinine-harness:at-plan`
+4. `/arpinine-harness:at-adr new ...` when a decision is consequential
+5. `/arpinine-harness:at-implement`
+6. `/arpinine-harness:at-eval ...` if needed
+7. `/arpinine-harness:at-observe ...` if runtime evidence matters
+8. `/arpinine-harness:at-audit`
+9. `/arpinine-harness:at-retro`
 
 For an existing feature already in progress:
 
-1. `/agent-align:at-status`
+1. `/arpinine-harness:at-status`
 2. read the spec, plan, ADRs, and delivery matrix
-3. continue the next planned task with `/agent-align:at-implement`
+3. continue the next planned task with `/arpinine-harness:at-implement`
 4. audit if drift appears
 
 ## What Is Manual vs Automatic Overall
@@ -555,11 +555,11 @@ Do not:
 
 If the team is lightweight and wants the smallest process that still works:
 
-1. `/agent-align:at-init`
-2. `/agent-align:at-new`
-3. `/agent-align:at-review`
-4. `/agent-align:at-plan`
-5. `/agent-align:at-implement`
-6. `/agent-align:at-status`
+1. `/arpinine-harness:at-init`
+2. `/arpinine-harness:at-new`
+3. `/arpinine-harness:at-review`
+4. `/arpinine-harness:at-plan`
+5. `/arpinine-harness:at-implement`
+6. `/arpinine-harness:at-status`
 
-That is the minimum viable governed vibe-coding loop.
+That is the minimum viable governed delivery loop.

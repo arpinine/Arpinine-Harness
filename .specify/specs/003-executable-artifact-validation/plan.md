@@ -53,7 +53,7 @@ Not applicable. This is shared governance tooling, not a harness-based product w
 ## Tasks
 
 - [ ] TASK-001: Define the validation scope per artifact type and reuse existing schemas where available
-- [ ] TASK-002: Implement `src/agent-align-core/scripts/validate_artifacts.py`
+- [ ] TASK-002: Implement `src/arpinine-harness-core/scripts/validate_artifacts.py`
 - [ ] TASK-003: Add plan validation rules for required sections and stable IDs
 - [ ] TASK-004: Extend or tighten schema coverage for specs, ADRs, observations, and rules
 - [ ] TASK-005: Add targeted hook integration for affected artifact writes

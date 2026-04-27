@@ -2,7 +2,7 @@
 
 ## Business Case
 
-Retrospectives and audits only compound value if their lessons become enforceable. Today AgentAlign can describe rules in markdown, but recurring failures can still reappear unless there is a deterministic execution path that turns those rules into repeatable checks.
+Retrospectives and audits only compound value if their lessons become enforceable. Today Arpinine Harness can describe rules in markdown, but recurring failures can still reappear unless there is a deterministic execution path that turns those rules into repeatable checks.
 
 A first deterministic rule engine lets the plugin prevent or report known classes of failure without depending purely on assistant interpretation.
 

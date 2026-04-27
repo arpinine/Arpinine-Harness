@@ -2,7 +2,7 @@
 
 ## Business Case
 
-AgentAlign relies on text artifacts such as `spec.md`, `plan.md`, ADRs, eval plans, observations, and rules. Today those artifacts are well structured by convention, but not fully enforced by executable validation. That leaves room for drift, malformed documents, and aspirational claims that the plugin cannot verify.
+Arpinine Harness relies on text artifacts such as `spec.md`, `plan.md`, ADRs, eval plans, observations, and rules. Today those artifacts are well structured by convention, but not fully enforced by executable validation. That leaves room for drift, malformed documents, and aspirational claims that the plugin cannot verify.
 
 Executable artifact validation turns the governance model into a machine-checkable contract. It is the foundation for stronger hooks, safer automation, CI verification, and implementation-neutral behavior across Claude, Codex, and future hosts.
 

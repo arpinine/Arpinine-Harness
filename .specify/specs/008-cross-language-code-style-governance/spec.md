@@ -2,7 +2,7 @@
 
 ## Business Case
 
-AgentAlign now supports multiple teams and assistant implementations working in the same repository. Without one shared code-style contract, Claude, Codex, and future teams can all produce valid code that still diverges in formatting, lint expectations, and file conventions by language.
+Arpinine Harness now supports multiple teams and assistant implementations working in the same repository. Without one shared code-style contract, Claude, Codex, and future teams can all produce valid code that still diverges in formatting, lint expectations, and file conventions by language.
 
 That inconsistency increases review noise, weakens trust in generated changes, and makes governance less reliable because style becomes dependent on which assistant or human happened to edit a file. The workflow needs one repository-owned, language-specific style standard that all teams follow and that shared hooks can validate before implementation edits proceed.
 
@@ -45,7 +45,7 @@ That inconsistency increases review noise, weakens trust in generated changes, a
 - Automatically running every formatter and linter during every file write
 - Defining style standards for every language the repository might ever add
 - IDE/editor integration beyond checked-in repository documentation and config paths
-- Replacing language-native tooling with AgentAlign-specific style engines
+- Replacing language-native tooling with Arpinine Harness-specific style engines
 
 ## AI-Nativeness Assessment
 

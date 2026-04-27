@@ -13,7 +13,7 @@ covers:
 Proposed
 
 ## Context
-AgentAlign must deliver the same governance workflow across multiple AI coding assistant platforms (Claude Code, Codex, and future assistants). Each platform has its own plugin manifest format, skill registration conventions, and extension points.
+Arpinine Harness must deliver the same governance workflow across multiple AI coding assistant platforms (Claude Code, Codex, and future assistants). Each platform has its own plugin manifest format, skill registration conventions, and extension points.
 
 Without a clear boundary, platform-specific concerns (manifest format, skill wrappers) would bleed into governance logic (commands, hooks, agents, templates), making it impossible to support a new assistant without modifying shared behavior.
 
@@ -22,13 +22,13 @@ The team needed a structure where the complete governance workflow lives in one 
 ## Decision
 The plugin source is split into two layers:
 
-1. `src/agent-align-core/` — all governance logic: commands, hooks, agents, skills, scripts, and templates. This directory is platform-agnostic.
+1. `src/arpinine-harness-core/` — all governance logic: commands, hooks, agents, skills, scripts, and templates. This directory is platform-agnostic.
 2. `src/implementations/<assistant>/` — platform-specific artifacts only: the assistant's plugin manifest and any skill wrappers or overrides that the platform requires.
 
 A `make assemble IMPLEMENTATION=<assistant>` step merges core + implementation into a single deployable build directory. The assembled output contains everything needed to install the plugin into the target assistant.
 
 ## Consequences
-- Positive: Adding a new assistant implementation requires no changes to `src/agent-align-core/`.
+- Positive: Adding a new assistant implementation requires no changes to `src/arpinine-harness-core/`.
 - Positive: The governance workflow can be tested and reasoned about independently of any platform.
 - Positive: Platform-specific bugs are isolated to the implementation layer.
 - Negative: The `assemble` step is an indirection that developers must understand — files in `plugins/` and `dist/` are generated, not authoritative.

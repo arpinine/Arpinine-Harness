@@ -1,9 +1,9 @@
 ---
 name: at-plan
-description: Turn an approved AgentAlign spec into a plan in Codex using the shared at-plan workflow.
+description: Turn an approved Arpinine Harness spec into a plan in Codex using the shared at-plan workflow.
 ---
 
-Follow `commands/at-plan.md` from the assembled AgentAlign plugin root.
+Follow `commands/at-plan.md` from the assembled Arpinine Harness plugin root.
 
 When using this skill in Codex:
 - execute the same planning workflow defined in `commands/at-plan.md`

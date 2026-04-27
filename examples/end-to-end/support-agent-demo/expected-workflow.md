@@ -1,4 +1,4 @@
-# Expected AgentAlign Workflow
+# Expected Arpinine Harness Workflow
 
 Use this file as a facilitator script when demonstrating the plugin.
 
@@ -17,7 +17,7 @@ Explain that the spec captures business case, user value, requirements, acceptan
 Run:
 
 ```text
-/agent-align:at-review .specify/specs/001-support-triage-agent/spec.md
+/arpinine-harness:at-review .specify/specs/001-support-triage-agent/spec.md
 ```
 
 Expected discussion:
@@ -30,7 +30,7 @@ Expected discussion:
 Run:
 
 ```text
-/agent-align:at-plan .specify/specs/001-support-triage-agent/
+/arpinine-harness:at-plan .specify/specs/001-support-triage-agent/
 ```
 
 Expected discussion:
@@ -44,7 +44,7 @@ Expected discussion:
 Run:
 
 ```text
-/agent-align:at-eval plan .specify/specs/001-support-triage-agent/
+/arpinine-harness:at-eval plan .specify/specs/001-support-triage-agent/
 ```
 
 Expected discussion:
@@ -92,7 +92,7 @@ Expected discussion:
 Run:
 
 ```text
-/agent-align:at-audit .specify/specs/001-support-triage-agent/spec.md
+/arpinine-harness:at-audit .specify/specs/001-support-triage-agent/spec.md
 ```
 
 Expected discussion:
@@ -104,7 +104,7 @@ Expected discussion:
 Run:
 
 ```text
-/agent-align:at-retro .specify/specs/001-support-triage-agent/spec.md
+/arpinine-harness:at-retro .specify/specs/001-support-triage-agent/spec.md
 ```
 
 Expected discussion:

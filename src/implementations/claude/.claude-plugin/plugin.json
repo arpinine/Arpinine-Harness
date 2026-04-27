@@ -1,5 +1,5 @@
 {
-  "name": "agent-align",
+  "name": "arpinine-harness",
   "version": "1.4.0",
   "description": "Shared product-engineering workflow with ADRs, drift detection, evaluation, and compounding rule learning",
   "author": {

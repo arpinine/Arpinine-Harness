@@ -18,7 +18,7 @@ Two-layer source structure, single-step composition:
 
 ```
 src/
-  agent-align-core/       ← platform-agnostic governance logic
+  arpinine-harness-core/       ← platform-agnostic governance logic
     agents/               ← agent role definitions
     commands/             ← at-* workflow command definitions
     hooks/                ← hooks.json (PreToolUse, PostToolUse)
@@ -36,8 +36,8 @@ src/
 Makefile                  ← build orchestrator (assemble, build, install, validate)
 
 plugins/                  ← stable registration targets (generated, committed)
-  agent-align-claude/     ← assembled Claude plugin; used for marketplace registration
-  agent-align-codex/      ← assembled Codex plugin (future install path)
+  arpinine-harness-claude/     ← assembled Claude plugin; used for marketplace registration
+  arpinine-harness-codex/      ← assembled Codex plugin (future install path)
 
 dist/                     ← transient artifacts (cleaned on every assemble)
   <name>-<impl>-v<ver>.zip
@@ -49,7 +49,7 @@ dist/                     ← transient artifacts (cleaned on every assemble)
 
 | Module | Responsibility | Depends On | Interface |
 |--------|----------------|------------|-----------|
-| `src/agent-align-core/` | All governance behavior: commands, hooks, agents, skills, templates | Nothing | File-system directory; consumed by assemble overlay |
+| `src/arpinine-harness-core/` | All governance behavior: commands, hooks, agents, skills, templates | Nothing | File-system directory; consumed by assemble overlay |
 | `src/implementations/<name>/` | Platform manifest and any platform-required skill wrappers | Nothing from core (overlay only) | File-system directory; overlaid onto core by assemble |
 | `Makefile` | Orchestrates assembly, packaging, install, validate, clean | Reads: core + implementation dirs. Writes: dist/, plugins/ | Shell targets with IMPLEMENTATION variable |
 | `plugins/<name>/` | Stable registration target; assembled copy of the plugin | None (output only) | Local directory path registered with assistant marketplace |
@@ -57,7 +57,7 @@ dist/                     ← transient artifacts (cleaned on every assemble)
 
 ## Dependency Rules
 
-- `src/agent-align-core/` MUST NOT reference any path or artifact under `src/implementations/`.
+- `src/arpinine-harness-core/` MUST NOT reference any path or artifact under `src/implementations/`.
 - `src/implementations/<name>/` MUST NOT contain governance artifacts — no commands, no agent definitions, no templates, no shared scripts. Platform-specific skill wrappers (Codex only) are permitted only where the platform cannot load the shared command format directly.
 - `Makefile` reads from `src/` directories and writes to `dist/` and `plugins/`. Source directories MUST NOT reference generated output.
 - `plugins/` and `dist/` are generated artifacts. No source file, test, or script MUST depend on their contents.
@@ -66,13 +66,13 @@ dist/                     ← transient artifacts (cleaned on every assemble)
 
 | Boundary | Test Type | Verification Method |
 |----------|-----------|---------------------|
-| Core independence | Static check | `grep -r "implementations/" src/agent-align-core/` returns empty |
+| Core independence | Static check | `grep -r "implementations/" src/arpinine-harness-core/` returns empty |
 | Implementation boundary | Static check | No `commands/`, `agents/`, `templates/` dirs exist under any `src/implementations/<name>/` |
-| Assemble idempotency (NFR-002) | Functional | Run `make assemble` twice; `diff -r plugins/agent-align-claude/ <second-output>/` reports no differences |
-| Validation (AC-001, AC-002) | Functional | `claude plugin validate plugins/agent-align-claude/` exits 0 |
+| Assemble idempotency (NFR-002) | Functional | Run `make assemble` twice; `diff -r plugins/arpinine-harness-claude/ <second-output>/` reports no differences |
+| Validation (AC-001, AC-002) | Functional | `claude plugin validate plugins/arpinine-harness-claude/` exits 0 |
 | Error on missing dir (AC-003, FR-007) | Functional | Rename core dir; run `make assemble`; assert exit non-zero with named error message |
 | Stable registration (NFR-003) | Functional | Run `make clean && make assemble`; confirm marketplace registration still resolves |
-| Command availability (AC-005) | Manual | After install, confirm `/agent-align:at-new`, `/agent-align:at-plan`, `/agent-align:at-implement`, and all other `at-*` commands respond |
+| Command availability (AC-005) | Manual | After install, confirm `/arpinine-harness:at-new`, `/arpinine-harness:at-plan`, `/arpinine-harness:at-implement`, and all other `at-*` commands respond |
 | Codex subset (AC-006) | Manual | After Codex install, confirm `at-init`, `at-new`, `at-review`, `at-plan` respond; others absent |
 
 ## Harness Strategy
@@ -82,12 +82,12 @@ N/A — this plugin has no agent runtime dependency. The plugin governs harness 
 ## Tasks
 
 ### Verification (retroactive — implementation already exists)
-- [ ] TASK-001: Run `grep -r "implementations/" src/agent-align-core/` and confirm empty — verifies core independence
+- [ ] TASK-001: Run `grep -r "implementations/" src/arpinine-harness-core/` and confirm empty — verifies core independence
 - [ ] TASK-002: Confirm no `commands/`, `agents/`, or `templates/` dirs under any `src/implementations/<name>/` — verifies implementation boundary
-- [ ] TASK-003: Run `make assemble IMPLEMENTATION=claude` twice; diff both `plugins/agent-align-claude/` outputs — verifies NFR-002 idempotency
-- [ ] TASK-004: Rename `src/agent-align-core/` temporarily; run `make assemble`; confirm exit non-zero with error naming the missing component — verifies AC-003 and FR-007
-- [ ] TASK-005: Run `claude plugin validate plugins/agent-align-claude/` — verifies AC-001
-- [ ] TASK-006: Confirm all `/agent-align:at-*` commands respond after Claude install — verifies AC-005
+- [ ] TASK-003: Run `make assemble IMPLEMENTATION=claude` twice; diff both `plugins/arpinine-harness-claude/` outputs — verifies NFR-002 idempotency
+- [ ] TASK-004: Rename `src/arpinine-harness-core/` temporarily; run `make assemble`; confirm exit non-zero with error naming the missing component — verifies AC-003 and FR-007
+- [ ] TASK-005: Run `claude plugin validate plugins/arpinine-harness-claude/` — verifies AC-001
+- [ ] TASK-006: Confirm all `/arpinine-harness:at-*` commands respond after Claude install — verifies AC-005
 - [ ] TASK-007: Document Codex parity gap explicitly in `src/implementations/codex/README.md` — resolves OQ-002
 
 ### Open question resolution

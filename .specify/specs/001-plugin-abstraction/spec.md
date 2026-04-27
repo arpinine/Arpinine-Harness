@@ -2,13 +2,13 @@
 
 ## Business Case
 
-AgentAlign governance workflows should be available to any team regardless of which AI coding assistant they use. Tying the plugin to a single assistant platform limits adoption and forces teams to choose between governance and their preferred tooling. A platform abstraction separates the shared governance core from assistant-specific delivery so both can evolve independently.
+Arpinine Harness governance workflows should be available to any team regardless of which AI coding assistant they use. Tying the plugin to a single assistant platform limits adoption and forces teams to choose between governance and their preferred tooling. A platform abstraction separates the shared governance core from assistant-specific delivery so both can evolve independently.
 
 ## User Stories
 
 - As a plugin author, I want to maintain one shared governance core and add new assistant implementations independently, so that new platform support does not require changes to existing workflow logic.
-- As a team member using Claude Code, I want to install and use AgentAlign governance commands natively in my assistant, so that the workflow fits my existing tool.
-- As a team member using Codex, I want to install and use AgentAlign governance commands in Codex, so that I get the same governance guarantees without switching assistants.
+- As a team member using Claude Code, I want to install and use Arpinine Harness governance commands natively in my assistant, so that the workflow fits my existing tool.
+- As a team member using Codex, I want to install and use Arpinine Harness governance commands in Codex, so that I get the same governance guarantees without switching assistants.
 - As a plugin author, I want to build and package the plugin for a specific assistant from a single command, so that releases are repeatable and not error-prone.
 
 ## Requirements
@@ -34,7 +34,7 @@ AgentAlign governance workflows should be available to any team regardless of wh
 - [ ] AC-002: Given a build invoked with the Codex implementation selector, a zip artifact is produced and the stable Codex registration directory is populated with the assembled plugin.
 - [ ] AC-003: Given a missing core or implementation source directory, the build halts with an error naming the missing component before creating any output files or directories.
 - [ ] AC-004: Given a build run twice from the same source, a recursive file-content comparison of the two outputs reports no differences.
-- [ ] AC-005: Given a Claude Code install, all core governance commands are available as `/agent-align:at-new`, `/agent-align:at-plan`, `/agent-align:at-implement`, and the remaining `/agent-align:at-*` commands.
+- [ ] AC-005: Given a Claude Code install, all core governance commands are available as `/arpinine-harness:at-new`, `/arpinine-harness:at-plan`, `/arpinine-harness:at-implement`, and the remaining `/arpinine-harness:at-*` commands.
 - [ ] AC-006: Given a Codex install, the implemented subset of governance commands is available and the remaining commands are absent or marked explicitly as not yet implemented.
 - [ ] AC-007: Given a new implementation directory added under the implementations source root, the build produces a valid assembled artifact without changes to the shared core source.
 

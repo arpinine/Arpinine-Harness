@@ -1,9 +1,9 @@
 ---
 name: at-eval
-description: Define, run, and review AgentAlign evaluation in Codex using the shared at-eval workflow.
+description: Define, run, and review Arpinine Harness evaluation in Codex using the shared at-eval workflow.
 ---
 
-Follow `commands/at-eval.md` from the assembled AgentAlign plugin root.
+Follow `commands/at-eval.md` from the assembled Arpinine Harness plugin root.
 
 When using this skill in Codex:
 - execute the same evaluation workflow defined in `commands/at-eval.md`

@@ -1,6 +1,6 @@
 # Codex Implementation Plan
 
-This directory owns the Codex-specific implementation layer for AgentAlign.
+This directory owns the Codex-specific implementation layer for Arpinine Harness.
 
 The intended abstraction is the common-denominator implementation contract:
 - `assemble`
@@ -19,7 +19,7 @@ Implemented now:
 - shared hook wiring through `hooks/hooks.json`, including automatic delivery-matrix refresh on `plan.md` writes
 - shared multi-team coordination inherited from the core, including task-claim enforcement and style-governance checks
 - real marketplace registration via `codex marketplace add ./`
-- first Codex skills that wrap the shared AgentAlign workflows:
+- first Codex skills that wrap the shared Arpinine Harness workflows:
   - `at-adr`
   - `at-audit`
   - `at-eval`
@@ -38,7 +38,7 @@ Not implemented yet:
 
 ## Goal
 
-Add a real Codex implementation without changing the shared AgentAlign core contract and without regressing the working Claude implementation.
+Add a real Codex implementation without changing the shared Arpinine Harness core contract and without regressing the working Claude implementation.
 
 Codex is expected to participate in the same multi-team operating model as Claude:
 
@@ -58,7 +58,7 @@ Codex is expected to participate in the same multi-team operating model as Claud
    - hooks model
    - agent and skill support
 
-2. Map AgentAlign core features to Codex capabilities.
+2. Map Arpinine Harness core features to Codex capabilities.
    Classify shared core assets as:
    - directly reusable
    - requires Codex-specific adaptation
@@ -76,10 +76,10 @@ Codex is expected to participate in the same multi-team operating model as Claud
 
 5. Implement the smallest supported Codex feature set first.
    Initial target:
-   - `/agent-align:at-init`
-   - `/agent-align:at-new`
-   - `/agent-align:at-review`
-   - `/agent-align:at-plan`
+   - `/arpinine-harness:at-init`
+   - `/arpinine-harness:at-new`
+   - `/arpinine-harness:at-review`
+   - `/arpinine-harness:at-plan`
 
 6. Add Codex-specific shims only where required.
    Keep shared prompts and workflow assets in the core unless Codex imposes a real limitation.
@@ -109,7 +109,7 @@ Codex is expected to participate in the same multi-team operating model as Claud
 
 ## Guardrails
 
-- do not add Claude-specific metadata back into `src/agent-align-core/`
+- do not add Claude-specific metadata back into `src/arpinine-harness-core/`
 - do not copy Claude metadata into this directory without a concrete Codex contract
 - keep the shared workflow content identical across implementations unless there is a verified assistant limitation
 

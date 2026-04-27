@@ -1,9 +1,9 @@
 ---
 name: at-audit
-description: Detect and realign AgentAlign drift in Codex using the shared at-audit workflow.
+description: Detect and realign Arpinine Harness drift in Codex using the shared at-audit workflow.
 ---
 
-Follow `commands/at-audit.md` from the assembled AgentAlign plugin root.
+Follow `commands/at-audit.md` from the assembled Arpinine Harness plugin root.
 
 When using this skill in Codex:
 - execute the same audit workflow defined in `commands/at-audit.md`

@@ -1,14 +1,14 @@
 {
-  "name": "agent-align-local",
+  "name": "arpinine-harness-local",
   "interface": {
-    "displayName": "AgentAlign Local"
+    "displayName": "Arpinine Harness Local"
   },
   "plugins": [
     {
-      "name": "agent-align",
+      "name": "arpinine-harness",
       "source": {
         "source": "local",
-        "path": "./plugins/agent-align-codex"
+        "path": "./plugins/arpinine-harness-codex"
       },
       "policy": {
         "installation": "AVAILABLE",

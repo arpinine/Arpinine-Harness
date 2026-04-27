@@ -1,9 +1,9 @@
 ---
 name: at-observe
-description: Record and review AgentAlign runtime observations in Codex using the shared at-observe workflow.
+description: Record and review Arpinine Harness runtime observations in Codex using the shared at-observe workflow.
 ---
 
-Follow `commands/at-observe.md` from the assembled AgentAlign plugin root.
+Follow `commands/at-observe.md` from the assembled Arpinine Harness plugin root.
 
 When using this skill in Codex:
 - execute the same observation workflow defined in `commands/at-observe.md`

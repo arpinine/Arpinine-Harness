@@ -13,14 +13,14 @@ covers:
 Proposed
 
 ## Context
-The plugin has two production targets: a zip artifact for distribution and an installed copy for local development. Both require the same composition step — merging `src/agent-align-core/` with `src/implementations/<assistant>/` into a single directory.
+The plugin has two production targets: a zip artifact for distribution and an installed copy for local development. Both require the same composition step — merging `src/arpinine-harness-core/` with `src/implementations/<assistant>/` into a single directory.
 
 Without a shared primitive, `build` and `install` would each need to duplicate the merge logic, risking divergence (e.g., install copies files that build omits, or vice versa). A one-step `make build` that implicitly does everything is opaque and harder to debug when assembly fails mid-way.
 
 ## Decision
 `make assemble IMPLEMENTATION=<assistant>` is the single composition primitive. It:
 1. Cleans the prior build directory
-2. Copies `src/agent-align-core/` into `BUILD_DIR`
+2. Copies `src/arpinine-harness-core/` into `BUILD_DIR`
 3. Overlays `src/implementations/<assistant>/` onto `BUILD_DIR`
 4. Removes dev artifacts (pycache, pyc, empty dirs)
 5. Copies `BUILD_DIR` to `plugins/<assistant>/` as the stable registration target

@@ -2,7 +2,7 @@
 
 ## Business Case
 
-AgentAlign now supports more than one assistant implementation, but delivery coordination still breaks down if Claude and Codex can start the same task concurrently. A shared workflow only becomes operationally safe for multi-team use when task ownership is explicit, machine-readable, and enforced before implementation edits land.
+Arpinine Harness now supports more than one assistant implementation, but delivery coordination still breaks down if Claude and Codex can start the same task concurrently. A shared workflow only becomes operationally safe for multi-team use when task ownership is explicit, machine-readable, and enforced before implementation edits land.
 
 This feature gives the governed workflow a real coordination contract so one team can work in Claude while another works in Codex without silently duplicating effort or overwriting each other's ownership.
 

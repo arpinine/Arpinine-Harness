@@ -13,14 +13,14 @@ covers:
 Accepted
 
 ## Context
-AgentAlign supports multiple assistant implementations, but the original implementation workflow assumed one active delivery team at a time. Task selection was effectively derived from `plan.md` checkbox state alone, which is sufficient for sequential work but unsafe for concurrent execution by Claude and Codex.
+Arpinine Harness supports multiple assistant implementations, but the original implementation workflow assumed one active delivery team at a time. Task selection was effectively derived from `plan.md` checkbox state alone, which is sufficient for sequential work but unsafe for concurrent execution by Claude and Codex.
 
 The workflow needed a coordination mechanism that both implementations could inspect and update without introducing assistant-specific semantics or requiring an external service. That mechanism also had to preserve `plan.md` as the human-readable planning artifact while preventing one runtime from starting work already assigned to or claimed by the other.
 
 The repository already uses shared scripts, hooks, and generated artifacts as the common cross-implementation seam. Multi-team coordination needed to follow that same design rather than pushing ownership logic into Claude-only or Codex-only overlays.
 
 ## Decision
-AgentAlign stores multi-team task ownership in a shared file-based coordination registry under `.specify/coordination/<slug>.json`.
+Arpinine Harness stores multi-team task ownership in a shared file-based coordination registry under `.specify/coordination/<slug>.json`.
 
 The coordination model is:
 

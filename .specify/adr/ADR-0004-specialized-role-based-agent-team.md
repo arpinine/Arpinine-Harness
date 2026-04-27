@@ -1,10 +1,10 @@
 ---
-governs: specs/002-agent-align-core-workflow
+governs: specs/002-arpinine-harness-core-workflow
 supersedes: ~
 status: Proposed
 date: 2026-04-25
 covers:
-  - decision:002-agent-align-core-workflow:agent-team-structure
+  - decision:002-arpinine-harness-core-workflow:agent-team-structure
 ---
 
 # ADR-0004: Specialized role-based agent team
@@ -13,7 +13,7 @@ covers:
 Proposed
 
 ## Context
-The AgentAlign workflow requires AI-assisted reasoning at multiple stages: validating product intent before implementation, enforcing TDD discipline during implementation, identifying architectural decisions during planning, and reviewing security before completion.
+The Arpinine Harness workflow requires AI-assisted reasoning at multiple stages: validating product intent before implementation, enforcing TDD discipline during implementation, identifying architectural decisions during planning, and reviewing security before completion.
 
 A single general-purpose agent could be invoked at each stage, but it would need to reason about product alignment, test discipline, architecture, and security simultaneously. In practice, a general agent deprioritizes concerns outside its current instruction focus — a product review instruction crowds out security analysis, and vice versa.
 

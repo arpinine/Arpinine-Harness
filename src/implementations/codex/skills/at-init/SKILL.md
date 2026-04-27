@@ -1,9 +1,9 @@
 ---
 name: at-init
-description: Initialize the AgentAlign workflow in Codex by following the shared at-init workflow and creating the required governance structure.
+description: Initialize the Arpinine Harness workflow in Codex by following the shared at-init workflow and creating the required governance structure.
 ---
 
-Follow `commands/at-init.md` from the assembled AgentAlign plugin root.
+Follow `commands/at-init.md` from the assembled Arpinine Harness plugin root.
 
 When using this skill in Codex:
 - execute the same workflow and file creation steps defined in `commands/at-init.md`

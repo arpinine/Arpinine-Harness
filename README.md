@@ -1,10 +1,10 @@
-# AgentAlign
+# Arpinine Harness
 
-AgentAlign is a plugin for anyone building software with AI coding assistants and who wants to ship real software, not just ship code.
+Arpinine Harness is a plugin for anyone building software with AI coding assistants and who wants to ship real software, not just ship code.
 
 When you build with AI coding assistants, things move fast. Too fast to track whether what you're building still matches what you intended. Specs drift. Architecture decisions get made by accident. Secrets end up hardcoded. There's no deployment plan. The code works locally and nowhere else.
 
-AgentAlign gives you a team to work with, not a prompt bundle. Specialized agents each own a slice of the work: product intent, architecture, tests, security, deployment, and evaluation. They show up at the right moments and block the wrong ones.
+Arpinine Harness gives you a team to work with, not a prompt bundle. Specialized agents each own a slice of the work: product intent, architecture, tests, security, deployment, and evaluation. They show up at the right moments and block the wrong ones.
 
 The goal isn't to slow you down. It's to make sure that what you ship is what you meant to build.
 
@@ -28,7 +28,7 @@ One command. Many responsibilities. No one agent carrying the whole load.
 
 ## Multi-Team Operating Model
 
-AgentAlign also supports multiple AI coding assistants working on the same repo at the same time.
+Arpinine Harness also supports multiple AI coding assistants working on the same repo at the same time.
 
 A typical setup:
 
@@ -41,11 +41,11 @@ So there are two layers: specialist roles inside one session, and multiple assis
 
 ## Start Here
 
-If you want to use AgentAlign rather than just read its files, start here:
+If you want to use Arpinine Harness rather than just read its files, start here:
 
 - [Vibe Coder Process](docs/vibe-coder-process.md)
 
-That guide covers the day-to-day operating model for anyone using AgentAlign with an AI coding assistant.
+That guide covers the day-to-day operating model for anyone using Arpinine Harness with an AI coding assistant.
 
 ## Agent Team
 
@@ -68,7 +68,7 @@ These agents don't replace your team. They help you govern AI-assisted work thro
 
 Not every specialist shows up for every feature — that would be noise. Security review matters on every spec. But you don't need a data engineer reviewing a settings page.
 
-AgentAlign splits the team into two groups.
+Arpinine Harness splits the team into two groups.
 
 ### Always-On
 
@@ -161,45 +161,45 @@ The agents don't own anything on this list. Your team does. The agents help you 
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
-| `/agent-align:at-init` | Setup | Initialize the shared workflow and ADR structure |
-| `/agent-align:at-new` | Define | Create a new specification from a product request |
-| `/agent-align:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
-| `/agent-align:at-plan` | Plan | Produce plan and tasks from an approved spec |
-| `/agent-align:at-adr` | Decide | Create and manage Architecture Decision Records |
-| `/agent-align:at-eval` | Evaluate | Define and run framework-agnostic evaluation |
-| `/agent-align:at-observe` | Evaluate | Record and review runtime observations |
-| `/agent-align:at-implement` | Execute | Implement the plan with TDD and security review |
-| `/agent-align:at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
+| `/arpinine-harness:at-init` | Setup | Initialize the shared workflow and ADR structure |
+| `/arpinine-harness:at-new` | Define | Create a new specification from a product request |
+| `/arpinine-harness:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
+| `/arpinine-harness:at-plan` | Plan | Produce plan and tasks from an approved spec |
+| `/arpinine-harness:at-adr` | Decide | Create and manage Architecture Decision Records |
+| `/arpinine-harness:at-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/arpinine-harness:at-observe` | Evaluate | Record and review runtime observations |
+| `/arpinine-harness:at-implement` | Execute | Implement the plan with TDD and security review |
+| `/arpinine-harness:at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
 
 ## Example Flow
 
 ```bash
 # Initialize team workflow
-/agent-align:at-init
+/arpinine-harness:at-init
 
 # Define product intent
-/agent-align:at-new "User login with email and password"
+/arpinine-harness:at-new "User login with email and password"
 
 # Refine before engineering starts
-/agent-align:at-review .specify/specs/001-user-login/spec.md
+/arpinine-harness:at-review .specify/specs/001-user-login/spec.md
 
 # Create implementation plan
-/agent-align:at-plan .specify/specs/001-user-login/
+/arpinine-harness:at-plan .specify/specs/001-user-login/
 
 # Record important decision if needed
-/agent-align:at-adr new "Session storage strategy"
+/arpinine-harness:at-adr new "Session storage strategy"
 
 # Define or run evaluation
-/agent-align:at-eval plan .specify/specs/001-user-login/
+/arpinine-harness:at-eval plan .specify/specs/001-user-login/
 
 # Record observed runtime behavior
-/agent-align:at-observe record .specify/specs/001-user-login/
+/arpinine-harness:at-observe record .specify/specs/001-user-login/
 
 # Execute with test-first discipline
-/agent-align:at-implement .specify/specs/001-user-login/
+/arpinine-harness:at-implement .specify/specs/001-user-login/
 
 # Realign when implementation and intent diverge
-/agent-align:at-audit .specify/specs/001-user-login/
+/arpinine-harness:at-audit .specify/specs/001-user-login/
 ```
 
 ## End-to-End Demo
@@ -210,7 +210,7 @@ There's a complete runnable demo product in the repo:
 examples/end-to-end/support-agent-demo/
 ```
 
-It covers the full AgentAlign loop on a small support triage agent: product request, governed `spec.md`, `plan.md` with module boundaries and harness strategy, fake harness adapter (no external runtime needed), runnable tests and evaluation script, observation trace, ADR and rule examples, and an intentional drift example for audit discussion.
+It covers the full Arpinine Harness loop on a small support triage agent: product request, governed `spec.md`, `plan.md` with module boundaries and harness strategy, fake harness adapter (no external runtime needed), runnable tests and evaluation script, observation trace, ADR and rule examples, and an intentional drift example for audit discussion.
 
 ```bash
 cd examples/end-to-end/support-agent-demo
@@ -251,7 +251,7 @@ Claude and Codex can share the same governed workflow. Concurrent execution need
 - `scripts/check-task-claim.sh` blocks implementation-path edits unless the current team identity owns an active claim
 - `.specify/delivery.md` shows assigned team, active claimer, and lease state
 
-Set `AGENT_ALIGN_TEAM_ID` or `AGENT_ALIGN_INSTANCE_ID` only when you need to override automatic identity resolution. By default the scripts derive both from the host plugin environment.
+Set `ARPININE_HARNESS_TEAM_ID` or `ARPININE_HARNESS_INSTANCE_ID` only when you need to override automatic identity resolution. By default the scripts derive both from the host plugin environment.
 
 ## Multi-Team Style Governance
 
@@ -275,7 +275,7 @@ All ADRs live in `.specify/adr/`. Each one links to its governing spec via `gove
 
 ```text
 src/
-  agent-align-core/      # commands, agents, hooks, scripts, skills, templates
+  arpinine-harness-core/      # commands, agents, hooks, scripts, skills, templates
   implementations/
     claude/              # working Claude implementation
     codex/               # Codex plugin implementation in progress
@@ -305,7 +305,7 @@ uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai c
 make install
 
 # 3. Initialize the workflow (run inside a Claude Code session)
-/agent-align:at-init
+/arpinine-harness:at-init
 ```
 
 Cross-implementation registration:
@@ -315,21 +315,21 @@ make register IMPLEMENTATION=claude
 make register IMPLEMENTATION=codex
 ```
 
-After Codex registration, enable `agent-align` from the Codex marketplace UI if your client requires a separate confirmation step.
+After Codex registration, enable `arpinine-harness` from the Codex marketplace UI if your client requires a separate confirmation step.
 
 Session-only load without installing (dev/testing):
 
 ```bash
 make assemble IMPLEMENTATION=claude
-claude --plugin-dir ./plugins/agent-align-claude
+claude --plugin-dir ./plugins/arpinine-harness-claude
 ```
 
 ## Dependency Handling
 
-AgentAlign doesn't install `spec-kit`, harness runtimes, or eval frameworks during plugin installation. It validates them during setup and before the relevant workflow stage:
+Arpinine Harness doesn't install `spec-kit`, harness runtimes, or eval frameworks during plugin installation. It validates them during setup and before the relevant workflow stage:
 
 - `spec-kit` is required for automated generation and planning
 - harness runtimes are required only when `## Harness Strategy` explicitly selects one
 - eval tools are required only when `eval-plan.md` selects them
 
-Run `src/agent-align-core/scripts/check-dependencies.sh --json` for a machine-readable readiness report.
+Run `src/arpinine-harness-core/scripts/check-dependencies.sh --json` for a machine-readable readiness report.

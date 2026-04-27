@@ -28,24 +28,24 @@ Plan: [specs/001-plugin-abstraction/plan.md](specs/001-plugin-abstraction/plan.m
 | [TASK-008](specs/001-plugin-abstraction/plan.md#L94) | none | - | - | - |
 | [TASK-009](specs/001-plugin-abstraction/plan.md#L95) | none | - | - | - |
 
-## [002-agent-align-core-workflow](specs/002-agent-align-core-workflow/spec.md)
-Plan: [specs/002-agent-align-core-workflow/plan.md](specs/002-agent-align-core-workflow/plan.md) &nbsp;|&nbsp; Progress: 0/13 full, 0 partial
+## [002-arpinine-harness-core-workflow](specs/002-arpinine-harness-core-workflow/spec.md)
+Plan: [specs/002-arpinine-harness-core-workflow/plan.md](specs/002-arpinine-harness-core-workflow/plan.md) &nbsp;|&nbsp; Progress: 0/13 full, 0 partial
 
 | Task | Status | Assigned Team | Claimed By | Lease Until |
 |------|--------|---------------|------------|-------------|
-| [TASK-001](specs/002-agent-align-core-workflow/plan.md#L86) | none | - | - | - |
-| [TASK-002](specs/002-agent-align-core-workflow/plan.md#L87) | none | - | - | - |
-| [TASK-003](specs/002-agent-align-core-workflow/plan.md#L88) | none | - | - | - |
-| [TASK-004](specs/002-agent-align-core-workflow/plan.md#L89) | none | - | - | - |
-| [TASK-005](specs/002-agent-align-core-workflow/plan.md#L90) | none | - | - | - |
-| [TASK-006](specs/002-agent-align-core-workflow/plan.md#L91) | none | - | - | - |
-| [TASK-007](specs/002-agent-align-core-workflow/plan.md#L92) | none | - | - | - |
-| [TASK-008](specs/002-agent-align-core-workflow/plan.md#L93) | none | - | - | - |
-| [TASK-009](specs/002-agent-align-core-workflow/plan.md#L96) | none | - | - | - |
-| [TASK-010](specs/002-agent-align-core-workflow/plan.md#L97) | none | - | - | - |
-| [TASK-011](specs/002-agent-align-core-workflow/plan.md#L100) | none | - | - | - |
-| [TASK-012](specs/002-agent-align-core-workflow/plan.md#L101) | none | - | - | - |
-| [TASK-013](specs/002-agent-align-core-workflow/plan.md#L102) | none | - | - | - |
+| [TASK-001](specs/002-arpinine-harness-core-workflow/plan.md#L86) | none | - | - | - |
+| [TASK-002](specs/002-arpinine-harness-core-workflow/plan.md#L87) | none | - | - | - |
+| [TASK-003](specs/002-arpinine-harness-core-workflow/plan.md#L88) | none | - | - | - |
+| [TASK-004](specs/002-arpinine-harness-core-workflow/plan.md#L89) | none | - | - | - |
+| [TASK-005](specs/002-arpinine-harness-core-workflow/plan.md#L90) | none | - | - | - |
+| [TASK-006](specs/002-arpinine-harness-core-workflow/plan.md#L91) | none | - | - | - |
+| [TASK-007](specs/002-arpinine-harness-core-workflow/plan.md#L92) | none | - | - | - |
+| [TASK-008](specs/002-arpinine-harness-core-workflow/plan.md#L93) | none | - | - | - |
+| [TASK-009](specs/002-arpinine-harness-core-workflow/plan.md#L96) | none | - | - | - |
+| [TASK-010](specs/002-arpinine-harness-core-workflow/plan.md#L97) | none | - | - | - |
+| [TASK-011](specs/002-arpinine-harness-core-workflow/plan.md#L100) | none | - | - | - |
+| [TASK-012](specs/002-arpinine-harness-core-workflow/plan.md#L101) | none | - | - | - |
+| [TASK-013](specs/002-arpinine-harness-core-workflow/plan.md#L102) | none | - | - | - |
 
 ## [003-executable-artifact-validation](specs/003-executable-artifact-validation/spec.md)
 Plan: [specs/003-executable-artifact-validation/plan.md](specs/003-executable-artifact-validation/plan.md) &nbsp;|&nbsp; Progress: 0/9 full, 0 partial

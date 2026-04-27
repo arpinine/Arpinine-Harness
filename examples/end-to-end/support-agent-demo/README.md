@@ -1,10 +1,10 @@
-# AgentAlign End-to-End Demo: Support Triage Agent
+# Arpinine Harness End-to-End Demo: Support Triage Agent
 
-This demo shows AgentAlign in action on a small product feature:
+This demo shows Arpinine Harness in action on a small product feature:
 
 > A support triage agent classifies inbound customer tickets, drafts a first response, and requires human approval before creating a support case.
 
-The demo is intentionally small. It is not a production service. Its purpose is to make the AgentAlign workflow visible from product intent to execution evidence.
+The demo is intentionally small. It is not a production service. Its purpose is to make the Arpinine Harness workflow visible from product intent to execution evidence.
 
 ## What This Demonstrates
 
@@ -21,7 +21,7 @@ The demo is intentionally small. It is not a production service. Its purpose is 
 ## Prerequisites
 
 - Python 3.10+
-- AgentAlign plugin installed in Claude Code
+- Arpinine Harness plugin installed in Claude Code
 
 No OpenHarness installation is required. The app uses a fake harness adapter so the demo is runnable anywhere.
 
@@ -40,17 +40,17 @@ pwd
 cat product-request.md
 ```
 
-2. Run the AgentAlign workflow in Claude Code:
+2. Run the Arpinine Harness workflow in Claude Code:
 
 ```text
-/agent-align:at-init
-/agent-align:at-review .specify/specs/001-support-triage-agent/spec.md
-/agent-align:at-plan .specify/specs/001-support-triage-agent/
-/agent-align:at-eval plan .specify/specs/001-support-triage-agent/
-/agent-align:at-eval review .specify/specs/001-support-triage-agent/
-/agent-align:at-observe review .specify/specs/001-support-triage-agent/
-/agent-align:at-status --onboard
-/agent-align:at-audit .specify/specs/001-support-triage-agent/spec.md
+/arpinine-harness:at-init
+/arpinine-harness:at-review .specify/specs/001-support-triage-agent/spec.md
+/arpinine-harness:at-plan .specify/specs/001-support-triage-agent/
+/arpinine-harness:at-eval plan .specify/specs/001-support-triage-agent/
+/arpinine-harness:at-eval review .specify/specs/001-support-triage-agent/
+/arpinine-harness:at-observe review .specify/specs/001-support-triage-agent/
+/arpinine-harness:at-status --onboard
+/arpinine-harness:at-audit .specify/specs/001-support-triage-agent/spec.md
 ```
 
 3. Run the implementation tests:
@@ -70,23 +70,23 @@ This writes `.specify/evals/001-support-triage-agent/latest-results.md`.
 5. Try the static drift/conformance checker from the demo directory:
 
 ```bash
-python3 ../../../src/agent-align-v1.0.0/scripts/quick_drift_check.py \
+python3 ../../../src/arpinine-harness-v1.0.0/scripts/quick_drift_check.py \
   --spec .specify/specs/001-support-triage-agent/spec.md
 ```
 
-For full local script behavior, run AgentAlign commands from this demo directory so `.specify/` is the project root.
+For full local script behavior, run Arpinine Harness commands from this demo directory so `.specify/` is the project root.
 
 ## Intentional Drift Example
 
 See `app/support_triage/application/drift_example_bad_direct_harness_import.py`.
 
-That file intentionally imports a harness runtime concept outside an adapter/infrastructure boundary. It represents the kind of issue AgentAlign should surface as harness drift or a rule violation.
+That file intentionally imports a harness runtime concept outside an adapter/infrastructure boundary. It represents the kind of issue Arpinine Harness should surface as harness drift or a rule violation.
 
 To simulate the post-edit hook check:
 
 ```bash
 printf '{"tool_input":{"file_path":"app/support_triage/application/drift_example_bad_direct_harness_import.py"}}' \
-  | python3 ../../../src/agent-align-v1.0.0/scripts/quick_drift_check.py
+  | python3 ../../../src/arpinine-harness-v1.0.0/scripts/quick_drift_check.py
 ```
 
 ## Expected Result

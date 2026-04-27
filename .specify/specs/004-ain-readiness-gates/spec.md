@@ -2,7 +2,7 @@
 
 ## Business Case
 
-AgentAlign should not let teams implement higher-AIN product behavior without the corresponding contracts, evaluation, and observation readiness. If the product spec claims agent-callable operations, feedback loops, or runtime-dependent behavior, implementation needs explicit gates rather than informal reminders.
+Arpinine Harness should not let teams implement higher-AIN product behavior without the corresponding contracts, evaluation, and observation readiness. If the product spec claims agent-callable operations, feedback loops, or runtime-dependent behavior, implementation needs explicit gates rather than informal reminders.
 
 AIN readiness gates connect product ambition to engineering discipline. They make AI-nativeness a governed constraint instead of a descriptive label.
 

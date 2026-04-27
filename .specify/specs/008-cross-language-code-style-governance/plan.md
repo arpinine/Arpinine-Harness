@@ -9,7 +9,7 @@
 |----------|-----------|-----|
 | Declare style governance in the constitution and enforce it through a shared hook | Keeps style as both a governance principle and an executable check | ADR-0006 |
 | Centralize checked-in style configs under `tools/style/` | Gives plugins and humans one canonical location for style standards | ADR-0006 |
-| Use language-native config formats such as Ruff, Prettier, ESLint, Checkstyle, and rustfmt | Keeps style standards understandable and reusable outside AgentAlign hooks | ADR-0006 |
+| Use language-native config formats such as Ruff, Prettier, ESLint, Checkstyle, and rustfmt | Keeps style standards understandable and reusable outside Arpinine Harness hooks | ADR-0006 |
 | Allow edits to the canonical style-config files even when no style standard is yet active for a language | Prevents the governance hook from blocking repository bootstrap and future updates | No separate ADR |
 
 ## Architecture
@@ -43,7 +43,7 @@ tests/test_style_governance.py             ← blocking and allow-path coverage
 - Style-governance enforcement MUST read canonical config markers from `tools/style/`.
 - Assistant implementations MUST not define divergent style-config locations for the same language.
 - The constitution SHOULD define the policy while hooks enforce the executable subset of that policy.
-- Language-specific style standards SHOULD be expressed through native config files rather than custom AgentAlign-only formats.
+- Language-specific style standards SHOULD be expressed through native config files rather than custom Arpinine Harness-only formats.
 
 ## Testability By Boundary
 

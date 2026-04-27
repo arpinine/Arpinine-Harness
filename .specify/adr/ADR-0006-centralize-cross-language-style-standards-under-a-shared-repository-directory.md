@@ -20,7 +20,7 @@ The repository needed one shared contract that makes style standards visible, as
 The style-governance hook also needed an unambiguous place to look for repository-approved standards so it can block code edits when a language lacks a declared style contract.
 
 ## Decision
-AgentAlign stores canonical code-style standards under `tools/style/` and treats that directory as the shared source of truth for repository formatting and lint expectations.
+Arpinine Harness stores canonical code-style standards under `tools/style/` and treats that directory as the shared source of truth for repository formatting and lint expectations.
 
 The structure is:
 
