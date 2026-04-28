@@ -1,0 +1,31 @@
+{
+  "dataset_name": "support-triage-core-suite",
+  "dataset_version": "v1.0.0",
+  "owner": "product-and-engineering-pair",
+  "scenarios": [
+    {
+      "scenario_id": "billing-refund",
+      "source": "synthetic",
+      "required": true,
+      "tags": ["billing", "happy-path"],
+      "expected_output_ref": "labels/billing-refund.json",
+      "adjudication_status": "approved"
+    },
+    {
+      "scenario_id": "enterprise-outage",
+      "source": "synthetic",
+      "required": true,
+      "tags": ["technical", "urgent"],
+      "expected_output_ref": "labels/enterprise-outage.json",
+      "adjudication_status": "approved"
+    },
+    {
+      "scenario_id": "general-question",
+      "source": "synthetic",
+      "required": true,
+      "tags": ["general", "low-priority"],
+      "expected_output_ref": "labels/general-question.json",
+      "adjudication_status": "approved"
+    }
+  ]
+}

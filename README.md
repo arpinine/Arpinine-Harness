@@ -151,7 +151,11 @@ The agents don't own anything on this list. Your team does. The agents help you 
 | `harness strategy` | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
 | `module boundaries` | Architectural contract for responsibilities, dependency direction, and replaceable seams |
 | `eval-plan.md` | Quality gate: how you measure readiness, regressions, and release fitness |
+| `dataset-manifest.json` | Versioned scenario and label contract for reproducible benchmarked evaluation |
+| `baseline.json` | Approved comparison target for regression-sensitive benchmark runs |
 | `observation artifacts` | Runtime evidence: how the system actually behaved |
+| `observation history` | Append-only runtime telemetry and provenance across repeated runs |
+| `eval history` | Append-only evaluation and benchmark result snapshots |
 | `ADR-*.md` | Why key decisions were made |
 | `ADR-INDEX.md` | Global index of decisions and drift coverage |
 | `coordination/*.json` | Multi-assistant task leases and ownership state for concurrent execution |
@@ -166,7 +170,7 @@ The agents don't own anything on this list. Your team does. The agents help you 
 | `/arpinine-harness:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
 | `/arpinine-harness:at-plan` | Plan | Produce plan and tasks from an approved spec |
 | `/arpinine-harness:at-adr` | Decide | Create and manage Architecture Decision Records |
-| `/arpinine-harness:at-eval` | Evaluate | Define and run framework-agnostic evaluation |
+| `/arpinine-harness:at-eval` | Evaluate | Define, run, benchmark, and review framework-agnostic evaluation |
 | `/arpinine-harness:at-observe` | Evaluate | Record and review runtime observations |
 | `/arpinine-harness:at-implement` | Execute | Implement the plan with TDD and security review |
 | `/arpinine-harness:at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |

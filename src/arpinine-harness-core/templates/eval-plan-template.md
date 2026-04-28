@@ -15,6 +15,13 @@
 - Execution command: `[command to run evaluation]`
 - Owner: [team or role]
 
+## Benchmark Policy
+- Benchmark required: [Yes / No]
+- Benchmark command: `[command to run benchmark suite]`
+- Dataset manifest path: `.specify/evals/[SPEC-NUMBER]-[name]/dataset-manifest.json`
+- Minimum scenario count for aggregated reporting: [e.g. 3]
+- Aggregation policy: [single run only / aggregate across scenarios / aggregate across repeated runs]
+
 ## Datasets And Scenarios
 | Dataset / Scenario | Purpose | Source | Required |
 |--------------------|---------|--------|----------|
@@ -33,9 +40,16 @@
 - Which metrics are release-blocking?
 - When must evaluation be rerun?
 
+## Baseline Comparison
+- Baseline required: [Yes / No]
+- Baseline artifact path: `.specify/evals/[SPEC-NUMBER]-[name]/baseline.json`
+- Comparable dimensions: [dataset version / model-runtime variant / prompt-config variant / scenario set]
+- Failure policy when baseline dimensions differ: [block comparison / warn only]
+
 ## Reporting
 - Latest results path: `.specify/evals/[SPEC-NUMBER]-[name]/latest-results.md`
-- Historical storage: [optional path or system]
+- Historical storage: `.specify/evals/[SPEC-NUMBER]-[name]/history/`
+- Observation history source: `.specify/observations/[SPEC-NUMBER]-[name]/history/`
 
 ## Approval Rule
 - Work is not complete until required thresholds pass or an explicit exception is documented.

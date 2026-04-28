@@ -314,6 +314,12 @@ def analyze_spec(spec: pathlib.Path, edited_file: str = "", edited_text: str = "
 
     eval_plan = REPO / ".specify" / "evals" / slug / "eval-plan.md"
     latest_results = REPO / ".specify" / "evals" / slug / "latest-results.md"
+    baseline = REPO / ".specify" / "evals" / slug / "baseline.json"
+    dataset_manifest = REPO / ".specify" / "evals" / slug / "dataset-manifest.json"
+    latest_observation = REPO / ".specify" / "observations" / slug / "latest-observation.md"
+    latest_trace = REPO / ".specify" / "observations" / slug / "trace.json"
+    observation_history = REPO / ".specify" / "observations" / slug / "history"
+    observation_index = REPO / ".specify" / "observations" / slug / "index.jsonl"
     if AGENTIC_HINT_RE.search(spec_text):
         if not eval_plan.exists():
             findings.append("HIGH missing eval plan for agentic spec")
@@ -326,6 +332,43 @@ def analyze_spec(spec: pathlib.Path, edited_file: str = "", edited_text: str = "
                         findings.append("MEDIUM code changed after latest eval results; rerun /at-eval")
                 except Exception:
                     pass
+
+    if eval_plan.exists():
+        eval_text = read_text(eval_plan)
+        requires_benchmark = bool(
+            re.search(r"benchmark required:\s*yes", eval_text, re.IGNORECASE)
+            or re.search(r"benchmark command:\s*`.+`", eval_text)
+            or re.search(r"release-blocking", eval_text, re.IGNORECASE)
+        )
+        requires_baseline = bool(re.search(r"baseline required:\s*yes", eval_text, re.IGNORECASE))
+        requires_perf_telemetry = bool(
+            re.search(r"(latency p\d+|token|cost usd|cost / latency|cost per run|token input|token output)", eval_text, re.IGNORECASE)
+        )
+
+        if requires_benchmark and not dataset_manifest.exists():
+            findings.append("HIGH benchmarked eval declared but dataset-manifest.json is missing")
+        if requires_baseline and not baseline.exists():
+            findings.append("HIGH regression-sensitive eval declared but baseline.json is missing")
+        if requires_benchmark and not latest_results.exists():
+            findings.append("MEDIUM benchmarked eval declared but no latest benchmark results were found")
+        if requires_benchmark and not observation_history.exists():
+            findings.append("MEDIUM benchmarked eval declared but no observation history directory exists")
+        if requires_benchmark and not observation_index.exists():
+            findings.append("MEDIUM benchmarked eval declared but no observation index exists")
+        if requires_perf_telemetry and latest_trace.exists():
+            trace_text = read_text(latest_trace)
+            missing_fields = [
+                field
+                for field in ("latency_ms", "token_count_input", "token_count_output", "cost_usd")
+                if f'"{field}"' not in trace_text
+            ]
+            if missing_fields:
+                findings.append(
+                    "MEDIUM perf-sensitive eval declared but latest trace is missing telemetry fields: "
+                    + ", ".join(missing_fields)
+                )
+        elif requires_perf_telemetry and not latest_trace.exists() and latest_observation.exists():
+            findings.append("MEDIUM perf-sensitive eval declared but no trace.json exists for telemetry review")
 
     findings.extend(static_conformance_findings(spec, spec_text, edited_file, edited_text))
     return {"slug": slug, "spec": str(spec), "findings": findings}

@@ -52,6 +52,14 @@ def parse_framework(eval_plan: pathlib.Path) -> str:
     return table_match.group(1).strip() if table_match else ""
 
 
+def parse_benchmark_command(eval_plan: pathlib.Path) -> str:
+    text = read_text(eval_plan)
+    if not text:
+        return ""
+    match = re.search(r"^- Benchmark command:\s*`?(.+?)`?\s*$", text, re.MULTILINE | re.IGNORECASE)
+    return match.group(1).strip() if match else ""
+
+
 def spec_checks(repo: pathlib.Path, spec_root: pathlib.Path, eval_root: pathlib.Path) -> list[dict[str, object]]:
     results: list[dict[str, object]] = []
     if not spec_root.exists():
@@ -68,11 +76,21 @@ def spec_checks(repo: pathlib.Path, spec_root: pathlib.Path, eval_root: pathlib.
 
         eval_plan = eval_root / slug / "eval-plan.md"
         framework = parse_framework(eval_plan) if eval_plan.exists() else ""
+        benchmark_command = parse_benchmark_command(eval_plan) if eval_plan.exists() else ""
         if framework:
             checks.append(
                 {
                     "label": "Declared evaluation framework",
                     "command": framework,
+                    "required": False,
+                    "available": True,
+                }
+            )
+        if benchmark_command:
+            checks.append(
+                {
+                    "label": "Declared benchmark command",
+                    "command": benchmark_command,
                     "required": False,
                     "available": True,
                 }
@@ -83,6 +101,8 @@ def spec_checks(repo: pathlib.Path, spec_root: pathlib.Path, eval_root: pathlib.
             checks.append(command_status("DeepEval CLI/runtime", "deepeval", False))
         if re.search(r"pytest", eval_text, re.IGNORECASE):
             checks.append(command_status("pytest", "pytest", False))
+        if re.search(r"\bvitest\b", eval_text, re.IGNORECASE):
+            checks.append(command_status("vitest via npx", "npx", False))
 
         if checks:
             results.append({"spec": slug, "checks": checks})

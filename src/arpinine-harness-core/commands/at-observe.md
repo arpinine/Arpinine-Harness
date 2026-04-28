@@ -25,35 +25,56 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 2. Create or update:
    - `.specify/observations/<spec-slug>/latest-observation.md`
    - `.specify/observations/<spec-slug>/trace.json`
+   - `.specify/observations/<spec-slug>/history/<run-id>.md`
+   - `.specify/observations/<spec-slug>/history/<run-id>.json`
+   - `.specify/observations/<spec-slug>/index.jsonl`
 3. Capture, at minimum:
+   - run id
+   - variant id
    - runtime class
    - runtime implementation
    - scenario id
    - timestamp
+   - started at / completed at
+   - latency ms
+   - turn count when applicable
+   - token input / output counts when available
+   - cost when available
+   - tool call count
+   - error count
    - tool calls
    - permission or approval events
    - memory or state events
    - failures
    - final outcome
-4. Normalize the trace using `templates/schemas/observation-schema.yaml`.
-5. Record raw runtime evidence only. Do not classify drift in this step.
-6. Leave `## Drift Signals` empty or marked `pending review` until `/arpinine-harness:at-observe review` runs.
+4. For decision-heavy systems, capture optional provenance fields:
+   - conversation ids
+   - run-wide evidence refs
+   - decision records with confidence, rationale, decision-level evidence refs, and review outcome
+5. Normalize the trace using `templates/schemas/observation-schema.yaml`.
+6. Update `latest-*` convenience artifacts and append immutable run artifacts under `history/`.
+7. Append a summary entry to `index.jsonl` so later review or benchmark workflows can aggregate multiple runs.
+8. Record raw runtime evidence only. Do not classify drift in this step.
+9. Leave `## Drift Signals` empty or marked `pending review` until `/arpinine-harness:at-observe review` runs.
 
 ## Workflow: `review`
 
 1. Read `latest-observation.md` and `trace.json`.
+2. When available, inspect `history/` and `index.jsonl` to compare repeated runs rather than only one latest snapshot.
+3. If the eval plan declares latency, token, cost, or benchmarked regression thresholds, verify that the required telemetry fields are present in the observation trace or history records.
+4. If the system makes nontrivial AI decisions, verify that provenance fields are present when required by the spec or plan.
 2. Compare observed behavior against:
    - `spec.md`
    - `plan.md`
    - `## Harness Strategy`
    - evaluation plan
-3. Report observation drift classes when found:
+5. Report observation drift classes when found:
    - `TOOL_DRIFT`
    - `PERMISSION_DRIFT`
    - `MEMORY_DRIFT`
    - `EVAL_COVERAGE_DRIFT`
    - `RUNTIME_BEHAVIOR_DRIFT`
-4. Recommend whether the next action is:
+6. Recommend whether the next action is:
    - refine spec
    - update plan
    - update harness strategy
@@ -65,8 +86,13 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 
 - `.specify/observations/<spec-slug>/latest-observation.md`
 - `.specify/observations/<spec-slug>/trace.json`
+- `.specify/observations/<spec-slug>/history/<run-id>.md`
+- `.specify/observations/<spec-slug>/history/<run-id>.json`
+- `.specify/observations/<spec-slug>/index.jsonl`
 
 ## Error Conditions
 
 - Observation artifacts missing → "Run `/arpinine-harness:at-observe record` first"
 - Trace missing required event data → "Normalize trace against observation-schema.yaml"
+- Perf-sensitive eval plan exists but telemetry fields are absent → "Populate runtime telemetry required by the eval plan before review can pass"
+- Provenance is required by the workflow but missing from the trace → "Record decision provenance fields before review can pass"

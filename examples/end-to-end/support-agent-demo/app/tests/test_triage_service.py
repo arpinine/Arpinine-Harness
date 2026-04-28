@@ -1,4 +1,12 @@
 import unittest
+import pathlib
+import sys
+
+
+_TESTS_DIR = pathlib.Path(__file__).resolve().parent
+_APP_ROOT = _TESTS_DIR.parent
+if str(_APP_ROOT) not in sys.path:
+    sys.path.insert(0, str(_APP_ROOT))
 
 from support_triage.adapters.fake_harness import FakeHarnessRuntime
 from support_triage.application.triage_service import SupportTriageService

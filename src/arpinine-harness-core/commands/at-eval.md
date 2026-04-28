@@ -9,6 +9,7 @@ Define or run evaluation for the current spec.
 ## Usage
 - `/arpinine-harness:at-eval plan <slug>` — create or update the evaluation plan
 - `/arpinine-harness:at-eval run <slug>` — run the chosen evaluation framework and record results
+- `/arpinine-harness:at-eval benchmark <slug>` — run the benchmark dataset or scenario suite and emit aggregated results
 - `/arpinine-harness:at-eval review <slug>` — review the latest evaluation results against thresholds
 
 `<slug>`: feature slug matching a directory under `.specify/specs/`, e.g. `001-user-login`
@@ -41,12 +42,17 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - evaluation objective
    - evaluation framework
    - datasets or scenarios
+   - whether benchmark mode is required
+   - benchmark command when benchmark mode is required
+   - dataset manifest path when benchmark mode is required
    - metrics (including AI-specific metrics from the `ai-engineer` review)
    - pass thresholds
    - regression policy
+   - baseline comparison policy
    - execution command
-6. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
-7. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
+6. If the workflow declares release-blocking latency, token, cost, or regression thresholds, mark benchmark mode as required rather than optional.
+7. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
+8. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
 
 ## Workflow: `run`
 
@@ -71,33 +77,74 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
       - Report: "BLOCKED: This command matches a known dangerous pattern and cannot be executed. Edit the eval-plan.md to use a safe framework command."
 5. Run the approved command.
 6. Save results to `.specify/evals/<spec-slug>/latest-results.md`.
-7. Summarize:
+7. For repeatable or regression-sensitive workflows, recommend `/arpinine-harness:at-eval benchmark <slug>` when a single run cannot satisfy the declared thresholds.
+8. Summarize:
    - framework used
    - datasets or scenarios covered
    - metric scores
    - thresholds
    - pass/fail result
-8. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
+9. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
+
+## Workflow: `benchmark`
+
+1. Read `.specify/evals/<spec-slug>/eval-plan.md`.
+2. Confirm that benchmark mode is required or explicitly requested by the plan.
+3. Validate the presence of:
+   - `.specify/evals/<spec-slug>/dataset-manifest.json`
+   - optional `.specify/evals/<spec-slug>/baseline.json` when regression comparison is required
+4. Validate that the benchmark command exists in the current environment.
+5. Run the approved benchmark command across the required scenarios.
+   The shared-core runner path is `python3 src/arpinine-harness-core/scripts/run_benchmark.py --slug <spec-slug>`.
+   It exports per-scenario context to the benchmark command through:
+   - `ARPININE_HARNESS_SCENARIO_ID`
+   - `ARPININE_HARNESS_SCENARIO_JSON`
+   - `ARPININE_HARNESS_DATASET_NAME`
+   - `ARPININE_HARNESS_DATASET_VERSION`
+   - `ARPININE_HARNESS_RESULT_PATH`
+   - `ARPININE_HARNESS_OBSERVATION_PATH`
+   The benchmark command must write scenario result JSON to `ARPININE_HARNESS_RESULT_PATH`. It may also write optional observation JSON to `ARPININE_HARNESS_OBSERVATION_PATH`.
+6. Save or update:
+   - `.specify/evals/<spec-slug>/latest-results.md`
+   - `.specify/evals/<spec-slug>/history/<run-id>-results.json`
+   - optional `.specify/evals/<spec-slug>/history/<run-id>-results.md`
+   Benchmark history is append-only. The shared aggregate report reads the benchmark result snapshots present in `history/`, so repeated runs accumulate unless the team partitions or clears history intentionally.
+7. Aggregate:
+   - quality metrics
+   - latency percentiles
+   - token and cost summaries
+   - failure and retry rates
+8. When a baseline exists, compare only when dataset version, model/runtime variant, prompt/config variant, and scenario set are compatible.
+   The generic baseline comparison covers shared governance metrics such as pass rate, latency P95, and total cost. Product-specific metrics require product-specific comparison logic if they must participate in regression decisions.
+9. Emit a governed verdict: `PASS`, `WARN`, `FAIL`, or `REGRESSION`.
 
 ## Workflow: `review`
 
 1. Compare `latest-results.md` against the thresholds in `eval-plan.md`.
-2. Report each metric as `PASS`, `WARN`, or `FAIL`.
-3. If any required threshold fails:
+2. When benchmark mode is required, confirm that the latest results came from benchmark aggregation rather than a single ad hoc run.
+3. When a baseline policy exists, confirm that the comparison used compatible dataset and variant dimensions.
+4. Report each metric as `PASS`, `WARN`, or `FAIL`.
+5. If any required threshold fails:
    - block completion
    - identify whether the fix belongs in code, spec, plan, prompts, or ADRs
-4. If the system passes, summarize residual risks and uncovered scenarios.
+6. If the system passes, summarize residual risks and uncovered scenarios.
 
 ## Required Outputs
 
 - `.specify/evals/<spec-slug>/eval-plan.md`
 - `.specify/evals/<spec-slug>/latest-results.md`
+- `.specify/evals/<spec-slug>/dataset-manifest.json` when benchmark mode is required
+- `.specify/evals/<spec-slug>/baseline.json` when regression comparison is required
+- `.specify/evals/<spec-slug>/history/<run-id>-results.json` for benchmarked or archived runs
 
 ## Error Conditions
 
 - Eval plan missing → "Run `/arpinine-harness:at-eval plan` first"
 - Framework command missing → "Add an execution command to eval-plan.md"
 - Framework dependency unavailable → "Install the tool declared in eval-plan.md before running `/arpinine-harness:at-eval run`"
+- Benchmark mode required but dataset manifest missing → "Add `.specify/evals/<spec-slug>/dataset-manifest.json` before running `/arpinine-harness:at-eval benchmark`"
+- Benchmark mode required but baseline policy missing for regression-sensitive workflow → "Declare baseline comparison policy in eval-plan.md and add baseline.json when required"
+- Baseline dimensions incompatible with latest benchmark run → "Do not compare against this baseline until dataset and variant dimensions match"
 - Results missing thresholds → "Define thresholds before evaluation can pass"
 - Command blocked by safety validation → "Edit eval-plan.md to use a recognized evaluation framework command"
 - Command contains shell metacharacters → "Review and approve the command, or simplify it to use a recognized pattern"

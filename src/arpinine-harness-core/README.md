@@ -157,16 +157,26 @@ The agents don't own anything on this list. Your team does.
     001-<slug>/
       spec.md
       plan.md
-      eval-plan.md
-      latest-results.md
   observations/
     001-<slug>/
       latest-observation.md
       trace.json
+      index.jsonl
+      history/
+        <run-id>.json
+        <run-id>.md
   adr/
     ADR-INDEX.md
     ADR-0001-<title>.md
   evals/
+    001-<slug>/
+      eval-plan.md
+      latest-results.md
+      dataset-manifest.json
+      baseline.json
+      history/
+        <run-id>-results.json
+        <run-id>-results.md
   rules/
     security/
       auth-001.md
@@ -177,6 +187,8 @@ The agents don't own anything on this list. Your team does.
 Each ADR links to its governing spec via `governs:` and to a concrete decision or drift key via `covers:`.
 
 Observation artifacts let you compare documented harness strategy against actual tool use, documented permission model against actual approval events, and documented memory model against actual state behavior.
+
+When benchmarked evaluation is enabled, observation and eval history support aggregate metrics such as latency P50/P95, token/cost summaries, and regression comparison against an approved baseline.
 
 Each rule documents what pattern triggers it (`triggers:`), what failure it prevents (`prevents:`), and which retro or ADR it came from (`source-adr:`, `evidence-project:`).
 
@@ -223,5 +235,8 @@ Available helpers:
 - `scripts/check-dependencies.sh --json` — machine-readable environment readiness
 - `scripts/spec_status.py [--spec <slug>] [--onboard]` — project governance report
 - `scripts/quick_drift_check.py --spec .specify/specs/<slug>/spec.md` — lightweight drift and static conformance hints
+- `scripts/run_benchmark.py --slug <slug>` — execute required benchmark scenarios from `dataset-manifest.json` and emit the governed aggregate result
 
 The post-write drift hook runs `quick_drift_check.py` automatically, so endpoint mismatches, stale eval runs, harness import leakage, and framework leakage into domain layers surface right after edits.
+
+For benchmarked evaluation, `run_benchmark.py` runs the declared benchmark command once per required dataset scenario and passes scenario context through `ARPININE_HARNESS_*` environment variables. The benchmark tool remains product-specific; Arpinine Harness governs the artifact contract and aggregates the results.

@@ -1,0 +1,12 @@
+{
+  "baseline_run_id": "20260428T000000Z-support-triage-core-suite",
+  "approved_at": "2026-04-28T00:00:00Z",
+  "approved_by": "product-and-engineering-pair",
+  "dataset_version": "v1.0.0",
+  "model_name": "fake-harness-runtime",
+  "model_version": "demo-v1",
+  "variant_id": "support-triage-demo",
+  "scenario_set": "support-triage-core-suite",
+  "source_results_path": ".specify/evals/001-support-triage-agent/baseline-results.json",
+  "release_note": "Known-good benchmark aggregate for the support triage demo after operational measurement rollout"
+}

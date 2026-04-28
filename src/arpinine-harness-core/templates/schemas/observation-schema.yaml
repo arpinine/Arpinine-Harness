@@ -8,14 +8,73 @@ required:
 properties:
   spec:
     type: string
+  run_id:
+    type: string
+  variant_id:
+    type: string
   runtime_class:
     type: string
   runtime_implementation:
+    type: string
+  model_name:
+    type: string
+  model_version:
     type: string
   scenario_id:
     type: string
   timestamp:
     type: string
+  started_at:
+    type: string
+  completed_at:
+    type: string
+  latency_ms:
+    type: integer
+  turn_count:
+    type: integer
+  tool_call_count:
+    type: integer
+  token_count_input:
+    type: integer
+  token_count_output:
+    type: integer
+  cost_usd:
+    type: number
+  error_count:
+    type: integer
+  dataset_version:
+    type: string
+  baseline_comparable:
+    type: boolean
+  conversation_ids:
+    type: array
+    items:
+      type: string
+  evidence_refs:
+    type: array
+    items:
+      type: string
+  decision_records:
+    type: array
+    items:
+      type: object
+      properties:
+        decision_type:
+          type: string
+        decision_id:
+          type: string
+        confidence:
+          type: number
+        rationale:
+          type: string
+        evidence_refs:
+          type: array
+          items:
+            type: string
+        review_required:
+          type: boolean
+        review_outcome:
+          type: string
   final_outcome:
     type: string
   events:
@@ -36,11 +95,25 @@ properties:
             - session_lifecycle
         tool:
           type: string
+        timestamp:
+          type: string
+        duration_ms:
+          type: integer
         approved:
           type: boolean
         action:
           type: string
         result:
+          type: string
+        token_count_input:
+          type: integer
+        token_count_output:
+          type: integer
+        cost_usd:
+          type: number
+        attempt:
+          type: integer
+        correlation_id:
           type: string
         scope:
           type: string

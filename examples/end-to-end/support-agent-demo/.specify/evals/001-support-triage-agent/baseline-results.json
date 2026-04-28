@@ -1,0 +1,28 @@
+{
+  "run_count": 3,
+  "dataset_version": "v1.0.0",
+  "variant_id": "support-triage-demo",
+  "model_name": "fake-harness-runtime",
+  "model_version": "demo-v1",
+  "scenario_set": "support-triage-core-suite",
+  "passed": 3,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "metrics": {
+    "latency_p50_ms": 180.0,
+    "latency_p95_ms": 234.0,
+    "latency_avg_ms": 180.0,
+    "approval_check_rate": 1.0,
+    "memory_scope_rate": 1.0,
+    "token_input_total": 62,
+    "token_output_total": 42,
+    "cost_total_usd": 0.04
+  },
+  "result": "PASS",
+  "threshold_notes": [
+    "all configured thresholds satisfied"
+  ],
+  "baseline_notes": [
+    "no baseline regressions detected"
+  ]
+}

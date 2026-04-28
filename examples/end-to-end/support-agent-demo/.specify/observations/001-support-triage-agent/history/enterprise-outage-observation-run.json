@@ -1,33 +1,33 @@
 {
-  "cost_usd": 0.012,
+  "cost_usd": 0.018,
   "dataset_version": "v1.0.0",
   "error_count": 0,
   "events": [
     {
-      "ticket_id": "E-003",
+      "ticket_id": "E-002",
       "tool": "draft_support_reply",
       "type": "tool_call"
     },
     {
       "action": "create_support_case",
       "result": "approved",
-      "ticket_id": "E-003",
+      "ticket_id": "E-002",
       "type": "permission_check"
     },
     {
-      "key": "triage:E-003",
+      "key": "triage:E-002",
       "scope": "session",
       "type": "memory_write"
     }
   ],
   "final_outcome": "PASS",
-  "latency_ms": 180,
-  "run_id": "general-question-observation-run",
+  "latency_ms": 240,
+  "run_id": "enterprise-outage-observation-run",
   "runtime_class": "embedded-agent-runtime",
   "runtime_implementation": "fake-harness-adapter",
-  "scenario_id": "general-question",
-  "token_count_input": 20,
-  "token_count_output": 14,
+  "scenario_id": "enterprise-outage",
+  "token_count_input": 24,
+  "token_count_output": 16,
   "tool_call_count": 1,
   "turn_count": 1
 }

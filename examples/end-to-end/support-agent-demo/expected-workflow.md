@@ -56,7 +56,7 @@ Expected discussion:
 Run:
 
 ```bash
-PYTHONPATH=app python3 -m unittest discover -s app/tests
+python3 -m unittest discover -s app/tests
 ```
 
 Expected result:
@@ -67,12 +67,28 @@ Expected result:
 Run:
 
 ```bash
-PYTHONPATH=app python3 app/eval/run_eval.py
+python3 app/eval/run_eval.py
 ```
 
 Expected result:
 - all scenarios pass
 - generated evidence is written to `.specify/evals/001-support-triage-agent/latest-results.md`
+
+## 5b. Benchmark
+
+Run:
+
+```bash
+python3 ../../../src/arpinine-harness-core/scripts/run_benchmark.py \
+  --slug 001-support-triage-agent
+```
+
+Expected result:
+- all required dataset scenarios run independently
+- benchmark history is written under `.specify/evals/001-support-triage-agent/history/`
+- observation history is written under `.specify/observations/001-support-triage-agent/history/`
+- `latest-results.md` becomes the governed aggregate benchmark report
+- baseline and dataset manifest are now part of the demonstration path
 
 ## 6. Observe
 

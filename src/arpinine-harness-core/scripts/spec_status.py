@@ -77,22 +77,75 @@ def checkbox_counts(spec_text: str) -> tuple[int, int]:
     return checked, total
 
 
+def eval_requirements(slug: str) -> dict[str, bool]:
+    eval_plan = EVAL_ROOT / slug / "eval-plan.md"
+    if not eval_plan.exists():
+        return {
+            "exists": False,
+            "benchmark_required": False,
+            "baseline_required": False,
+            "perf_sensitive": False,
+        }
+    eval_text = read_text(eval_plan)
+    return {
+        "exists": True,
+        "benchmark_required": bool(
+            re.search(r"benchmark required:\s*yes", eval_text, re.IGNORECASE)
+            or re.search(r"benchmark command:\s*`.+`", eval_text)
+        ),
+        "baseline_required": bool(re.search(r"baseline required:\s*yes", eval_text, re.IGNORECASE)),
+        "perf_sensitive": bool(
+            re.search(r"(latency p\d+|token|cost usd|cost / latency|cost per run|token input|token output)", eval_text, re.IGNORECASE)
+        ),
+    }
+
+
+def benchmark_state(slug: str) -> dict[str, object]:
+    root = EVAL_ROOT / slug
+    history_dir = root / "history"
+    dataset_manifest = root / "dataset-manifest.json"
+    baseline = root / "baseline.json"
+    history_count = len(list(history_dir.glob("*-results.json"))) if history_dir.exists() else 0
+    return {
+        "dataset_manifest": dataset_manifest.exists(),
+        "baseline": baseline.exists(),
+        "history_count": history_count,
+    }
+
+
 def eval_state(slug: str) -> str:
     eval_plan = EVAL_ROOT / slug / "eval-plan.md"
     latest = EVAL_ROOT / slug / "latest-results.md"
+    history_dir = EVAL_ROOT / slug / "history"
+    baseline = EVAL_ROOT / slug / "baseline.json"
+    dataset_manifest = EVAL_ROOT / slug / "dataset-manifest.json"
+    requirements = eval_requirements(slug)
     if not eval_plan.exists():
         return "MISSING"
     if not latest.exists():
         return "PLANNED"
+    if requirements["benchmark_required"]:
+        if not dataset_manifest.exists():
+            return "BENCHMARK-MISSING-DATASET"
+        if requirements["baseline_required"] and not baseline.exists():
+            return "BENCHMARK-MISSING-BASELINE"
+        if not history_dir.exists() or not any(history_dir.glob("*-results.json")):
+            return "BENCHMARK-NO-HISTORY"
     text = read_text(latest)
     if re.search(r"^Result:\s*FAIL\b", text, re.MULTILINE | re.IGNORECASE):
         return "FAIL"
+    if re.search(r"^Result:\s*REGRESSION\b", text, re.MULTILINE | re.IGNORECASE):
+        return "REGRESSION"
+    if re.search(r"^Result:\s*WARN\b", text, re.MULTILINE | re.IGNORECASE):
+        return "WARN"
     if re.search(r"^Result:\s*PASS\b", text, re.MULTILINE | re.IGNORECASE):
         return "PASS"
     if re.search(r"^-\s*Failed:\s*[1-9]\d*\b", text, re.MULTILINE | re.IGNORECASE):
         return "FAIL"
     if re.search(r"\bthreshold not met\b", text, re.IGNORECASE):
         return "FAIL"
+    if requirements["benchmark_required"]:
+        return "BENCHMARKED"
     if re.search(r"\b(pass|passed|all thresholds met)\b", text, re.IGNORECASE):
         return "PASS"
     return "RECORDED"
@@ -122,7 +175,12 @@ def harness_state(spec_text: str, plan_text: str) -> str:
 def observation_state(slug: str) -> str:
     latest = OBS_ROOT / slug / "latest-observation.md"
     trace = OBS_ROOT / slug / "trace.json"
+    history_dir = OBS_ROOT / slug / "history"
+    index = OBS_ROOT / slug / "index.jsonl"
+    history_exists = history_dir.exists() and any(history_dir.iterdir()) if history_dir.exists() else False
     if latest.exists() and trace.exists():
+        if history_exists and index.exists():
+            return "history"
         return "recorded"
     if latest.exists() or trace.exists():
         return "partial"
@@ -199,6 +257,8 @@ def spec_rows(spec_filter: str | None = None) -> list[dict[str, object]]:
         plan_text = read_text(spec.parent / "plan.md")
         checked, total = checkbox_counts(spec_text)
         analysis = qdc.analyze_spec(spec)
+        eval_requirements_state = eval_requirements(slug)
+        benchmark_state_info = benchmark_state(slug)
         rows.append(
             {
                 "slug": slug,
@@ -206,6 +266,9 @@ def spec_rows(spec_filter: str | None = None) -> list[dict[str, object]]:
                 "drift": "CLEAN" if not analysis["findings"] else f"{len(analysis['findings'])} HINTS",
                 "adrs": adr_count_for_spec(spec),
                 "eval": eval_state(slug),
+                "benchmark_required": eval_requirements_state["benchmark_required"],
+                "baseline_required": eval_requirements_state["baseline_required"],
+                "benchmark_state": benchmark_state_info,
                 "arch": architecture_state(plan_text),
                 "harness": harness_state(spec_text, plan_text),
                 "obs": observation_state(slug),
@@ -232,6 +295,12 @@ def blocked_work(rows: list[dict[str, object]], deps: dict[str, object]) -> list
     for row in rows:
         if row["eval"] == "MISSING" and row["harness"] != "n/a":
             blocked.append(f"{row['slug']}: missing eval plan on harness or agentic feature")
+        if row["eval"] == "BENCHMARK-MISSING-DATASET":
+            blocked.append(f"{row['slug']}: benchmarked evaluation requires dataset-manifest.json")
+        if row["eval"] == "BENCHMARK-MISSING-BASELINE":
+            blocked.append(f"{row['slug']}: regression-sensitive benchmark requires baseline.json")
+        if row["eval"] == "BENCHMARK-NO-HISTORY":
+            blocked.append(f"{row['slug']}: benchmarked evaluation requires archived history results")
         if row["arch"] == "✗":
             blocked.append(f"{row['slug']}: architecture sections absent or still placeholders")
         if row["harness"] == "✗":
@@ -324,10 +393,29 @@ def main(argv: list[str]) -> int:
         f"{len(rows)} specs  |  {sum(1 for row in rows if row['drift'] == 'CLEAN')} clean  |  "
         f"{sum(1 for row in rows if row['drift'] != 'CLEAN')} open drift  |  "
         f"{sum(1 for row in rows if row['eval'] == 'MISSING')} missing eval  |  "
-        f"{sum(1 for row in rows if row['harness'] == '✗')} missing harness"
+        f"{sum(1 for row in rows if row['harness'] == '✗')} missing harness  |  "
+        f"{sum(1 for row in rows if row['benchmark_required'])} benchmarked"
     )
     lines.extend(
         [
+            "",
+            "BENCHMARK READINESS",
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        ]
+    )
+    benchmarked = [row for row in rows if row["benchmark_required"]]
+    if benchmarked:
+        for row in benchmarked:
+            state = row["benchmark_state"]
+            lines.append(
+                f"{row['slug']}: dataset={'yes' if state['dataset_manifest'] else 'no'}, "
+                f"baseline={'yes' if state['baseline'] else 'no'}, history={state['history_count']}"
+            )
+    else:
+        lines.append("No specs currently require benchmarked evaluation.")
+    lines.extend(
+        [
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
             "",
             "ADR COVERAGE",
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",

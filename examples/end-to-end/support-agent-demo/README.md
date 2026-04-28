@@ -13,6 +13,7 @@ The demo is intentionally small. It is not a production service. Its purpose is 
 - architecture boundaries in `plan.md`
 - harness strategy without requiring a real harness runtime
 - evaluation plan and runnable evaluation script
+- benchmark dataset, baseline, and history artifacts
 - runtime observation trace
 - ADR for the harness boundary decision
 - retro rule that prevents direct harness coupling
@@ -56,21 +57,38 @@ cat product-request.md
 3. Run the implementation tests:
 
 ```bash
-PYTHONPATH=app python3 -m unittest discover -s app/tests
+python3 -m unittest discover -s app/tests
 ```
 
-4. Run the evaluation evidence:
+4. Run the single-run evaluation evidence:
 
 ```bash
-PYTHONPATH=app python3 app/eval/run_eval.py
+python3 app/eval/run_eval.py
 ```
 
 This writes `.specify/evals/001-support-triage-agent/latest-results.md`.
 
-5. Try the static drift/conformance checker from the demo directory:
+5. Run the benchmarked measurement path:
 
 ```bash
-python3 ../../../src/arpinine-harness-v1.0.0/scripts/quick_drift_check.py \
+python3 ../../../src/arpinine-harness-core/scripts/run_benchmark.py \
+  --slug 001-support-triage-agent
+```
+
+This writes:
+- `.specify/evals/001-support-triage-agent/history/*-results.json`
+- `.specify/evals/001-support-triage-agent/latest-results.md`
+- `.specify/observations/001-support-triage-agent/history/*.json`
+- `.specify/observations/001-support-triage-agent/latest-observation.md`
+
+Notes:
+- `baseline-results.json` in this demo includes domain-specific metrics such as `approval_check_rate` and `memory_scope_rate`. The generic shared-core baseline comparison currently evaluates `pass_rate`, `latency_p95_ms`, and `cost_total_usd`. Additional metric regression rules require product-specific comparison logic.
+- Benchmark history is append-only. Re-running the benchmark adds more scenario result files to `history/`, and aggregate reporting reads the full accumulated history set. For an isolated benchmark session, clear or partition history before rerunning.
+
+6. Try the static drift/conformance checker from the demo directory:
+
+```bash
+python3 ../../../src/arpinine-harness-core/scripts/quick_drift_check.py \
   --spec .specify/specs/001-support-triage-agent/spec.md
 ```
 
@@ -86,7 +104,7 @@ To simulate the post-edit hook check:
 
 ```bash
 printf '{"tool_input":{"file_path":"app/support_triage/application/drift_example_bad_direct_harness_import.py"}}' \
-  | python3 ../../../src/arpinine-harness-v1.0.0/scripts/quick_drift_check.py
+  | python3 ../../../src/arpinine-harness-core/scripts/quick_drift_check.py
 ```
 
 ## Expected Result
@@ -97,7 +115,8 @@ The happy path should show:
 - plan has module boundaries, dependency rules, testability, harness strategy, and eval strategy
 - tests pass
 - eval passes required thresholds
-- observation trace is recorded
+- benchmark history and observation history are recorded
+- baseline and dataset manifest make benchmark results reproducible
 - ADR documents the harness boundary
 - status report gives a new engineer the governance state
 

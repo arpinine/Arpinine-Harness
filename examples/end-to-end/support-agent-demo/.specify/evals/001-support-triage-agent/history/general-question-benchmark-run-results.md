@@ -5,10 +5,5 @@ Run ID: general-question-benchmark-run
 Dataset Version: v1.0.0
 Variant ID: support-triage-demo
 Scenario Set: support-triage-core-suite
-Passed: 3
+Passed: 1
 Failed: 0
-Latency P50 ms: 180.0
-Latency P95 ms: 234.0
-Token Input Total: 62
-Token Output Total: 42
-Cost USD Total: 0.04
