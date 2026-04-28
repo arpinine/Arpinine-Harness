@@ -124,7 +124,7 @@ def write_observation_run(
         "history_json": history_json,
         "history_markdown": history_md,
         "index": paths["index"],
-        "session_id": pathlib.Path(history_json).parent.name if session_id else "",
+        "session_id": session_id or "",
     }
 
 
@@ -181,7 +181,7 @@ def write_eval_run(
         "latest_markdown": paths["latest_markdown"],
         "history_json": history_json,
         "history_markdown": history_md,
-        "session_id": pathlib.Path(history_json).parent.name if session_id else "",
+        "session_id": session_id or "",
     }
 
 

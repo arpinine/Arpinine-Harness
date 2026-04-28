@@ -56,7 +56,7 @@ def latest_session_id(paths: dict[str, pathlib.Path]) -> str | None:
     return str(value) if value else None
 
 
-def load_history(history_dir: pathlib.Path, session_id: str | None = None) -> list[dict]:
+def load_eval_history(history_dir: pathlib.Path, session_id: str | None = None) -> list[dict]:
     entries: list[dict] = []
     target_dir = history_dir / session_id if session_id else history_dir
     if not target_dir.exists():
@@ -282,7 +282,7 @@ def build_report(repo: pathlib.Path, slug: str, session_id: str | None = None) -
         raise FileNotFoundError("eval-plan.md is required for benchmark reporting")
 
     effective_session_id = session_id or latest_session_id(paths)
-    results = load_history(paths["history"], effective_session_id)
+    results = load_eval_history(paths["history"], effective_session_id)
     if not results:
         raise FileNotFoundError("no benchmark history results were found")
 
