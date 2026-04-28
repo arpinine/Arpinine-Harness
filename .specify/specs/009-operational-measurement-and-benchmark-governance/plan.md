@@ -21,10 +21,10 @@
 .specify/evals/<slug>/dataset-manifest.json             ← dataset/scenario version contract
 .specify/evals/<slug>/baseline.json                     ← approved regression comparison target
 .specify/evals/<slug>/latest-results.md                 ← latest human-readable evaluation summary
-.specify/evals/<slug>/history/<run-id>-results.json     ← immutable benchmark/eval result snapshots
+.specify/evals/<slug>/history/<session-id>/<run-id>-results.json ← immutable benchmark/eval result snapshots
 .specify/observations/<slug>/latest-observation.md      ← latest human-readable observation summary
 .specify/observations/<slug>/trace.json                 ← latest machine-readable trace
-.specify/observations/<slug>/history/<run-id>.json      ← immutable observation snapshots
+.specify/observations/<slug>/history/<session-id>/<run-id>.json ← immutable observation snapshots
 .specify/observations/<slug>/index.jsonl                ← append-only observation run index
 templates/schemas/observation-schema.yaml               ← shared telemetry and provenance contract
 templates/eval-plan-template.md                         ← benchmark policy and baseline sections

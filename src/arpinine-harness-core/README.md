@@ -240,3 +240,4 @@ Available helpers:
 The post-write drift hook runs `quick_drift_check.py` automatically, so endpoint mismatches, stale eval runs, harness import leakage, and framework leakage into domain layers surface right after edits.
 
 For benchmarked evaluation, `run_benchmark.py` runs the declared benchmark command once per required dataset scenario and passes scenario context through `ARPININE_HARNESS_*` environment variables. The benchmark tool remains product-specific; Arpinine Harness governs the artifact contract and aggregates the results.
+Benchmark history is partitioned by session under `.specify/evals/<slug>/history/<session-id>/` and `.specify/observations/<slug>/history/<session-id>/`. Aggregate reporting defaults to the latest recorded benchmark session.

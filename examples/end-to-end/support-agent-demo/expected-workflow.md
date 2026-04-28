@@ -85,8 +85,8 @@ python3 ../../../src/arpinine-harness-core/scripts/run_benchmark.py \
 
 Expected result:
 - all required dataset scenarios run independently
-- benchmark history is written under `.specify/evals/001-support-triage-agent/history/`
-- observation history is written under `.specify/observations/001-support-triage-agent/history/`
+- benchmark history is written under `.specify/evals/001-support-triage-agent/history/<session-id>/`
+- observation history is written under `.specify/observations/001-support-triage-agent/history/<session-id>/`
 - `latest-results.md` becomes the governed aggregate benchmark report
 - baseline and dataset manifest are now part of the demonstration path
 

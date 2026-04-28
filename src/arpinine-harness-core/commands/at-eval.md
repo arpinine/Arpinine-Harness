@@ -106,9 +106,10 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    The benchmark command must write scenario result JSON to `ARPININE_HARNESS_RESULT_PATH`. It may also write optional observation JSON to `ARPININE_HARNESS_OBSERVATION_PATH`.
 6. Save or update:
    - `.specify/evals/<spec-slug>/latest-results.md`
-   - `.specify/evals/<spec-slug>/history/<run-id>-results.json`
-   - optional `.specify/evals/<spec-slug>/history/<run-id>-results.md`
-   Benchmark history is append-only. The shared aggregate report reads the benchmark result snapshots present in `history/`, so repeated runs accumulate unless the team partitions or clears history intentionally.
+   - `.specify/evals/<spec-slug>/history/<session-id>/<run-id>-results.json`
+   - optional `.specify/evals/<spec-slug>/history/<session-id>/<run-id>-results.md`
+   - `.specify/evals/<spec-slug>/latest-benchmark-session.json`
+   Benchmark history is append-only, but it is partitioned by benchmark session. The shared aggregate report defaults to the latest recorded session unless a specific session id is requested.
 7. Aggregate:
    - quality metrics
    - latency percentiles

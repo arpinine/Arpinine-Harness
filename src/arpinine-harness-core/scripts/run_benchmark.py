@@ -14,7 +14,7 @@ import sys
 import tempfile
 
 from benchmark_report import build_report
-from measurement_artifacts import write_eval_run, write_observation_run
+from measurement_artifacts import benchmark_session_id, eval_paths, observation_paths, write_eval_run, write_latest_session, write_observation_run
 
 
 def find_project_root(start: pathlib.Path) -> pathlib.Path | None:
@@ -70,7 +70,14 @@ def normalize_result(result: dict, scenario: dict, dataset_manifest: dict) -> di
     return normalized
 
 
-def run_scenario(repo: pathlib.Path, slug: str, command: str, dataset_manifest: dict, scenario: dict) -> dict:
+def run_scenario(
+    repo: pathlib.Path,
+    slug: str,
+    command: str,
+    dataset_manifest: dict,
+    scenario: dict,
+    session_id: str,
+) -> dict:
     if has_shell_metacharacters(command):
         raise ValueError("benchmark command contains unsupported shell metacharacters")
 
@@ -91,6 +98,7 @@ def run_scenario(repo: pathlib.Path, slug: str, command: str, dataset_manifest: 
                 "ARPININE_HARNESS_DATASET_VERSION": str(dataset_manifest.get("dataset_version", "")),
                 "ARPININE_HARNESS_SCENARIO_ID": str(scenario.get("scenario_id", "")),
                 "ARPININE_HARNESS_SCENARIO_JSON": json.dumps(scenario, sort_keys=True),
+                "ARPININE_HARNESS_BENCHMARK_SESSION_ID": session_id,
                 "ARPININE_HARNESS_RESULT_PATH": str(result_path),
                 "ARPININE_HARNESS_OBSERVATION_PATH": str(observation_path),
             }
@@ -114,13 +122,13 @@ def run_scenario(repo: pathlib.Path, slug: str, command: str, dataset_manifest: 
             )
 
         result = normalize_result(read_json(result_path), scenario, dataset_manifest)
-        write_eval_run(repo, slug, result, archive=True)
+        write_eval_run(repo, slug, result, archive=True, session_id=session_id)
 
         if observation_path.exists():
             observation = read_json(observation_path)
             observation.setdefault("scenario_id", scenario.get("scenario_id"))
             observation.setdefault("dataset_version", dataset_manifest.get("dataset_version"))
-            write_observation_run(repo, slug, observation)
+            write_observation_run(repo, slug, observation, session_id=session_id)
 
         return result
 
@@ -146,12 +154,15 @@ def run_benchmark(repo: pathlib.Path, slug: str) -> dict:
     scenarios = required_scenarios(dataset_manifest)
     if not scenarios:
         raise ValueError("dataset-manifest.json must declare at least one required scenario")
+    session_id = benchmark_session_id()
+    write_latest_session(eval_paths(repo, slug)["latest_session"], session_id)
+    write_latest_session(observation_paths(repo, slug)["latest_session"], session_id)
 
     for scenario in scenarios:
-        run_scenario(repo, slug, benchmark_command, dataset_manifest, scenario)
+        run_scenario(repo, slug, benchmark_command, dataset_manifest, scenario, session_id)
 
-    aggregate = build_report(repo, slug)
-    write_eval_run(repo, slug, aggregate, archive=False)
+    aggregate = build_report(repo, slug, session_id)
+    write_eval_run(repo, slug, aggregate, archive=False, session_id=session_id)
     return aggregate
 
 

@@ -35,6 +35,7 @@ def observation_paths(repo: pathlib.Path, slug: str) -> dict[str, pathlib.Path]:
         "latest_trace": root / "trace.json",
         "history": root / "history",
         "index": root / "index.jsonl",
+        "latest_session": root / "latest-benchmark-session.json",
     }
 
 
@@ -46,7 +47,20 @@ def eval_paths(repo: pathlib.Path, slug: str) -> dict[str, pathlib.Path]:
         "history": root / "history",
         "baseline": root / "baseline.json",
         "dataset_manifest": root / "dataset-manifest.json",
+        "latest_session": root / "latest-benchmark-session.json",
     }
+
+
+def benchmark_session_id() -> str:
+    return utc_now_run_id("benchmark-session")
+
+
+def session_history_dir(history_root: pathlib.Path, session_id: str | None) -> pathlib.Path:
+    return history_root / session_id if session_id else history_root
+
+
+def write_latest_session(path: pathlib.Path, session_id: str) -> None:
+    _write_json(path, {"session_id": session_id})
 
 
 def default_observation_markdown(observation: dict) -> str:
@@ -73,14 +87,17 @@ def write_observation_run(
     slug: str,
     observation: dict,
     markdown: str | None = None,
+    session_id: str | None = None,
 ) -> dict[str, pathlib.Path]:
     paths = observation_paths(repo, slug)
     run_id = observation.get("run_id") or utc_now_run_id(observation.get("scenario_id", "scenario"))
     observation = {**observation, "run_id": run_id}
+    if session_id:
+        observation["benchmark_session_id"] = session_id
     md = markdown or default_observation_markdown(observation)
-
-    history_json = paths["history"] / f"{run_id}.json"
-    history_md = paths["history"] / f"{run_id}.md"
+    history_dir = session_history_dir(paths["history"], session_id)
+    history_json = history_dir / f"{run_id}.json"
+    history_md = history_dir / f"{run_id}.md"
 
     _write_json(paths["latest_trace"], observation)
     _write_text(paths["latest_markdown"], md)
@@ -90,6 +107,7 @@ def write_observation_run(
         paths["index"],
         {
             "run_id": run_id,
+            "benchmark_session_id": session_id,
             "scenario_id": observation.get("scenario_id"),
             "variant_id": observation.get("variant_id"),
             "dataset_version": observation.get("dataset_version"),
@@ -106,6 +124,7 @@ def write_observation_run(
         "history_json": history_json,
         "history_markdown": history_md,
         "index": paths["index"],
+        "session_id": pathlib.Path(history_json).parent.name if session_id else "",
     }
 
 
@@ -142,15 +161,19 @@ def write_eval_run(
     result: dict,
     markdown: str | None = None,
     archive: bool = True,
+    session_id: str | None = None,
 ) -> dict[str, pathlib.Path]:
     paths = eval_paths(repo, slug)
     run_id = result.get("run_id") or utc_now_run_id("results")
     result = {**result, "run_id": run_id}
+    if session_id:
+        result["benchmark_session_id"] = session_id
     md = markdown or default_eval_markdown(result)
 
     _write_text(paths["latest_markdown"], md)
-    history_json = paths["history"] / f"{run_id}-results.json"
-    history_md = paths["history"] / f"{run_id}-results.md"
+    history_dir = session_history_dir(paths["history"], session_id)
+    history_json = history_dir / f"{run_id}-results.json"
+    history_md = history_dir / f"{run_id}-results.md"
     if archive:
         _write_json(history_json, result)
         _write_text(history_md, md)
@@ -158,6 +181,7 @@ def write_eval_run(
         "latest_markdown": paths["latest_markdown"],
         "history_json": history_json,
         "history_markdown": history_md,
+        "session_id": pathlib.Path(history_json).parent.name if session_id else "",
     }
 
 

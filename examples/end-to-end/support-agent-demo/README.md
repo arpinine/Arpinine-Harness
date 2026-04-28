@@ -76,14 +76,14 @@ python3 ../../../src/arpinine-harness-core/scripts/run_benchmark.py \
 ```
 
 This writes:
-- `.specify/evals/001-support-triage-agent/history/*-results.json`
+- `.specify/evals/001-support-triage-agent/history/<session-id>/*-results.json`
 - `.specify/evals/001-support-triage-agent/latest-results.md`
-- `.specify/observations/001-support-triage-agent/history/*.json`
+- `.specify/observations/001-support-triage-agent/history/<session-id>/*.json`
 - `.specify/observations/001-support-triage-agent/latest-observation.md`
 
 Notes:
 - `baseline-results.json` in this demo includes domain-specific metrics such as `approval_check_rate` and `memory_scope_rate`. The generic shared-core baseline comparison currently evaluates `pass_rate`, `latency_p95_ms`, and `cost_total_usd`. Additional metric regression rules require product-specific comparison logic.
-- Benchmark history is append-only. Re-running the benchmark adds more scenario result files to `history/`, and aggregate reporting reads the full accumulated history set. For an isolated benchmark session, clear or partition history before rerunning.
+- Benchmark history is append-only, but it is partitioned by session. Aggregate reporting defaults to the latest recorded session rather than blending all historical scenario files together.
 
 6. Try the static drift/conformance checker from the demo directory:
 

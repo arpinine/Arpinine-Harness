@@ -105,11 +105,19 @@ def benchmark_state(slug: str) -> dict[str, object]:
     history_dir = root / "history"
     dataset_manifest = root / "dataset-manifest.json"
     baseline = root / "baseline.json"
-    history_count = len(list(history_dir.glob("*-results.json"))) if history_dir.exists() else 0
+    session_file = root / "latest-benchmark-session.json"
+    latest_session = None
+    if session_file.exists():
+        try:
+            latest_session = json.loads(read_text(session_file)).get("session_id")
+        except Exception:
+            latest_session = None
+    history_count = len(list(history_dir.rglob("*-results.json"))) if history_dir.exists() else 0
     return {
         "dataset_manifest": dataset_manifest.exists(),
         "baseline": baseline.exists(),
         "history_count": history_count,
+        "latest_session": latest_session,
     }
 
 
@@ -129,7 +137,7 @@ def eval_state(slug: str) -> str:
             return "BENCHMARK-MISSING-DATASET"
         if requirements["baseline_required"] and not baseline.exists():
             return "BENCHMARK-MISSING-BASELINE"
-        if not history_dir.exists() or not any(history_dir.glob("*-results.json")):
+        if not history_dir.exists() or not any(history_dir.rglob("*-results.json")):
             return "BENCHMARK-NO-HISTORY"
     text = read_text(latest)
     if re.search(r"^Result:\s*FAIL\b", text, re.MULTILINE | re.IGNORECASE):

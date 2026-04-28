@@ -48,8 +48,8 @@
 
 ## Reporting
 - Latest results path: `.specify/evals/[SPEC-NUMBER]-[name]/latest-results.md`
-- Historical storage: `.specify/evals/[SPEC-NUMBER]-[name]/history/`
-- Observation history source: `.specify/observations/[SPEC-NUMBER]-[name]/history/`
+- Historical storage: `.specify/evals/[SPEC-NUMBER]-[name]/history/<session-id>/`
+- Observation history source: `.specify/observations/[SPEC-NUMBER]-[name]/history/<session-id>/`
 
 ## Approval Rule
 - Work is not complete until required thresholds pass or an explicit exception is documented.

@@ -32,9 +32,10 @@ class MeasurementArtifactsTests(unittest.TestCase):
             "cost_usd": 0.01,
             "final_outcome": "PASS",
         }
-        paths = self.module.write_observation_run(self.repo, "001-demo", payload)
+        paths = self.module.write_observation_run(self.repo, "001-demo", payload, session_id="session-a")
         self.assertTrue(paths["latest_trace"].exists())
         self.assertTrue(paths["history_json"].exists())
+        self.assertEqual(paths["history_json"].parent.name, "session-a")
         self.assertTrue(paths["index"].exists())
         lines = paths["index"].read_text(encoding="utf-8").strip().splitlines()
         self.assertEqual(len(lines), 1)
@@ -50,9 +51,10 @@ class MeasurementArtifactsTests(unittest.TestCase):
             "passed": 3,
             "failed": 0,
         }
-        paths = self.module.write_eval_run(self.repo, "001-demo", payload)
+        paths = self.module.write_eval_run(self.repo, "001-demo", payload, session_id="session-a")
         self.assertTrue(paths["latest_markdown"].exists())
         self.assertTrue(paths["history_json"].exists())
+        self.assertEqual(paths["history_json"].parent.name, "session-a")
         stored = json.loads(paths["history_json"].read_text(encoding="utf-8"))
         self.assertEqual(stored["run_id"], payload["run_id"])
 

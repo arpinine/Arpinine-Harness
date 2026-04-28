@@ -44,11 +44,24 @@ def percentile(values: list[float], p: float) -> float | None:
     return float(ordered[lower] + (ordered[upper] - ordered[lower]) * fraction)
 
 
-def load_history(history_dir: pathlib.Path) -> list[dict]:
+def latest_session_id(paths: dict[str, pathlib.Path]) -> str | None:
+    session_file = paths.get("latest_session")
+    if not session_file or not session_file.exists():
+        return None
+    try:
+        payload = read_json(session_file)
+    except Exception:
+        return None
+    value = payload.get("session_id")
+    return str(value) if value else None
+
+
+def load_history(history_dir: pathlib.Path, session_id: str | None = None) -> list[dict]:
     entries: list[dict] = []
-    if not history_dir.exists():
+    target_dir = history_dir / session_id if session_id else history_dir
+    if not target_dir.exists():
         return entries
-    for path in sorted(history_dir.glob("*-results.json")):
+    for path in sorted(target_dir.glob("*-results.json")):
         try:
             entries.append(read_json(path))
         except Exception:
@@ -259,7 +272,7 @@ def compare_to_baseline(aggregate: dict, baseline: dict, baseline_results: dict 
     return result, signals
 
 
-def build_report(repo: pathlib.Path, slug: str) -> dict:
+def build_report(repo: pathlib.Path, slug: str, session_id: str | None = None) -> dict:
     paths = eval_paths(repo, slug)
     dataset_manifest = paths["dataset_manifest"]
     if not dataset_manifest.exists():
@@ -268,13 +281,16 @@ def build_report(repo: pathlib.Path, slug: str) -> dict:
     if not eval_plan.exists():
         raise FileNotFoundError("eval-plan.md is required for benchmark reporting")
 
-    results = load_history(paths["history"])
+    effective_session_id = session_id or latest_session_id(paths)
+    results = load_history(paths["history"], effective_session_id)
     if not results:
         raise FileNotFoundError("no benchmark history results were found")
 
     thresholds, minimum_runs = parse_thresholds(read_text(eval_plan))
     aggregate = aggregate_results(results)
     aggregate["run_id"] = results[-1].get("run_id", "aggregate")
+    if effective_session_id:
+        aggregate["benchmark_session_id"] = effective_session_id
     threshold_verdict, threshold_notes = evaluate_thresholds(aggregate, thresholds, minimum_runs)
     if aggregate["mixed_dimensions"] and threshold_verdict != "FAIL":
         threshold_verdict = "FAIL"
@@ -306,6 +322,7 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--slug", required=True, help="Spec slug under .specify/evals/")
     parser.add_argument("--json", action="store_true", help="Emit aggregate JSON instead of writing markdown")
+    parser.add_argument("--session-id", help="Limit aggregation to one benchmark session")
     args = parser.parse_args(argv)
 
     repo = find_project_root(pathlib.Path.cwd())
@@ -314,7 +331,7 @@ def main(argv: list[str]) -> int:
         return 1
 
     try:
-        aggregate = build_report(repo, args.slug)
+        aggregate = build_report(repo, args.slug, args.session_id)
     except FileNotFoundError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -324,7 +341,7 @@ def main(argv: list[str]) -> int:
         sys.stdout.write("\n")
         return 0
 
-    write_eval_run(repo, args.slug, aggregate, archive=False)
+    write_eval_run(repo, args.slug, aggregate, archive=False, session_id=args.session_id or aggregate.get("benchmark_session_id"))
     print(f"Wrote benchmark summary for {args.slug} with result {aggregate['result']}")
     return 0
 

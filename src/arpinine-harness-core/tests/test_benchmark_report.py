@@ -43,8 +43,10 @@ class BenchmarkReportTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.tempdir.cleanup()
 
-    def write_result(self, name: str, payload: dict) -> None:
-        path = self.repo / ".specify" / "evals" / "001-demo" / "history" / f"{name}-results.json"
+    def write_result(self, name: str, payload: dict, session_id: str | None = None) -> None:
+        base = self.repo / ".specify" / "evals" / "001-demo" / "history"
+        path = (base / session_id if session_id else base) / f"{name}-results.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
 
     def run_report(self, *args: str) -> subprocess.CompletedProcess[str]:
@@ -161,6 +163,31 @@ class BenchmarkReportTests(unittest.TestCase):
         payload = json.loads(result.stdout)
         self.assertEqual(payload["result"], "FAIL")
         self.assertTrue(any("minimum benchmark scenario count" in note for note in payload["threshold_notes"]))
+
+    def test_latest_session_isolated_from_older_history(self) -> None:
+        base = {
+            "dataset_version": "v1.0.0",
+            "variant_id": "variant-a",
+            "model_name": "demo-model",
+            "model_version": "2026-04",
+            "scenario_set": "core",
+            "result": "PASS",
+        }
+        self.write_result("old-1", {**base, "run_id": "old-1", "latency_ms": 50}, session_id="session-old")
+        self.write_result("old-2", {**base, "run_id": "old-2", "latency_ms": 60}, session_id="session-old")
+        self.write_result("old-3", {**base, "run_id": "old-3", "latency_ms": 70}, session_id="session-old")
+        self.write_result("new-1", {**base, "run_id": "new-1", "latency_ms": 100}, session_id="session-new")
+        self.write_result("new-2", {**base, "run_id": "new-2", "latency_ms": 200}, session_id="session-new")
+        self.write_result("new-3", {**base, "run_id": "new-3", "latency_ms": 300}, session_id="session-new")
+        (self.repo / ".specify" / "evals" / "001-demo" / "latest-benchmark-session.json").write_text(
+            json.dumps({"session_id": "session-new"}) + "\n",
+            encoding="utf-8",
+        )
+        result = self.run_report("--json")
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["run_count"], 3)
+        self.assertEqual(payload["benchmark_session_id"], "session-new")
+        self.assertEqual(payload["metrics"]["latency_p50_ms"], 200.0)
 
 
 if __name__ == "__main__":

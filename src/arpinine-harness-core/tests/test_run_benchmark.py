@@ -115,6 +115,7 @@ class RunBenchmarkTests(unittest.TestCase):
         payload = json.loads(result.stdout)
         self.assertEqual(payload["run_count"], 3)
         self.assertEqual(payload["result"], "PASS")
+        self.assertIn("benchmark_session_id", payload)
         self.assertEqual(payload["dataset_version"], "v1.0.0")
         self.assertEqual(payload["variant_id"], "variant-a")
         self.assertAlmostEqual(payload["metrics"]["latency_p95_ms"], 236.0)
@@ -122,9 +123,12 @@ class RunBenchmarkTests(unittest.TestCase):
         eval_root = self.repo / ".specify" / "evals" / "001-demo"
         observation_root = self.repo / ".specify" / "observations" / "001-demo"
         self.assertTrue((eval_root / "latest-results.md").exists())
-        self.assertEqual(len(list((eval_root / "history").glob("*-results.json"))), 3)
+        session_id = payload["benchmark_session_id"]
+        self.assertEqual(len(list((eval_root / "history" / session_id).glob("*-results.json"))), 3)
+        self.assertTrue((eval_root / "latest-benchmark-session.json").exists())
         self.assertTrue((observation_root / "latest-observation.md").exists())
-        self.assertEqual(len(list((observation_root / "history").glob("*.json"))), 3)
+        self.assertEqual(len(list((observation_root / "history" / session_id).glob("*.json"))), 3)
+        self.assertTrue((observation_root / "latest-benchmark-session.json").exists())
 
     def test_runner_rejects_non_benchmark_eval_plan(self) -> None:
         eval_plan = self.repo / ".specify" / "evals" / "001-demo" / "eval-plan.md"
