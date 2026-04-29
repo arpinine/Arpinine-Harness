@@ -336,7 +336,7 @@ claude --plugin-dir ./plugins/arpinine-harness-claude
 
 Arpinine Harness doesn't install the configured specification provider, harness runtimes, or eval frameworks during plugin installation. It validates them during setup and before the relevant workflow stage:
 
-- the configured specification provider is required for automated generation and planning
+- `spec-kit` is the default specification provider for automated generation and planning
 - harness runtimes are required only when `## Harness Strategy` explicitly selects one
 - eval tools are required only when `eval-plan.md` selects them
 
