@@ -11,6 +11,9 @@ from typing import Any
 
 
 PROVIDER_CONFIG_PATH = pathlib.Path(".specify/specification-provider.json")
+# The provider layer currently supports one execution contract only.
+# Adding another kind is a harness change, not a configuration change.
+SUPPORTED_ACTION_KINDS = {"assistant-command"}
 
 
 DEFAULT_PROVIDER: dict[str, Any] = {
@@ -38,8 +41,31 @@ def find_project_root(start: pathlib.Path) -> pathlib.Path | None:
     return None
 
 
+def normalize_provider_name(name: str) -> str:
+    normalized = name.strip().lower().replace("_", "-")
+    if normalized == "speckit":
+        return "spec-kit"
+    return normalized
+
+
+def _validate_action(action_name: str, action_value: dict[str, Any], provider_name: str) -> dict[str, Any]:
+    kind = str(action_value.get("kind", "")).strip()
+    command = str(action_value.get("command", "")).strip()
+    if not kind:
+        raise ValueError(f"provider {provider_name!r} action {action_name!r} is missing required field 'kind'")
+    if kind not in SUPPORTED_ACTION_KINDS:
+        allowed = ", ".join(sorted(SUPPORTED_ACTION_KINDS))
+        raise ValueError(
+            f"provider {provider_name!r} action {action_name!r} uses unsupported kind {kind!r}; supported kinds: {allowed}"
+        )
+    if not command:
+        raise ValueError(f"provider {provider_name!r} action {action_name!r} is missing required field 'command'")
+    return {"kind": kind, "command": command}
+
+
 def _merge_action_defaults(provider_name: str, payload: dict[str, Any]) -> dict[str, Any]:
-    if provider_name == "spec-kit":
+    normalized_name = normalize_provider_name(provider_name)
+    if normalized_name == "spec-kit":
         merged = copy.deepcopy(DEFAULT_PROVIDER)
     else:
         merged = {
@@ -63,10 +89,18 @@ def _merge_action_defaults(provider_name: str, payload: dict[str, Any]) -> dict[
         else:
             merged[key] = value
 
-    merged["provider"] = provider_name
+    merged["provider"] = normalized_name
     merged.setdefault("description", "")
     merged.setdefault("dependencies", [])
     merged.setdefault("actions", {})
+    validated_actions: dict[str, dict[str, Any]] = {}
+    for action_name, action_value in merged["actions"].items():
+        if not isinstance(action_value, dict):
+            raise ValueError(
+                f"provider {normalized_name!r} action {action_name!r} must be a JSON object with 'kind' and 'command'"
+            )
+        validated_actions[action_name] = _validate_action(action_name, action_value, normalized_name)
+    merged["actions"] = validated_actions
     return merged
 
 
@@ -103,8 +137,16 @@ def provider_action(provider: dict[str, Any], action: str) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
-def provider_command(provider: dict[str, Any], action: str) -> str:
+def require_provider_action(provider: dict[str, Any], action: str) -> dict[str, Any]:
     action_payload = provider_action(provider, action)
+    provider_name = str(provider.get("provider", "unknown"))
+    if not action_payload:
+        raise ValueError(f"Provider {provider_name} has no action {action!r} configured")
+    return _validate_action(action, action_payload, provider_name)
+
+
+def provider_command(provider: dict[str, Any], action: str) -> str:
+    action_payload = require_provider_action(provider, action)
     command = action_payload.get("command", "")
     return str(command).strip()
 
@@ -124,4 +166,3 @@ def provider_dependency_checks(provider: dict[str, Any]) -> list[dict[str, objec
             }
         )
     return checks
-

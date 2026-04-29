@@ -28,24 +28,25 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - Slug = `NNN-kebab-name`, e.g. `002-payment-flow`
 2. Create directory `.specify/specs/<slug>/`.
 3. Resolve the configured specification provider from `.specify/specification-provider.json`. By default this is `spec-kit`.
-4. Run the provider's `new_spec` action with the user request — this writes `spec.md` to the project root. For the default provider, this is `/speckit.specify`.
+4. Validate that the provider declares a supported `new_spec` action with a non-empty command. If not, stop with: `Provider <name> has no action 'new_spec' configured`.
+5. Run the provider's `new_spec` action with the user request — this writes `spec.md` to the project root. For the default provider, this is `/speckit.specify`.
 
 > **Error recovery:** If any subsequent step fails after the temporary root copy is created, immediately delete the temporary root file (`spec.md` or `plan.md`) before reporting the error and halting. Do not leave transient copies at the project root.
 
-5. Move the generated root `spec.md` to `.specify/specs/<slug>/spec.md` and delete the root copy.
-6. Open `.specify/specs/<slug>/spec.md`.
-7. Validate that the spec contains:
+6. Move the generated root `spec.md` to `.specify/specs/<slug>/spec.md` and delete the root copy.
+7. Open `.specify/specs/<slug>/spec.md`.
+8. Validate that the spec contains:
    - user stories
    - measurable functional and non-functional requirements
    - measurable acceptance criteria
    - explicit out-of-scope items
    - a `## Related ADRs` section, even if initially empty
-8. Remove implementation details from the spec. Tech choices belong in `plan.md` or ADRs.
-9. If acceptance criteria are vague, rewrite them to be testable.
-10. Identify any architectural constraints implied by the spec, such as modularity, replaceable integrations, boundary isolation, or separation of concerns.
-11. Add those constraints as product-facing non-functional expectations, not implementation details.
-12. If the feature may require an agent harness in the product application, call out that need as an explicit product or operating constraint without naming low-level implementation APIs.
-13. If open questions, ambiguities, or scope edges remain, ask the user the minimum set of focused clarification questions needed to remove ambiguity.
-14. Write the user's answers directly into `.specify/specs/<slug>/spec.md` by updating the relevant sections and the `## Open Questions` section. Do not require the user to edit the spec manually.
-15. Summarize any constitution fixes and clarifications that were applied after generation.
-16. Confirm: "Spec created at `.specify/specs/<slug>/spec.md`"
+9. Remove implementation details from the spec. Tech choices belong in `plan.md` or ADRs.
+10. If acceptance criteria are vague, rewrite them to be testable.
+11. Identify any architectural constraints implied by the spec, such as modularity, replaceable integrations, boundary isolation, or separation of concerns.
+12. Add those constraints as product-facing non-functional expectations, not implementation details.
+13. If the feature may require an agent harness in the product application, call out that need as an explicit product or operating constraint without naming low-level implementation APIs.
+14. If open questions, ambiguities, or scope edges remain, ask the user the minimum set of focused clarification questions needed to remove ambiguity.
+15. Write the user's answers directly into `.specify/specs/<slug>/spec.md` by updating the relevant sections and the `## Open Questions` section. Do not require the user to edit the spec manually.
+16. Summarize any constitution fixes and clarifications that were applied after generation.
+17. Confirm: "Spec created at `.specify/specs/<slug>/spec.md`"
