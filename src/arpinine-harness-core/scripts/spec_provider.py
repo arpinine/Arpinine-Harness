@@ -13,7 +13,7 @@ from typing import Any
 PROVIDER_CONFIG_PATH = pathlib.Path(".specify/specification-provider.json")
 # The provider layer currently supports one execution contract only.
 # Adding another kind is a harness change, not a configuration change.
-SUPPORTED_ACTION_KINDS = {"assistant-command"}
+ONLY_SUPPORTED_ACTION_KIND = "assistant-command"
 
 
 DEFAULT_PROVIDER: dict[str, Any] = {
@@ -53,10 +53,10 @@ def _validate_action(action_name: str, action_value: dict[str, Any], provider_na
     command = str(action_value.get("command", "")).strip()
     if not kind:
         raise ValueError(f"provider {provider_name!r} action {action_name!r} is missing required field 'kind'")
-    if kind not in SUPPORTED_ACTION_KINDS:
-        allowed = ", ".join(sorted(SUPPORTED_ACTION_KINDS))
+    if kind != ONLY_SUPPORTED_ACTION_KIND:
         raise ValueError(
-            f"provider {provider_name!r} action {action_name!r} uses unsupported kind {kind!r}; supported kinds: {allowed}"
+            f"provider {provider_name!r} action {action_name!r} uses unsupported kind {kind!r}; "
+            f"only {ONLY_SUPPORTED_ACTION_KIND!r} is supported today, and new kinds require harness changes"
         )
     if not command:
         raise ValueError(f"provider {provider_name!r} action {action_name!r} is missing required field 'command'")
