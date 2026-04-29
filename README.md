@@ -8,6 +8,9 @@ Arpinine Harness gives you a team to work with, not a prompt bundle. Specialized
 
 The goal isn't to slow you down. It's to make sure that what you ship is what you meant to build.
 
+This workflow aligns with the Two-Axis Framework in [docs/two_axis_framework.pdf](docs/two_axis_framework.pdf).
+Arpinine Harness mainly operationalizes the AI engineering process maturity axis: a governed way to build AI-assisted software, regardless of how AI-native the product itself is.
+
 ## One Plugin, Team Of Agents
 
 When you run a command, you're not talking to one assistant. You're talking to a team.
@@ -218,8 +221,9 @@ It covers the full Arpinine Harness loop on a small support triage agent: produc
 
 ```bash
 cd examples/end-to-end/support-agent-demo
-PYTHONPATH=app python3 -m unittest discover -s app/tests
-PYTHONPATH=app python3 app/eval/run_eval.py
+python3 -m unittest discover -s app/tests
+python3 app/eval/run_eval.py
+python3 ../../../src/arpinine-harness-core/scripts/run_benchmark.py --slug 001-support-triage-agent
 ```
 
 ## How Alignment Works
