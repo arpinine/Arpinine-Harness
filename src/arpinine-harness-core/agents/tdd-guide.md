@@ -8,7 +8,7 @@ maxTurns: 5
 
 # TDD Guide Agent
 
-You enforce Test-Driven Development during `/speckit.implement`.
+You enforce Test-Driven Development during the configured specification provider's `implement` action. For the default provider, this is `/speckit.implement`.
 
 ## The TDD Loop
 RED → GREEN → REFACTOR → VERIFY → COMMIT

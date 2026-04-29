@@ -1,5 +1,5 @@
 ---
-description: Initialize the shared product-engineering workflow, including spec-kit conventions and ADR structure. Run once per project.
+description: Initialize the shared product-engineering workflow, including specification-provider configuration and ADR structure. Run once per project.
 ---
 
 # /at-init
@@ -16,9 +16,12 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 ## Workflow
 
 1. Run `check-dependencies.sh` from the plugin scripts directory, or perform equivalent environment validation and share the output.
-2. If `spec-kit` is missing, stop and install it before relying on automated `/at-*` generation flows.
-3. Run `/speckit.constitution`.
-4. Ensure these paths exist:
+2. Ensure `.specify/specification-provider.json` exists. If it does not, create it from `templates/specification-provider-template.json`.
+3. Resolve the configured specification provider from `.specify/specification-provider.json`. By default this is `spec-kit`.
+4. If the configured provider dependencies are missing, stop before relying on automated `/at-*` generation flows.
+5. Run the provider's `constitution` action. For the default provider, this is `/speckit.constitution`.
+6. Ensure these paths exist:
+   - `.specify/specification-provider.json`
    - `.specify/specs/`
    - `.specify/adr/`
    - `.specify/adr/ADR-INDEX.md`
@@ -26,7 +29,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - `.specify/observations/`
    - `.specify/rules/`
    - `.specify/coordination/`
-5. If `ADR-INDEX.md` does not exist, create it with:
+7. If `ADR-INDEX.md` does not exist, create it with:
 
 ```md
 # ADR Index
@@ -35,7 +38,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 |--------|-------|--------|---------|--------|
 ```
 
-6. Confirm the plugin conventions in the repo:
+8. Confirm the plugin conventions in the repo:
    - each feature lives under `.specify/specs/<slug>/` — slug format: `NNN-kebab-name`
    - `spec.md` captures product intent only — lives at `.specify/specs/<slug>/spec.md`
    - `plan.md` captures implementation details — lives at `.specify/specs/<slug>/plan.md`
@@ -46,15 +49,15 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - observations capture actual runtime behavior for later drift analysis
    - rules compound across projects — lessons from retros live in `.specify/rules/`
    - refinement happens before implementation and after drift is found
-7. Tell the user which files were created or verified.
-8. Report dependency status clearly:
-   - `spec-kit` required for automated generation and planning
+9. Tell the user which files were created or verified.
+10. Report dependency status clearly:
+   - configured specification provider required for automated generation and planning
    - harness runtime required only when selected in `## Harness Strategy`
    - eval tool required only when selected in `eval-plan.md`
-9. **Security tooling setup:** Run `setup_security_tooling.py` from the plugin scripts directory. This will:
+11. **Security tooling setup:** Run `setup_security_tooling.py` from the plugin scripts directory. This will:
    - Detect languages used in the project
    - Generate or merge `.pre-commit-config.yaml` with security, linting, formatting, type checking, testing, and dependency audit hooks
    - Install `pre-commit` and `pre-push` git hooks
    - Report the setup summary (languages detected, hooks installed, tools configured)
    - If `pre-commit` is not installed, report the missing dependency with install instructions but do not block the rest of the init workflow
-10. Print a final summary including both governance structure and security tooling status.
+12. Print a final summary including both governance structure and security tooling status.

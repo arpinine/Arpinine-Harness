@@ -4,6 +4,8 @@ This package contains the shared workflow assets that power Arpinine Harness acr
 
 Commands, agents, hooks, scripts, skills, and templates all live here. Assistant-specific metadata (manifests, registration files, implementation-specific skill wrappers) lives under `src/implementations/<assistant>/` and gets overlaid during the build step. Nothing in this package assumes Claude, Codex, or any specific assistant — the workflow is the abstraction.
 
+Specification generation and planning also go through an adapter layer. Arpinine Harness keeps `.specify/` as the canonical artifact contract, while `.specify/specification-provider.json` selects the backend that generates or updates `spec.md` and `plan.md`.
+
 The shared core also owns the cross-team coordination model. When multiple assistants run against the same repo, they all rely on:
 
 - shared task ownership and leases under `.specify/coordination/`
@@ -153,6 +155,7 @@ The agents don't own anything on this list. Your team does.
 
 ```text
 .specify/
+  specification-provider.json
   specs/
     001-<slug>/
       spec.md
@@ -221,7 +224,7 @@ Key rules:
 
 Arpinine Harness doesn't install external dependencies during plugin installation. It validates them during setup and before the relevant workflow stage:
 
-- `spec-kit` is required for automated spec generation and planning
+- the configured specification provider is required only for automated spec generation and planning
 - harness runtimes are required only when `## Harness Strategy` explicitly selects one
 - eval tools are required only when `eval-plan.md` selects them
 

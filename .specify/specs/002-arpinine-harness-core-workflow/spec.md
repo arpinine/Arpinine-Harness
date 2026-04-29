@@ -68,7 +68,7 @@ The core workflow is the primary product. It must be coherent, automatable at ea
 ## Operating Constraints
 
 - The workflow has no agent harness dependency. Harness governance skills exist to govern harness use in the product application being built, not in the plugin itself.
-- The workflow depends on spec-kit (`specify` CLI) for automated spec generation. Commands that call spec-kit gracefully degrade when spec-kit is absent, but automated generation is unavailable.
+- The workflow depends on a configured specification provider for automated spec generation and planning. The default provider is spec-kit (`specify` CLI), but commands must resolve provider actions through the shared adapter layer so other providers can be used without changing the command surface.
 - All governance artifacts must remain in `.specify/` and committed with the codebase. External stores or databases are out of scope.
 - Pre-implementation hooks enforce architecture and constitution requirements. Teams cannot opt out of these gates by skipping the hook.
 

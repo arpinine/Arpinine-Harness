@@ -114,7 +114,7 @@ Run /at-init to set up pre-commit hooks, linting, and dependency auditing.
 
 Use the script output as the initial blocked-work list, then explain any additional context. List any specs where work cannot proceed due to:
 - CRITICAL unresolved drift without ADR
-- Missing `spec-kit` for automated generation/planning flows
+- Missing configured specification-provider dependency for automated generation/planning flows
 - Missing eval plan on agentic spec
 - Missing runtime dependency for selected harness strategy
 - Missing eval tool for the declared evaluation framework

@@ -8,7 +8,7 @@ maxTurns: 10
 
 # Tech Architect Agent
 
-You extend `/speckit.plan` with ADR suggestions.
+You extend the configured specification provider's `plan` action with ADR suggestions. For the default provider, this is `/speckit.plan`.
 
 ## Your Job
 1. Parse plan.md for technical decisions

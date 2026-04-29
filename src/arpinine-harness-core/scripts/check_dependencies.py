@@ -10,13 +10,7 @@ import re
 import shutil
 import sys
 
-
-def find_project_root(start: pathlib.Path) -> pathlib.Path | None:
-    current = start.resolve()
-    for candidate in [current, *current.parents]:
-        if (candidate / ".specify").exists() or (candidate / "Makefile").exists() or (candidate / ".git").exists():
-            return candidate
-    return None
+from spec_provider import find_project_root, load_provider_config, provider_dependency_checks
 
 
 def command_status(label: str, cmd: str, required: bool) -> dict[str, object]:
@@ -112,10 +106,10 @@ def spec_checks(repo: pathlib.Path, spec_root: pathlib.Path, eval_root: pathlib.
 
 def build_report() -> dict[str, object]:
     repo = find_project_root(pathlib.Path.cwd())
+    provider = load_provider_config(repo) if repo else {"provider": "spec-kit", "source": "default", "dependencies": []}
     global_checks = [
-        command_status("spec-kit CLI", "specify", True),
+        *provider_dependency_checks(provider),
         command_status("Python", "python3", True),
-        command_status("uv/uvx", "uvx", False),
         command_status("Node.js", "node", False),
         command_status("npm", "npm", False),
         command_status("OpenHarness-ready JS toolchain", "npx", False),
@@ -127,10 +121,15 @@ def build_report() -> dict[str, object]:
             ],
             "root_found": bool(repo),
         },
+        "provider": {
+            "name": provider.get("provider", "spec-kit"),
+            "source": provider.get("source", "default"),
+            "actions": sorted(provider.get("actions", {}).keys()),
+        },
         "global": global_checks,
         "specs": [],
         "guidance": [
-            "spec-kit is required for automated /at-* generation flows.",
+            f"The configured specification provider ({provider.get('provider', 'spec-kit')}) supplies automated /at-* generation flows.",
             "Harness and eval dependencies are required only if selected in plan/eval artifacts.",
             "Arpinine Harness validates dependencies; it does not install them during plugin installation.",
         ],
@@ -148,6 +147,8 @@ def render_text(report: dict[str, object]) -> str:
     lines = [
         "ARPININE HARNESS DEPENDENCY CHECK",
         "----------------------------------",
+        f"Specification provider: {report['provider']['name']} [{report['provider']['source']}]",
+        "",
     ]
 
     for item in report["global"]:

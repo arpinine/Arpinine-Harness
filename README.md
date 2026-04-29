@@ -306,7 +306,7 @@ Claude also has native targets for install, uninstall, and validator-backed vali
 ## Usage Model
 
 ```bash
-# 1. Install spec-kit
+# 1. Install the default specification provider (spec-kit), or configure another provider later
 uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai claude
 
 # 2. Install from Claude's native CLI
@@ -334,10 +334,12 @@ claude --plugin-dir ./plugins/arpinine-harness-claude
 
 ## Dependency Handling
 
-Arpinine Harness doesn't install `spec-kit`, harness runtimes, or eval frameworks during plugin installation. It validates them during setup and before the relevant workflow stage:
+Arpinine Harness doesn't install the configured specification provider, harness runtimes, or eval frameworks during plugin installation. It validates them during setup and before the relevant workflow stage:
 
-- `spec-kit` is required for automated generation and planning
+- the configured specification provider is required for automated generation and planning
 - harness runtimes are required only when `## Harness Strategy` explicitly selects one
 - eval tools are required only when `eval-plan.md` selects them
+
+The provider is selected in `.specify/specification-provider.json`. The default adapter targets `spec-kit`, but the command surface stays the same if you switch providers.
 
 Run `src/arpinine-harness-core/scripts/check-dependencies.sh --json` for a machine-readable readiness report.
