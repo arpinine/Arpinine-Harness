@@ -4,7 +4,16 @@
 
 ## Why Harness
 
-A harness is an agent runtime embedded in product code. It provides the tool-calling loop, memory, and permission control for features that go beyond a single LLM call.
+A harness is an agent runtime embedded in product code. Where a single LLM call takes a prompt and returns a response, a harness wraps the model in an operational layer that runs a loop: call the model, detect tool requests, execute approved tools, feed results back, repeat until the task resolves. That loop is what makes an agent — and the harness is the infrastructure that runs it.
+
+Concretely, a harness provides:
+
+- **Tool execution** — the model requests a tool call; the harness validates it against a registered allowlist, checks permissions, executes it, and returns the result to the next model turn
+- **Memory** — state that persists across turns within a session (conversation history, intermediate results, working context) and optionally across sessions
+- **Permission control** — a gate between tool requests and execution; write actions can require human approval before proceeding
+- **Session lifecycle** — initialization, turn management, and teardown with explicit reset boundaries
+
+Without a harness, you write this loop yourself. With one, you get a framework that handles the loop mechanics — but you take on a dependency that sits between your product and the model. That dependency is what governance targets.
 
 Without governance, three failure modes appear consistently:
 
