@@ -4,8 +4,6 @@ This demo shows Arpinine Harness in action on a small product feature.
 
 For a step-by-step explanation of what a harness is, why governance matters, and how each lifecycle stage works — see **[harness-explained.md](harness-explained.md)**.
 
-
-
 > A support triage agent classifies inbound customer tickets, drafts a first response, and requires human approval before creating a support case.
 
 The demo is intentionally small. It is not a production service. Its purpose is to make the Arpinine Harness workflow visible from product intent to execution evidence.
@@ -45,7 +43,7 @@ pwd
 cat product-request.md
 ```
 
-2. Run the Arpinine Harness workflow in Claude Code:
+1. Run the Arpinine Harness workflow in Claude Code:
 
 ```text
 /arpinine-harness:at-init
@@ -58,13 +56,13 @@ cat product-request.md
 /arpinine-harness:at-audit .specify/specs/001-support-triage-agent/spec.md
 ```
 
-3. Run the implementation tests:
+1. Run the implementation tests:
 
 ```bash
 python3 -m unittest discover -s app/tests
 ```
 
-4. Run the single-run evaluation evidence:
+1. Run the single-run evaluation evidence:
 
 ```bash
 python3 app/eval/run_eval.py
@@ -72,7 +70,7 @@ python3 app/eval/run_eval.py
 
 This writes `.specify/evals/001-support-triage-agent/latest-results.md`.
 
-5. Run the benchmarked measurement path:
+1. Run the benchmarked measurement path:
 
 ```bash
 python3 ../../../src/arpinine-harness-core/scripts/run_benchmark.py \
@@ -80,16 +78,18 @@ python3 ../../../src/arpinine-harness-core/scripts/run_benchmark.py \
 ```
 
 This writes:
+
 - `.specify/evals/001-support-triage-agent/history/<session-id>/*-results.json`
 - `.specify/evals/001-support-triage-agent/latest-results.md`
 - `.specify/observations/001-support-triage-agent/history/<session-id>/*.json`
 - `.specify/observations/001-support-triage-agent/latest-observation.md`
 
 Notes:
+
 - `baseline-results.json` in this demo includes domain-specific metrics such as `approval_check_rate` and `memory_scope_rate`. The generic shared-core baseline comparison currently evaluates `pass_rate`, `latency_p95_ms`, and `cost_total_usd`. Additional metric regression rules require product-specific comparison logic.
 - Benchmark history is append-only, but it is partitioned by session. Aggregate reporting defaults to the latest recorded session rather than blending all historical scenario files together.
 
-6. Try the static drift/conformance checker from the demo directory:
+1. Try the static drift/conformance checker from the demo directory:
 
 ```bash
 python3 ../../../src/arpinine-harness-core/scripts/quick_drift_check.py \
