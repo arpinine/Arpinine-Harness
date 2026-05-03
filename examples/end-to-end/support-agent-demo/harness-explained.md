@@ -30,6 +30,61 @@ With governance:
 
 ---
 
+## OpenHarness
+
+OpenHarness is a JS/Node.js agent runtime SDK (`@openharness/*`) that provides tool registration, approval callbacks, and session management for product-facing agent features.
+
+**The plugin does not integrate with OpenHarness.** It governs how teams use it.
+
+What the plugin does when `plan.md` names OpenHarness:
+
+| Where | What |
+|---|---|
+| `harness-governor` | Fires three extra HIGH checks on top of the generic harness controls |
+| `quick_drift_check.py` | Detects `@openharness/` imports outside adapter/infrastructure layer after every write |
+| `check_dependencies.py` | Validates `node` and `npm` are available on the host |
+| `bootstrap_from_code.py` | Flags existing OpenHarness imports during codebase assessment and warns if not isolated |
+
+**Three OpenHarness-specific blocks** (beyond the generic 5):
+
+| Missing | Severity |
+|---|---|
+| Adapter-layer isolation not defined | HIGH — blocks implementation |
+| Approval callback or permission flow undocumented | HIGH — blocks implementation |
+| Session or state handling undocumented | HIGH — blocks implementation |
+
+**Recommended structure when OpenHarness is selected:**
+
+```text
+product feature / application service
+        │
+        ▼
+internal runtime interface
+        │
+        ▼
+OpenHarness adapter          ← only file with @openharness/* imports
+        │
+        ▼
+OpenHarness agent, tools, permissions, sessions
+```
+
+**Import drift detection regex:**
+
+```python
+OPENHARNESS_IMPORT_RE = re.compile(
+    r"(@openharness/|from\s+openharness\b|import\s+openharness\b"
+    r"|from\s+[\"'][^\"']*openharness[^\"']*[\"']"
+    r"|require\([\"'][^\"']*openharness[^\"']*[\"']\))",
+    re.IGNORECASE,
+)
+```
+
+Found outside `adapters/` or `infrastructure/` → HIGH drift warning fires automatically via PostToolUse hook.
+
+The actual OpenHarness integration is always the team's code inside the adapter. The plugin only enforces that it stays there.
+
+---
+
 ## Step 1 — Declare the Harness in `plan.md`
 
 Before any code, `plan.md` must contain `## Harness Strategy`. If the section is missing or says `N/A`, `harness-governor` is silent. When a runtime is named, all controls are required.
