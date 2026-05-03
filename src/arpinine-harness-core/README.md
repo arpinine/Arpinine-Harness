@@ -88,6 +88,7 @@ Scope is evaluated during `/at-plan` by reading what the spec and plan actually 
 |---------|-------|---------|
 | `/arpinine-harness:at-init` | Setup | Initialize the workflow, ADR structure, and rules directory |
 | `/arpinine-harness:at-new` | Define | Create a specification from a feature request |
+| `/arpinine-harness:at-bootstrap-from-code` | Define | Assess an existing repo and seed governed artifacts from implementation evidence |
 | `/arpinine-harness:at-review` | Refine | Tighten clarity, scope, and measurability |
 | `/arpinine-harness:at-plan` | Plan | Generate plan and tasks from the spec |
 | `/arpinine-harness:at-adr` | Decide | Create and manage decision records |
@@ -236,6 +237,7 @@ Commands are stronger when they start from executable checks rather than prompt 
 
 Available helpers:
 - `scripts/check-dependencies.sh --json` — machine-readable environment readiness
+- `scripts/bootstrap_from_code.py --json --write-artifacts [--git-log]` — existing-codebase assessment with docs, tests, monorepo, and optional git-history intent signals
 - `scripts/spec_status.py [--spec <slug>] [--onboard]` — project governance report
 - `scripts/quick_drift_check.py --spec .specify/specs/<slug>/spec.md` — lightweight drift and static conformance hints
 - `scripts/run_benchmark.py --slug <slug>` — execute required benchmark scenarios from `dataset-manifest.json` and emit the governed aggregate result

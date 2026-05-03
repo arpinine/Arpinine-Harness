@@ -170,6 +170,7 @@ The agents don't own anything on this list. Your team does. The agents help you 
 |---------|-------|---------|
 | `/arpinine-harness:at-init` | Setup | Initialize the shared workflow and ADR structure |
 | `/arpinine-harness:at-new` | Define | Create a new specification from a product request |
+| `/arpinine-harness:at-bootstrap-from-code` | Define | Assess an existing codebase and seed the first governed spec, plan, eval, and ADR artifacts |
 | `/arpinine-harness:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
 | `/arpinine-harness:at-plan` | Plan | Produce plan and tasks from an approved spec |
 | `/arpinine-harness:at-adr` | Decide | Create and manage Architecture Decision Records |
@@ -183,6 +184,9 @@ The agents don't own anything on this list. Your team does. The agents help you 
 ```bash
 # Initialize team workflow
 /arpinine-harness:at-init
+
+# Or bootstrap a governed slice from an existing codebase
+/arpinine-harness:at-bootstrap-from-code .
 
 # Define product intent
 /arpinine-harness:at-new "User login with email and password"
@@ -309,12 +313,61 @@ Claude also has native targets for install, uninstall, and validator-backed vali
 # 1. Install the default specification provider (spec-kit), or configure another provider later
 uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai claude
 
-# 2. Install from Claude's native CLI
-make install
-
-# 3. Initialize the workflow (run inside a Claude Code session)
+# 2. Initialize the workflow (run inside a Claude Code session)
 /arpinine-harness:at-init
+
+# 3. Reverse/bootstrap an existing codebase
+/arpinine-harness:at-bootstrap-from-code . --git-log
 ```
+
+## Plugin Install
+
+### Claude
+
+Use the Claude-native install flow.
+
+If this repo was previously registered under an older local marketplace name such as `agent-align-local`, remove that stale marketplace first:
+
+```bash
+claude plugin marketplace remove agent-align-local
+```
+
+Then install Arpinine Harness from this repo:
+
+```bash
+cd /Users/anepoti/workspace/Arpinine/specops
+make validate-structure IMPLEMENTATION=claude
+make assemble IMPLEMENTATION=claude
+claude plugin marketplace add ./
+claude plugin install arpinine-harness@arpinine-harness-local
+```
+
+Verify the install:
+
+```bash
+claude plugin list
+```
+
+Expected result:
+
+```text
+arpinine-harness@arpinine-harness-local
+Status: ✔ enabled
+```
+
+If you prefer the convenience target, `make install IMPLEMENTATION=claude` is still supported, but the explicit sequence above is the most reliable way to recover from stale local marketplace registrations.
+
+### Codex
+
+Use the Codex marketplace registration flow:
+
+```bash
+cd /Users/anepoti/workspace/Arpinine/specops
+make validate-structure IMPLEMENTATION=codex
+make register IMPLEMENTATION=codex
+```
+
+After registration, enable `arpinine-harness` from the Codex marketplace UI if your client requires a separate confirmation step.
 
 Cross-implementation registration:
 
@@ -323,13 +376,34 @@ make register IMPLEMENTATION=claude
 make register IMPLEMENTATION=codex
 ```
 
-After Codex registration, enable `arpinine-harness` from the Codex marketplace UI if your client requires a separate confirmation step.
-
 Session-only load without installing (dev/testing):
 
 ```bash
 make assemble IMPLEMENTATION=claude
 claude --plugin-dir ./plugins/arpinine-harness-claude
+```
+
+## Reverse An Existing Codebase
+
+Once the plugin is installed and enabled, move into the target repo and run:
+
+```text
+/arpinine-harness:at-init
+/arpinine-harness:at-bootstrap-from-code . --git-log
+```
+
+This creates:
+- `.specify/bootstrap/latest-assessment.json`
+- `.specify/bootstrap/latest-assessment.md`
+- `.specify/specs/<slug>/spec.md`
+- `.specify/specs/<slug>/plan.md`
+- optional eval and ADR seed artifacts when the assessment warrants them
+
+Then refine the reverse-engineered slice:
+
+```text
+/arpinine-harness:at-review .specify/specs/<slug>/spec.md
+/arpinine-harness:at-audit .specify/specs/<slug>/spec.md
 ```
 
 ## Dependency Handling

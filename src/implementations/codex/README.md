@@ -20,6 +20,7 @@ Implemented now:
 - shared multi-team coordination inherited from the core, including task-claim enforcement and style-governance checks
 - real marketplace registration via `codex marketplace add ./`
 - first Codex skills that wrap the shared Arpinine Harness workflows:
+  - `at-bootstrap-from-code`
   - `at-adr`
   - `at-audit`
   - `at-eval`
@@ -35,6 +36,8 @@ Implemented now:
 Not implemented yet:
 - agent wrapper strategy for `product-owner`, `tech-architect`, `security-reviewer`, and `tdd-guide`
 - published plugin assets and richer install-surface metadata
+
+Build packaging intentionally strips test directories from assembled plugin artifacts so host/plugin validation does not re-run the shared core test suite from `plugins/`.
 
 ## Goal
 

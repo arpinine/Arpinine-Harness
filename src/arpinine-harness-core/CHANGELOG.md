@@ -6,6 +6,9 @@
 - shared `src/arpinine-harness-core/` package plus `src/implementations/<assistant>/` overlays
 - `src/implementations/codex/README.md` placeholder to reserve the future Codex implementation seam
 - initial Codex plugin scaffold with `.codex-plugin/plugin.json`, repo marketplace metadata, and first workflow skills for `at-init`, `at-new`, `at-review`, and `at-plan`
+- `/at-bootstrap-from-code` shared workflow for assessing an existing repo and seeding governed artifacts from implementation evidence
+- `scripts/bootstrap_from_code.py` for assistant-agnostic codebase assessment and bootstrap recommendations
+- `tests/test_bootstrap_from_code.py` coverage for API and agentic bootstrap signals
 - `harness-governor` skill to enforce harness strategy for product-facing agent systems
 - `## Harness Strategy` section in the plan template for harness choice, abstraction boundary, tool access, memory, permissions, and swap strategy
 - `/at-observe` command for recording and reviewing runtime observation artifacts
@@ -17,6 +20,8 @@
 - end-to-end support triage demo under `examples/end-to-end/support-agent-demo`
 
 ### Changed
+- `bootstrap_from_code.py` now prunes ignored directories during traversal, validates invalid paths and empty repos explicitly, keeps timestamped assessment history, and exposes bounded sampling limits in the report
+- bootstrap assessment now reads docs/test/git intent signals, detects monorepo service candidates, adds confidence-weighted agentic detection, and derives subdirectory-aware spec slugs
 - build now assembles an assistant implementation package from shared core content plus implementation-specific metadata
 - planning and implementation guidance now enforce harness design documentation before building product features on top of an agent runtime
 - `harness-governor` now includes OpenHarness-specific checks for adapter isolation, approval flow, and session handling when OpenHarness is selected

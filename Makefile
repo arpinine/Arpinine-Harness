@@ -25,10 +25,13 @@ assemble: clean
 	test -d $(CORE_DIR) || (echo "Missing shared core directory: $(CORE_DIR)" && exit 1); \
 	test -d $(IMPLEMENTATION_DIR) || (echo "Missing implementation directory: $(IMPLEMENTATION_DIR)" && exit 1); \
 	echo "Assembling $(PLUGIN_NAME) v$(VERSION) for $(IMPLEMENTATION)..."; \
+	find $(CORE_DIR) $(IMPLEMENTATION_DIR) -type d -name "__pycache__" -prune -exec rm -rf {} +; \
+	find $(CORE_DIR) $(IMPLEMENTATION_DIR) -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete; \
 	mkdir -p $(BUILD_DIR); \
 	cp -r $(CORE_DIR)/. $(BUILD_DIR)/; \
 	cp -r $(IMPLEMENTATION_DIR)/. $(BUILD_DIR)/; \
 	chmod +x $(BUILD_DIR)/scripts/*.sh 2>/dev/null || true; \
+	find $(BUILD_DIR) -type d -name tests -prune -exec rm -rf {} +; \
 	find $(BUILD_DIR) -type d -name "__pycache__" -prune -exec rm -rf {} +; \
 	find $(BUILD_DIR) -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete; \
 	find $(BUILD_DIR) -depth -type d -empty -delete; \
@@ -88,7 +91,7 @@ validate-structure: assemble
 		grep -q '"hooks"[[:space:]]*:[[:space:]]*"./hooks/hooks.json"' $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Codex plugin manifest must declare hooks at ./hooks/hooks.json" && exit 1); \
 		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json" && exit 1); \
 		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
-		for skill in at-init at-new at-review at-plan at-adr at-audit at-eval at-implement at-observe at-retro at-status; do \
+		for skill in at-init at-new at-review at-plan at-bootstrap-from-code at-adr at-audit at-eval at-implement at-observe at-retro at-status; do \
 			test -f "$(BUILD_DIR)/skills/$$skill/SKILL.md" || (echo "Missing Codex workflow wrapper: $$skill" && exit 1); \
 		done; \
 		echo "Codex plugin structure looks valid."; \
