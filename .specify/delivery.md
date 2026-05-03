@@ -133,7 +133,22 @@ Plan: [specs/008-cross-language-code-style-governance/plan.md](specs/008-cross-l
 | [TASK-008](specs/008-cross-language-code-style-governance/plan.md#L71) | full | - | - | - |
 | [TASK-009](specs/008-cross-language-code-style-governance/plan.md#L72) | full | - | - | - |
 
----
-_Last updated: 2026-04-25 15:54_
+## [009-operational-measurement-and-benchmark-governance](specs/009-operational-measurement-and-benchmark-governance/spec.md)
+Plan: [specs/009-operational-measurement-and-benchmark-governance/plan.md](specs/009-operational-measurement-and-benchmark-governance/plan.md) &nbsp;|&nbsp; Progress: 9/9 full, 0 partial
 
-**Total tasks:** 72 &nbsp;|&nbsp; **Full:** 17 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 55
+| Task | Status | Assigned Team | Claimed By | Lease Until |
+|------|--------|---------------|------------|-------------|
+| [TASK-001](specs/009-operational-measurement-and-benchmark-governance/plan.md#L76) | full | - | - | - |
+| [TASK-002](specs/009-operational-measurement-and-benchmark-governance/plan.md#L77) | full | - | - | - |
+| [TASK-003](specs/009-operational-measurement-and-benchmark-governance/plan.md#L78) | full | - | - | - |
+| [TASK-004](specs/009-operational-measurement-and-benchmark-governance/plan.md#L79) | full | - | - | - |
+| [TASK-005](specs/009-operational-measurement-and-benchmark-governance/plan.md#L80) | full | - | - | - |
+| [TASK-006](specs/009-operational-measurement-and-benchmark-governance/plan.md#L81) | full | - | - | - |
+| [TASK-007](specs/009-operational-measurement-and-benchmark-governance/plan.md#L82) | full | - | - | - |
+| [TASK-008](specs/009-operational-measurement-and-benchmark-governance/plan.md#L83) | full | - | - | - |
+| [TASK-009](specs/009-operational-measurement-and-benchmark-governance/plan.md#L84) | full | - | - | - |
+
+---
+_Last updated: 2026-05-03 23:28_
+
+**Total tasks:** 81 &nbsp;|&nbsp; **Full:** 26 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 55
