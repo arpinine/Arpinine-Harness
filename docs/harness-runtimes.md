@@ -1,0 +1,180 @@
+# Harness Runtimes: Why, What, and How the Plugin Governs Them
+
+---
+
+## Why Harness
+
+A harness is an agent runtime embedded in product code. It provides the tool-calling loop, memory, and permission control for features that go beyond a single LLM call.
+
+Without governance, three failure modes appear consistently:
+
+**Coupling failure** — product code imports the harness SDK directly, everywhere. Swapping runtimes means rewriting the product, not swapping a file.
+
+**Scope creep** — tool access grows without justification. Agents call things they should not. No audit trail, no approved list.
+
+**Silent state** — memory scope is undocumented. Session state leaks across users. Approval flows are implicit. Write actions happen without human gates.
+
+Arpinine Harness does not provide a runtime. It governs how a runtime connects to the product by requiring explicit documentation before implementation starts and verifying that documentation against observed runtime behavior after execution.
+
+---
+
+## Mandatory Capabilities
+
+For a framework to satisfy harness governance controls, it must support seven capabilities. These are not preferences — each maps to a specific enforcement point in the plugin.
+
+### 1. Explicit Tool Allowlist
+
+Framework must allow a fixed allowlist declared at registration time, not at call time. Unknown tools must be rejected before execution.
+
+**Why:** `drift-detector` compares observed tool calls against the allowlist documented in `## Harness Strategy`. A framework that permits undeclared tools at runtime makes this check meaningless.
+
+### 2. Approval Callbacks for Write Actions
+
+Write actions must trigger a callback before execution. The caller must explicitly approve or deny. Pattern: `onApprovalRequired(action, context)` → `approve(id)` or `deny(id)`.
+
+**Why:** observation traces must contain a `permission_check` event before any write tool completes. Missing approval event = `PERMISSION_DRIFT` = CRITICAL, blocks completion.
+
+### 3. Session-Scoped Memory
+
+Memory must be scopeable to a session with an explicit reset condition. Framework must not write cross-session state by default.
+
+**Why:** `memory_write` events in observation traces carry a `scope` field. `drift-detector` verifies scope matches the declared memory model. Cross-session writes without documentation = `MEMORY_DRIFT` = CRITICAL.
+
+### 4. Observable Event Stream
+
+Every tool call, permission check, and memory write must emit inspectable structured events — not just logs. Events are the evidence that runtime behavior matched the documented strategy.
+
+**Why:** observation traces are the artifact `at-audit` uses. Frameworks that produce only text logs cannot generate the structured per-event evidence the governance model requires.
+
+### 5. Wrappable Behind an Interface
+
+Framework must be instantiable through an adapter class. No mandatory static globals, no forced SDK imports throughout product code.
+
+**Why:** `quick_drift_check.py` detects harness imports outside adapter or infrastructure paths after every file write. A framework that forces its imports into domain or application layers will generate continuous HIGH drift warnings.
+
+### 6. Testable Without Full Runtime
+
+Framework must be replaceable with a stub or fake for unit tests. Tests cannot depend on a live model, network, or credentials.
+
+**Why:** `tdd-guide` enforces RED→GREEN→REFACTOR per task. If tests require a live runtime, the TDD loop breaks and the test suite cannot serve as implementation evidence.
+
+### 7. Swap Path Feasibility
+
+Switching frameworks must require changing the adapter only. A framework that bleeds abstractions into product layers — custom decorators, mandatory base classes, file conventions in domain code — fails this.
+
+**Why:** `## Harness Strategy` requires a documented swap path. If the honest answer is "rewrite the whole product," `harness-governor` blocks implementation until the team either picks a different runtime or documents an ADR ratifying the coupling.
+
+---
+
+## Framework Comparison
+
+| Capability | LangGraph | Pydantic AI | OpenHarness | Semantic Kernel | CrewAI |
+|---|---|---|---|---|---|
+| Explicit tool allowlist | Yes | Yes | Yes | Yes | Partial |
+| Approval callbacks | Yes (interrupt) | Partial | Yes | Partial | No |
+| Session-scoped memory | Yes | Yes | Needs config | Yes | Partial |
+| Observable event stream | Yes | Partial | Partial | Yes | No |
+| Wrappable behind interface | Yes | Yes | Likely | Yes | Yes |
+| Testable without runtime | Yes | Yes | Partial | Yes | Yes |
+| Clean swap path | Yes | Yes | Medium | Harder | Harder |
+
+**LangGraph** and **Pydantic AI** satisfy all seven with no extra configuration. Best default choices.
+
+**OpenHarness** ([github.com/HKUDS/OpenHarness](https://github.com/HKUDS/OpenHarness)) — Python, 11.8k stars, MIT. Satisfies most capabilities but has two governance risks that require explicit mitigation:
+
+- Memory is cross-session by default (MEMORY.md persists across sessions). Teams must configure and document session scope in `## Harness Strategy` or `MEMORY_DRIFT` will fire.
+- 43+ tools available out of the box. Tool allowlist must be explicitly restricted at registration time. Broad default access fails the narrow-allowlist requirement.
+
+**Semantic Kernel** — approval callbacks and swap path require workarounds. Document them in `## Harness Strategy` before `harness-governor` passes.
+
+**CrewAI** — no approval callbacks, no structured event stream. Two hard gaps. Requires significant adapter work to satisfy governance controls. Not recommended without custom event instrumentation.
+
+Any framework not listed is valid. Governance controls apply regardless of runtime — the team documents the controls, `harness-governor` enforces that documentation exists and `drift-detector` verifies it against observations.
+
+---
+
+## How the Plugin Manages Frameworks
+
+The plugin is runtime-agnostic. It does not install, wrap, or call any harness SDK. It governs through four mechanisms:
+
+### 1. Pre-Implementation Gate (`harness-governor` skill)
+
+Fires during `/at-plan` when `## Harness Strategy` names a runtime. Checks all seven controls are documented. Missing any = HIGH block, `/at-implement` cannot start.
+
+When `plan.md` names OpenHarness specifically, three additional checks fire:
+
+| Check | Severity |
+|---|---|
+| Adapter-layer isolation not defined | HIGH |
+| Approval callback or permission flow undocumented | HIGH |
+| Session or state handling undocumented | HIGH |
+
+### 2. Post-Write Drift Detection (`quick_drift_check.py`)
+
+Runs automatically via PostToolUse hook after every file write. Checks:
+
+- Harness imports outside adapter or infrastructure paths
+- Framework imports inside domain or business layers
+- Endpoint mismatches between spec and code
+
+```python
+OPENHARNESS_IMPORT_RE = re.compile(
+    r"(@openharness/|from\s+openharness\b|import\s+openharness\b"
+    r"|from\s+[\"'][^\"']*openharness[^\"']*[\"']"
+    r"|require\([\"'][^\"']*openharness[^\"']*[\"']\))",
+    re.IGNORECASE,
+)
+
+FRAMEWORK_IMPORT_RE = re.compile(
+    r"\b(fastapi|flask|django|express|nestjs|sqlalchemy|typeorm|sequelize|prisma|redis)\b",
+    re.IGNORECASE,
+)
+
+DOMAIN_PATH_RE = re.compile(r"(^|/)(domain|core|business)(/|$)", re.IGNORECASE)
+```
+
+Harness import found outside adapter path → HIGH drift warning. Framework import found in domain layer → HIGH drift warning. Both fire on every write, not just at audit time.
+
+### 3. Observation Verification (`drift-detector` skill)
+
+After benchmark runs, `drift-detector` compares the observation trace against `## Harness Strategy`:
+
+| Trace event | Checked against |
+|---|---|
+| `tool_call.tool` | documented tool allowlist |
+| `permission_check.action` | documented permission model |
+| `memory_write.scope` | documented memory model |
+
+Contradictions produce named drift classes:
+
+| Class | Trigger | Severity |
+|---|---|---|
+| `TOOL_DRIFT` | Tool call not in allowlist | CRITICAL |
+| `PERMISSION_DRIFT` | Write action without approval event | CRITICAL |
+| `MEMORY_DRIFT` | Memory write scope contradicts strategy | CRITICAL |
+| `EVAL_COVERAGE_DRIFT` | Observed failure path not in eval plan | HIGH |
+| `RUNTIME_BEHAVIOR_DRIFT` | Runtime behavior contradicts adapter assumptions | HIGH |
+
+CRITICAL drift blocks completion. The team must fix the adapter or update `## Harness Strategy` and create an ADR ratifying the change.
+
+### 4. Dependency Check (`check_dependencies.py`)
+
+Validates toolchain readiness before governance-required commands run. Triggered conditionally:
+
+```python
+if "## Harness Strategy" in plan_text and re.search(r"openharness", plan_text, re.IGNORECASE):
+    checks.append(command_status("Node.js for OpenHarness workflows", "node", False))
+    checks.append(command_status("npm for OpenHarness workflows", "npm", False))
+```
+
+Only runs the check when the plan names the runtime. No unnecessary toolchain requirements for teams that chose a different framework.
+
+---
+
+## Summary
+
+The plugin enforces one rule regardless of which framework a team picks:
+
+> The harness runtime must be isolated behind an adapter. Product code depends on an internal interface. Observed runtime behavior must match documented strategy.
+
+Framework choice is the team's decision. Governance of that choice is the plugin's job.

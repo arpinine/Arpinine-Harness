@@ -32,7 +32,18 @@ With governance:
 
 ## OpenHarness
 
-OpenHarness is a JS/Node.js agent runtime SDK (`@openharness/*`) that provides tool registration, approval callbacks, and session management for product-facing agent features.
+[OpenHarness](https://github.com/HKUDS/OpenHarness) is an open-source Python agent infrastructure framework by HKUDS. 11.8k stars, MIT licensed, actively maintained. Its own description: "The model provides intelligence; the harness provides hands, eyes, memory, and safety boundaries."
+
+**What it provides:**
+
+| Capability | Detail |
+|---|---|
+| Tool registration | 43+ built-in tools (file I/O, shell, web search, MCP); Pydantic-validated schemas; PreToolUse/PostToolUse hooks |
+| Permission model | Multi-level: Default (ask before writes), Auto (allow all), Plan Mode (block writes); path-level rules; interactive approval dialogs |
+| Memory | Persistent cross-session via MEMORY.md; auto-compaction; session resume |
+| Multi-agent | Subagent spawning, team registry, background task lifecycle |
+| Observability | Token counting, cost tracking, debug logging, structured output (text/JSON/stream-JSON) |
+| LLM providers | Claude, OpenAI, GitHub Copilot, Moonshot/Kimi, OpenAI-compatible endpoints |
 
 **The plugin does not integrate with OpenHarness.** It governs how teams use it.
 
@@ -53,6 +64,12 @@ What the plugin does when `plan.md` names OpenHarness:
 | Approval callback or permission flow undocumented | HIGH — blocks implementation |
 | Session or state handling undocumented | HIGH — blocks implementation |
 
+**Governance concerns when using OpenHarness:**
+
+- **Memory is cross-session by default** — MEMORY.md persists across sessions. `harness-governor` requires session-scoped memory declared in `## Harness Strategy`. Teams must explicitly configure and document scope.
+- **43+ tools out of the box** — `harness-governor` requires a narrow explicit allowlist. Broad default toolkit must be restricted at registration time.
+- **CLAUDE.md / MEMORY.md conventions** — file-based coupling may leak into product layer. Adapter boundary must explicitly contain this.
+
 **Recommended structure when OpenHarness is selected:**
 
 ```text
@@ -62,7 +79,7 @@ product feature / application service
 internal runtime interface
         │
         ▼
-OpenHarness adapter          ← only file with @openharness/* imports
+OpenHarness adapter          ← only file with openharness imports
         │
         ▼
 OpenHarness agent, tools, permissions, sessions
@@ -82,6 +99,41 @@ OPENHARNESS_IMPORT_RE = re.compile(
 Found outside `adapters/` or `infrastructure/` → HIGH drift warning fires automatically via PostToolUse hook.
 
 The actual OpenHarness integration is always the team's code inside the adapter. The plugin only enforces that it stays there.
+
+---
+
+## Framework Comparison
+
+Seven capabilities required for a framework to satisfy harness governance controls:
+
+| Capability | Why required |
+|---|---|
+| Explicit tool allowlist | Tool calls verified against documented allowlist in observations |
+| Approval callbacks | `permission_check` event must appear before any write tool completes |
+| Session-scoped memory | `memory_write` events must carry `scope` — verified against strategy |
+| Observable event stream | Structured events are the evidence that runtime matched documented strategy |
+| Wrappable behind interface | SDK must live in one adapter file — import leakage detected after every write |
+| Testable without full runtime | TDD enforcement requires tests runnable without live model or network |
+| Swap path feasibility | Swap must require changing adapter only — framework must not bleed into product layer |
+
+**How mature frameworks compare:**
+
+| Capability | LangGraph | Pydantic AI | OpenHarness | Semantic Kernel | CrewAI |
+|---|---|---|---|---|---|
+| Explicit tool allowlist | Yes | Yes | Yes | Yes | Partial |
+| Approval callbacks | Yes (interrupt) | Partial | Yes | Partial | No |
+| Session-scoped memory | Yes | Yes | **Needs config** | Yes | Partial |
+| Observable event stream | Yes | Partial | Partial | Yes | No |
+| Wrappable behind interface | Yes | Yes | Likely | Yes | Yes |
+| Testable without runtime | Yes | Yes | Partial | Yes | Yes |
+| Clean swap path | Yes | Yes | Medium | Harder | Harder |
+
+**Notes:**
+
+- **LangGraph** and **Pydantic AI** satisfy all 7 with no extra configuration.
+- **OpenHarness** satisfies most but requires explicit session scope configuration and tool restriction to pass `harness-governor`. Cross-session memory default and broad tool set are governance risks if undocumented.
+- **Semantic Kernel** and **CrewAI** have gaps that require workarounds documented in `## Harness Strategy` before `harness-governor` passes.
+- Any framework not listed is still valid — governance controls apply regardless of runtime. The team documents the controls; `harness-governor` enforces that documentation exists.
 
 ---
 
