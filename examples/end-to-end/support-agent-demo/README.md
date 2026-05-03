@@ -1,6 +1,10 @@
 # Arpinine Harness End-to-End Demo: Support Triage Agent
 
-This demo shows Arpinine Harness in action on a small product feature:
+This demo shows Arpinine Harness in action on a small product feature.
+
+For a step-by-step explanation of what a harness is, why governance matters, and how each lifecycle stage works — see **[harness-explained.md](harness-explained.md)**.
+
+
 
 > A support triage agent classifies inbound customer tickets, drafts a first response, and requires human approval before creating a support case.
 
