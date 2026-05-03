@@ -1,0 +1,1 @@
+Support agents spend too much time reading inbound tickets and drafting the first response. We want a lightweight triage assistant that drafts a helpful first reply with an LLM, but still requires human approval before any support case is created.

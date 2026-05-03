@@ -215,10 +215,11 @@ The agents don't own anything on this list. Your team does. The agents help you 
 
 ## End-to-End Demo
 
-There's a complete runnable demo product in the repo:
+There are complete runnable demo products in the repo:
 
 ```text
 examples/end-to-end/support-agent-demo/
+examples/end-to-end/support-agent-openai-demo/
 ```
 
 It covers the full Arpinine Harness loop on a small support triage agent: product request, governed `spec.md`, `plan.md` with module boundaries and harness strategy, fake harness adapter (no external runtime needed), runnable tests and evaluation script, observation trace, ADR and rule examples, and an intentional drift example for audit discussion.
@@ -335,7 +336,6 @@ claude plugin marketplace remove agent-align-local
 Then install Arpinine Harness from this repo:
 
 ```bash
-cd /Users/anepoti/workspace/Arpinine/specops
 make validate-structure IMPLEMENTATION=claude
 make assemble IMPLEMENTATION=claude
 claude plugin marketplace add ./
@@ -362,7 +362,6 @@ If you prefer the convenience target, `make install IMPLEMENTATION=claude` is st
 Use the Codex marketplace registration flow:
 
 ```bash
-cd /Users/anepoti/workspace/Arpinine/specops
 make validate-structure IMPLEMENTATION=codex
 make register IMPLEMENTATION=codex
 ```
