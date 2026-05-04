@@ -1,7 +1,7 @@
 ---
 governs: specs/008-cross-language-code-style-governance
 supersedes: ~
-status: Proposed
+status: Accepted
 date: 2026-04-25
 covers:
   - decision:008-cross-language-code-style-governance:canonical-style-config-directory
@@ -10,7 +10,7 @@ covers:
 # ADR-0006: Centralize cross-language style standards under a shared repository directory
 
 ## Status
-Proposed
+Accepted
 
 ## Context
 With multiple teams and assistant implementations operating on the same repository, style consistency can no longer depend on editor defaults, assistant-local habits, or language-specific config files scattered opportunistically through the root directory.

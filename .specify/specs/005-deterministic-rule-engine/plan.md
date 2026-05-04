@@ -8,7 +8,7 @@
 | Decision | Rationale | ADR |
 |----------|-----------|-----|
 | Add `check_rules.py` under shared core scripts | Keeps rule execution reusable across hooks, audit, status, and implementations | Consequence of ADR-0001 |
-| Define a shared JSON violation contract first | Downstream consumers need one stable output format | No separate ADR |
+| Define a shared JSON violation contract first | Downstream consumers need one stable output format | ADR-0011 |
 | Start with a constrained executable schema rather than a broad policy DSL | Faster path to reliable enforcement and lower false-positive risk | No separate ADR |
 
 ## Architecture
@@ -82,4 +82,4 @@ Not applicable. Rule execution governs repository artifacts and code layout, not
 
 ## ADRs Created During Planning
 
-No new ADR required at planning time.
+- ADR-0011: Shared JSON violation contract as the output format for rule execution — governs TASK-004, TASK-006, TASK-007

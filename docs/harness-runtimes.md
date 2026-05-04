@@ -32,6 +32,57 @@ Arpinine Harness does not provide a runtime. It governs how a runtime connects t
 
 ---
 
+## How To Evaluate A Harnessed Agent
+
+Evaluate a harnessed agent at two levels:
+
+1. **Task quality** — did the agent produce the correct business outcome?
+2. **Runtime behavior** — did the harness use tools, memory, permissions, and session state the way the plan said it would?
+
+An agent is not "working" just because the final text looks plausible. A governed harness must produce evidence that the runtime stayed inside its declared boundaries.
+
+### What To Check
+
+| Area | Questions to answer |
+|---|---|
+| Task outcome | Did it solve the task correctly? Did it finish within acceptable latency and cost? |
+| Tool behavior | Did it call the right tool? Were arguments valid? Did it avoid unnecessary or repeated tool calls? |
+| Permission behavior | Did protected actions require approval? Did denied actions stay blocked? |
+| Memory behavior | Did state persist only within the allowed scope? Did reset actually clear it? |
+| Session behavior | Did a new session start clean? Did the loop terminate correctly instead of spinning? |
+| Safety behavior | Did it resist prompt injection, avoid forbidden tools, and stay within the documented boundary? |
+
+### Evidence The Harness Must Expose
+
+To make those checks possible, the harness or its adapter should expose structured evidence:
+
+- **tool events** — requested, started, completed, denied
+- **permission events** — approval required, approved, denied
+- **memory events** — read, write, scope, reset
+- **session lifecycle events** — started, cleared, ended
+- **trace metadata** — model, turn count, retries, latency, token/cost telemetry where relevant
+
+Text logs are not enough. Governance needs structured events that can be compared against `## Harness Strategy` and `eval-plan.md`.
+
+### Practical Evaluation Pattern
+
+For each eval case, score both the output and the runtime evidence.
+
+Example assertions:
+
+- the final classification or answer is correct
+- only approved tools were called
+- a `permission_check` happened before any protected write
+- memory stayed in `session` scope when the plan said session-only
+- reset cleared prior context before the next run
+
+This is why Arpinine Harness requires both:
+
+- `## Harness Strategy` in `plan.md`
+- harness-specific checks in `## Evaluation Strategy` and `eval-plan.md`
+
+---
+
 ## Mandatory Capabilities
 
 For a framework to satisfy harness governance controls, it must support seven capabilities. These are not preferences — each maps to a specific enforcement point in the plugin.
@@ -98,6 +149,29 @@ Switching frameworks must require changing the adapter only. A framework that bl
 
 - Memory is cross-session by default (MEMORY.md persists across sessions). Teams must configure and document session scope in `## Harness Strategy` or `MEMORY_DRIFT` will fire.
 - 43+ tools available out of the box. Tool allowlist must be explicitly restricted at registration time. Broad default access fails the narrow-allowlist requirement.
+
+### What OpenHarness Provides In Practice
+
+OpenHarness is viable, but not "governed by default." In the demo in this repo, some required evidence comes from OpenHarness and some is added by the adapter:
+
+| Capability | OpenHarness alone | In this repo's adapter |
+|---|---|---|
+| Tool loop | Yes | `QueryEngine.submit_message(...)` runs the loop |
+| Tool allowlist | Yes | `ToolRegistry` + `PermissionSettings(allowed_tools=[...])` narrow it |
+| Permission gate for tools | Yes | `PermissionChecker` enforces tool permission settings |
+| Session reset | Partial | `engine.clear()` is called explicitly after each triage run |
+| Structured tool event stream | Partial | adapter records `tool_call` when `ToolExecutionStarted` is observed |
+| Product-level approval evidence | No | adapter emits `permission_check` for `create_support_case` |
+| Memory-scope evidence | No direct proof by itself | adapter emits `memory_write` with `scope: "session"` |
+| Eval harness | No | repo adds `run_live_eval.py`, governed eval plan, and drift checks |
+
+So the practical answer is:
+
+- **yes**, OpenHarness provides the core agent runtime loop, tool registration, and permission primitives
+- **partially**, it provides the observability needed for governance
+- **no**, it does not by itself satisfy the full Arpinine Harness evidence model unless your adapter adds the missing runtime signals
+
+In this repository's OpenHarness example, that missing evidence is intentionally added in `app/support_triage/adapters/openharness_adapter.py`.
 
 **Semantic Kernel** — approval callbacks and swap path require workarounds. Document them in `## Harness Strategy` before `harness-governor` passes.
 

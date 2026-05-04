@@ -7,9 +7,9 @@
 
 | Decision | Rationale | ADR |
 |----------|-----------|-----|
-| PreToolUse hooks as hard enforcement gates (blocking, not advisory) | Advisory warnings are ignorable; blocking gates enforce the governance contract without relying on developer discipline | Proposed — ADR-0004 |
-| Plain-text version-controlled artifact store under `.specify/` | Artifacts must be reviewable, diffable, and trustworthy; a database introduces infrastructure dependency and breaks NFR-006 (session independence) | Proposed — ADR-0005 |
-| Specialized role-based agent team (4 agents, each with one concern) | A single general agent cannot maintain distinct role boundaries (product vs. architecture vs. TDD vs. security) across a multi-stage workflow | Proposed — ADR-0006 |
+| PreToolUse hooks as hard enforcement gates (blocking, not advisory) | Advisory warnings are ignorable; blocking gates enforce the governance contract without relying on developer discipline | ADR-0008 |
+| Plain-text version-controlled artifact store under `.specify/` | Artifacts must be reviewable, diffable, and trustworthy; a database introduces infrastructure dependency and breaks NFR-006 (session independence) | ADR-0009 |
+| Specialized role-based agent team (4 agents, each with one concern) | A single general agent cannot maintain distinct role boundaries (product vs. architecture vs. TDD vs. security) across a multi-stage workflow | ADR-0004 |
 | Commands are the orchestration layer; agents and skills contain no side effects | Keeps agents and skills reusable across commands; a command can invoke product-owner + tdd-guide independently without coupling their concerns | Consequence of ADR-0006 — no separate ADR |
 | Enforcement scripts are stateless exit-code validators | Hooks expect exit 0 (allow) or exit 1 (block); stateful scripts would produce inconsistent hook behavior | Consequence of ADR-0004 — no separate ADR |
 
@@ -97,9 +97,9 @@ N/A — the core workflow is not a harness-based product feature. The `harness-g
 - [ ] TASK-010: Decide OQ-004 — do compounding rules from at-retro auto-promote to hook-level blockers or remain advisory? Update rule-manager skill if auto-promote
 
 ### ADR creation
-- [ ] TASK-011: Create ADR-0004 for hook-based enforcement gate decision
-- [ ] TASK-012: Create ADR-0005 for plain-text version-controlled artifact store
-- [ ] TASK-013: Create ADR-0006 for specialized role-based agent team
+- [x] TASK-011: Create ADR-0008 for hook-based enforcement gate decision
+- [x] TASK-012: Create ADR-0009 for plain-text version-controlled artifact store
+- [x] TASK-013: ADR-0004 covers specialized role-based agent team (filed separately)
 
 ## Evaluation Strategy
 
@@ -130,7 +130,6 @@ Not applicable. The core workflow is not an agentic product system with measurab
 
 ## ADRs Created During Planning
 
-No ADRs created yet — three are proposed and should be created next:
-- **Proposed ADR-0004**: Hook-based enforcement as the implementation gate mechanism — governs FR-012, AC-007
-- **Proposed ADR-0005**: Plain-text version-controlled artifact store under `.specify/` — governs NFR-002, NFR-006
-- **Proposed ADR-0006**: Specialized role-based agent team rather than single general agent — governs FR-013, AC-008
+- ADR-0004: Specialized role-based agent team rather than single general agent — governs FR-013, AC-008
+- ADR-0008: PreToolUse hooks as blocking enforcement gates — governs FR-012, AC-007
+- ADR-0009: Plain-text version-controlled artifact store under `.specify/` — governs NFR-002, NFR-006

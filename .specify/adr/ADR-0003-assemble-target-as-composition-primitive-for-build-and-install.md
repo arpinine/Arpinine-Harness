@@ -1,7 +1,7 @@
 ---
 governs: specs/001-plugin-abstraction
 supersedes: ~
-status: Proposed
+status: Accepted
 date: 2026-04-25
 covers:
   - decision:001-plugin-abstraction:assemble-as-build-primitive
@@ -10,7 +10,7 @@ covers:
 # ADR-0003: assemble target as composition primitive for build and install
 
 ## Status
-Proposed
+Accepted
 
 ## Context
 The plugin has two production targets: a zip artifact for distribution and an installed copy for local development. Both require the same composition step — merging `src/arpinine-harness-core/` with `src/implementations/<assistant>/` into a single directory.

@@ -1,6 +1,6 @@
 PLUGIN_NAME  := arpinine-harness
-VERSION      := $(shell python3 -c 'import json; print(json.load(open("src/implementations/claude/.claude-plugin/plugin.json"))["version"])')
 IMPLEMENTATION ?= claude
+VERSION      := $(shell python3 -c 'import json; print(json.load(open("src/implementations/$(IMPLEMENTATION)/.$(IMPLEMENTATION)-plugin/plugin.json"))["version"])')
 CORE_DIR     := src/arpinine-harness-core
 IMPLEMENTATION_DIR := src/implementations/$(IMPLEMENTATION)
 DIST_DIR     := dist
@@ -95,7 +95,7 @@ validate-structure: assemble
 		grep -q '"hooks"[[:space:]]*:[[:space:]]*"./hooks/hooks.json"' $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Codex plugin manifest must declare hooks at ./hooks/hooks.json" && exit 1); \
 		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json" && exit 1); \
 		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
-		for skill in at-init at-new at-review at-plan at-bootstrap-from-code at-adr at-ask at-audit at-eval at-implement at-observe at-retro at-status; do \
+		for skill in $$(ls $(CORE_DIR)/commands/ | sed 's/\.md$$//'); do \
 			test -f "$(BUILD_DIR)/skills/$$skill/SKILL.md" || (echo "Missing Codex workflow wrapper: $$skill" && exit 1); \
 		done; \
 		echo "Codex plugin structure looks valid."; \

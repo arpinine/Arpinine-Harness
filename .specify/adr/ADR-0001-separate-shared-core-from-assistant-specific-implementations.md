@@ -1,7 +1,7 @@
 ---
 governs: specs/001-plugin-abstraction
 supersedes: ~
-status: Proposed
+status: Accepted
 date: 2026-04-25
 covers:
   - decision:001-plugin-abstraction:core-impl-separation
@@ -10,7 +10,7 @@ covers:
 # ADR-0001: Separate shared core from assistant-specific implementations
 
 ## Status
-Proposed
+Accepted
 
 ## Context
 Arpinine Harness must deliver the same governance workflow across multiple AI coding assistant platforms (Claude Code, Codex, and future assistants). Each platform has its own plugin manifest format, skill registration conventions, and extension points.

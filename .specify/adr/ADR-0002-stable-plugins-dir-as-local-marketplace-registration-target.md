@@ -1,7 +1,7 @@
 ---
 governs: specs/001-plugin-abstraction
 supersedes: ~
-status: Proposed
+status: Accepted
 date: 2026-04-25
 covers:
   - decision:001-plugin-abstraction:local-marketplace-registration-path
@@ -10,7 +10,7 @@ covers:
 # ADR-0002: Stable dist/plugins/ dir as local marketplace registration target
 
 ## Status
-Proposed
+Accepted
 
 ## Context
 Claude Code's local marketplace registration (`claude plugin marketplace add <path>`) requires a stable directory path. Once registered, that path is stored in the user's Claude config and must remain valid across rebuilds.

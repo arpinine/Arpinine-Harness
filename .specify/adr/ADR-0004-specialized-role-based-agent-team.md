@@ -1,7 +1,7 @@
 ---
 governs: specs/002-arpinine-harness-core-workflow
 supersedes: ~
-status: Proposed
+status: Accepted
 date: 2026-04-25
 covers:
   - decision:002-arpinine-harness-core-workflow:agent-team-structure
@@ -10,7 +10,7 @@ covers:
 # ADR-0004: Specialized role-based agent team
 
 ## Status
-Proposed
+Accepted
 
 ## Context
 The Arpinine Harness workflow requires AI-assisted reasoning at multiple stages: validating product intent before implementation, enforcing TDD discipline during implementation, identifying architectural decisions during planning, and reviewing security before completion.

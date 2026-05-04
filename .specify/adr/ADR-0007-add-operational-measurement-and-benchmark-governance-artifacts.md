@@ -1,7 +1,7 @@
 ---
 governs: specs/009-operational-measurement-and-benchmark-governance
 supersedes: ~
-status: Proposed
+status: Accepted
 date: 2026-04-28
 covers:
   - decision:009-operational-measurement-and-benchmark-governance:benchmark-history-baseline-model
@@ -13,7 +13,7 @@ covers:
 # ADR-0007: Add operational measurement and benchmark governance artifacts
 
 ## Status
-Proposed
+Accepted
 
 ## Context
 

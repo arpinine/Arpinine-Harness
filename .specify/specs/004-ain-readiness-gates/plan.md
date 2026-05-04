@@ -7,7 +7,7 @@
 
 | Decision | Rationale | ADR |
 |----------|-----------|-----|
-| Use machine-readable AIN fields in `spec.md` as the source of truth | Gating cannot rely on brittle prose-only parsing | No separate ADR yet |
+| Use machine-readable AIN fields in `spec.md` as the source of truth | Gating cannot rely on brittle prose-only parsing | ADR-0010 |
 | Implement AIN checks in shared core scripts, not host overlays | Keeps Claude and Codex behavior coherent | Consequence of ADR-0001 |
 | Reuse status reporting as the user-facing surface for readiness state | Avoids a separate fragmented reporting path | No separate ADR |
 
@@ -80,4 +80,4 @@ Not applicable to the plugin itself. Harness requirements are checked only when 
 
 ## ADRs Created During Planning
 
-No new ADR required at planning time.
+- ADR-0010: Machine-readable AIN fields in spec.md as the gating source of truth — governs TASK-001, TASK-003 through TASK-006
