@@ -15,10 +15,11 @@ Codex participates in that shared contract. Claude-specific native operations su
 
 Implemented now:
 - `.codex-plugin/plugin.json` manifest for Codex
-- initial repo marketplace entry at `.agents/plugins/marketplace.json`
+- source marketplace template at `.agents/plugins/marketplace.json`
 - shared hook wiring through `hooks/hooks.json`, including automatic delivery-matrix refresh on `plan.md` writes
 - shared multi-team coordination inherited from the core, including task-claim enforcement and style-governance checks
-- real marketplace registration via `codex marketplace add ./`
+- generated marketplace manifest at `dist/.agents/plugins/marketplace.json`
+- real marketplace registration via `codex marketplace add ./dist`
 - first Codex skills that wrap the shared Arpinine Harness workflows:
   - `at-bootstrap-from-code`
   - `at-adr`

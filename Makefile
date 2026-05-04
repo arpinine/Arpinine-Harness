@@ -12,7 +12,8 @@ ZIP_PATH     := $(DIST_DIR)/$(ZIP_NAME)
 MARKETPLACE  := arpinine-harness-local
 CLAUDE_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/arpinine-harness-claude
 CODEX_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/arpinine-harness-codex
-CODEX_MARKETPLACE_FILE := .agents/plugins/marketplace.json
+CLAUDE_MARKETPLACE_FILE := $(DIST_DIR)/.claude-plugin/marketplace.json
+CODEX_MARKETPLACE_FILE := $(DIST_DIR)/.agents/plugins/marketplace.json
 
 .DEFAULT_GOAL := build
 
@@ -37,13 +38,15 @@ assemble: clean
 	find $(BUILD_DIR) -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete; \
 	find $(BUILD_DIR) -depth -type d -empty -delete; \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
-		mkdir -p $(PLUGIN_DIST_DIR); \
+		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.claude-plugin; \
 		rm -rf $(CLAUDE_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
+		cat .claude-plugin/marketplace.json | sed 's#\./dist/plugins/#./plugins/#g' > $(CLAUDE_MARKETPLACE_FILE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		mkdir -p .agents/plugins $(PLUGIN_DIST_DIR); \
+		mkdir -p .agents/plugins $(PLUGIN_DIST_DIR) $(DIST_DIR)/.agents/plugins; \
 		rm -rf $(CODEX_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(CODEX_PLUGIN_DIR); \
+		cat .agents/plugins/marketplace.json | sed 's#\./dist/plugins/#./plugins/#g' > $(CODEX_MARKETPLACE_FILE); \
 	fi; \
 	trap - EXIT
 
@@ -67,9 +70,9 @@ register:
 	@set -e; \
 	$(MAKE) assemble IMPLEMENTATION=$(IMPLEMENTATION); \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
-		claude plugin marketplace add ./; \
+		claude plugin marketplace add ./dist; \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		codex marketplace add ./; \
+		codex marketplace add ./dist; \
 		echo "Codex marketplace registered from $(CODEX_MARKETPLACE_FILE)."; \
 		echo "Enable $(PLUGIN_NAME) from the Codex marketplace UI if your Codex client requires a separate confirmation step."; \
 	else \

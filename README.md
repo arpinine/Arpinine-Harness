@@ -341,9 +341,11 @@ Then install Arpinine Harness from this repo:
 ```bash
 make validate-structure IMPLEMENTATION=claude
 make assemble IMPLEMENTATION=claude
-claude plugin marketplace add ./
+claude plugin marketplace add ./dist
 claude plugin install arpinine-harness@arpinine-harness-local
 ```
+
+`make assemble` generates both the assembled plugin at `dist/plugins/arpinine-harness-claude/` and the Claude marketplace manifest at `dist/.claude-plugin/marketplace.json`, so the registration target is now `./dist`, not the repo root.
 
 Verify the install:
 
@@ -368,6 +370,8 @@ Use the Codex marketplace registration flow:
 make validate-structure IMPLEMENTATION=codex
 make register IMPLEMENTATION=codex
 ```
+
+This generates the Codex marketplace manifest at `dist/.agents/plugins/marketplace.json` and registers `./dist` as the local marketplace root.
 
 After registration, enable `arpinine-harness` from the Codex marketplace UI if your client requires a separate confirmation step.
 
