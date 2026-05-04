@@ -84,6 +84,7 @@ Each workflow step should feel like the right part of the agent team is leading:
 - `at-observe`: primarily `drift-detector`
 - `at-audit`: `drift-detector` plus architecture/evaluation governance
 - `at-retro`: governance roles extracting reusable lessons
+- `at-ask`: routes directly to whichever specialist you name — available at any stage, no workflow step required
 
 This framing matters because the plugin should not ask generic questions. It should ask the kind of questions the responsible role would ask at that stage, then update the corresponding artifacts directly.
 
@@ -468,6 +469,36 @@ Turn one feature's learning into reusable team rules.
 **Exit Criteria**
 - important lessons are preserved as reusable constraints, not just remembered informally
 
+## At Any Stage: Ask A Specialist Directly
+
+**Command**
+- `/arpinine-harness:at-ask <agent> "<question>"`
+- `/arpinine-harness:at-ask <agent> <slug> "<question>"`
+
+**Goal**
+Get a focused answer from a named specialist without running the full workflow step.
+
+**When to use**
+- during planning: "does this API shape violate the spec scope?" → ask `product-owner`
+- during implementation: "should this decision get an ADR?" → ask `tech-architect`
+- at any point: "is it safe to log this field?" → ask `security-reviewer`
+- after a model change: "does the plan still hold?" → ask `ai-engineer`
+
+**Supported agents**
+`product-owner`, `tech-architect`, `security-reviewer`, `ai-engineer`, `devops`, `data-engineer`, `tdd-guide`
+
+**Automatic**
+- loads the current spec, plan, and any matching ADRs as read-only context
+- invokes the named specialist with the question
+- returns a direct answer with a citation to the relevant spec or plan section
+- flags a required follow-up command (`/at-review`, `/at-adr`, `/at-plan`) when the answer surfaces a gap
+
+**Expected Deliverable**
+- a direct specialist answer
+- an explicit `Action needed? YES/NO` with the follow-up command if one is required
+
+---
+
 ## Step 11: Use Status As The Daily Control Surface
 
 **Command**
@@ -511,6 +542,8 @@ For a new feature:
 7. `/arpinine-harness:at-observe ...` if runtime evidence matters
 8. `/arpinine-harness:at-audit`
 9. `/arpinine-harness:at-retro`
+
+At any point in this loop: `/arpinine-harness:at-ask <agent> "<question>"` to consult a specialist without interrupting the current step.
 
 For an existing feature already in progress:
 

@@ -98,6 +98,7 @@ Scope is evaluated during `/at-plan` by reading what the spec and plan actually 
 | `/arpinine-harness:at-audit` | Realign | Detect drift, attribute failures, trigger refinement |
 | `/arpinine-harness:at-retro` | Learn | Extract lessons as compounding rules |
 | `/arpinine-harness:at-status` | Govern | Project-wide governance overview and onboarding brief |
+| `/arpinine-harness:at-ask` | Any stage | Ask a focused question to a named specialist agent with spec and plan as context |
 
 ## Multi-Team Note
 

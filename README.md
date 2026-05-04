@@ -178,6 +178,9 @@ The agents don't own anything on this list. Your team does. The agents help you 
 | `/arpinine-harness:at-observe` | Evaluate | Record and review runtime observations |
 | `/arpinine-harness:at-implement` | Execute | Implement the plan with TDD and security review |
 | `/arpinine-harness:at-audit` | Realign | Detect drift and trigger refinement, ADR updates, or eval reruns |
+| `/arpinine-harness:at-retro` | Learn | Extract lessons from completed work as compounding rules |
+| `/arpinine-harness:at-status` | Govern | Project-wide governance overview and onboarding brief |
+| `/arpinine-harness:at-ask` | Any stage | Ask a focused question to a named specialist agent with spec and plan as context |
 
 ## Example Flow
 

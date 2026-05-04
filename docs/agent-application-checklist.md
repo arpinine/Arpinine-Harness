@@ -217,3 +217,4 @@ Steps to create a governed agent application using Arpinine Harness. Follow in o
 | `/arpinine-harness:at-audit` | Drift detection |
 | `/arpinine-harness:at-retro` | Rule extraction |
 | `/arpinine-harness:at-status` | Governance overview |
+| `/arpinine-harness:at-ask <agent> "<question>"` | Any stage — focused specialist consultation |
