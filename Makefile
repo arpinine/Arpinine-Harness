@@ -4,13 +4,14 @@ IMPLEMENTATION ?= claude
 CORE_DIR     := src/arpinine-harness-core
 IMPLEMENTATION_DIR := src/implementations/$(IMPLEMENTATION)
 DIST_DIR     := dist
+PLUGIN_DIST_DIR := $(DIST_DIR)/plugins
 BUILD_NAME   := $(PLUGIN_NAME)-$(IMPLEMENTATION)-v$(VERSION)
 BUILD_DIR    := $(DIST_DIR)/$(BUILD_NAME)
 ZIP_NAME     := $(BUILD_NAME).zip
 ZIP_PATH     := $(DIST_DIR)/$(ZIP_NAME)
 MARKETPLACE  := arpinine-harness-local
-CLAUDE_PLUGIN_DIR := plugins/arpinine-harness-claude
-CODEX_PLUGIN_DIR := plugins/arpinine-harness-codex
+CLAUDE_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/arpinine-harness-claude
+CODEX_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/arpinine-harness-codex
 CODEX_MARKETPLACE_FILE := .agents/plugins/marketplace.json
 
 .DEFAULT_GOAL := build
@@ -36,11 +37,11 @@ assemble: clean
 	find $(BUILD_DIR) -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete; \
 	find $(BUILD_DIR) -depth -type d -empty -delete; \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
-		mkdir -p plugins; \
+		mkdir -p $(PLUGIN_DIST_DIR); \
 		rm -rf $(CLAUDE_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		mkdir -p .agents/plugins plugins; \
+		mkdir -p .agents/plugins $(PLUGIN_DIST_DIR); \
 		rm -rf $(CODEX_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(CODEX_PLUGIN_DIR); \
 	fi; \
@@ -55,7 +56,7 @@ build: assemble
 
 ## Remove generated build outputs
 clean:
-	@rm -rf $(DIST_DIR) plugins
+	@rm -rf $(DIST_DIR)
 
 ## Regenerate .specify/delivery.md from plan task status
 delivery:

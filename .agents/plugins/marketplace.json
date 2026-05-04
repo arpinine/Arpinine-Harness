@@ -8,7 +8,7 @@
       "name": "arpinine-harness",
       "source": {
         "source": "local",
-        "path": "./plugins/arpinine-harness-codex"
+        "path": "./dist/plugins/arpinine-harness-codex"
       },
       "policy": {
         "installation": "AVAILABLE",

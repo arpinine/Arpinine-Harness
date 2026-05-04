@@ -1,5 +1,10 @@
 # Harness Runtimes: Why, What, and How the Plugin Governs Them
 
+This is the canonical conceptual guide for harness selection and governance.
+
+For a step-by-step operator flow, use [agent-application-checklist.md](agent-application-checklist.md).
+For an example-driven walkthrough, use [examples/end-to-end/support-agent-demo/harness-explained.md](../examples/end-to-end/support-agent-demo/harness-explained.md).
+
 ---
 
 ## Why Harness

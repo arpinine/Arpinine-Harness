@@ -382,7 +382,7 @@ Session-only load without installing (dev/testing):
 
 ```bash
 make assemble IMPLEMENTATION=claude
-claude --plugin-dir ./plugins/arpinine-harness-claude
+claude --plugin-dir ./dist/plugins/arpinine-harness-claude
 ```
 
 ## Reverse An Existing Codebase

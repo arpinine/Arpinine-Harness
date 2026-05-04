@@ -23,7 +23,7 @@ Without a shared primitive, `build` and `install` would each need to duplicate t
 2. Copies `src/arpinine-harness-core/` into `BUILD_DIR`
 3. Overlays `src/implementations/<assistant>/` onto `BUILD_DIR`
 4. Removes dev artifacts (pycache, pyc, empty dirs)
-5. Copies `BUILD_DIR` to `plugins/<assistant>/` as the stable registration target
+5. Copies `BUILD_DIR` to `dist/plugins/<assistant>/` as the stable registration target
 
 Both `make build` and `make install` call `assemble` as their first step. Neither duplicates the merge logic.
 
@@ -32,7 +32,7 @@ Both `make build` and `make install` call `assemble` as their first step. Neithe
 - Positive: The composition logic is in one place — bugs in merge order or file exclusion are fixed once.
 - Positive: `assemble` can be run independently for inspection without producing a zip or triggering install.
 - Negative: Every `make build` or `make install` starts with a clean + full copy, even when only one file changed. No incremental assembly.
-- Negative: Developers unfamiliar with the pattern must learn that `plugins/` is an assemble output, not a source directory.
+- Negative: Developers unfamiliar with the pattern must learn that `dist/plugins/` is an assemble output, not a source directory.
 
 ## Alternatives Considered
 | Option | Rejected Because |

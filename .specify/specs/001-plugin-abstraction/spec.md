@@ -62,5 +62,5 @@ Arpinine Harness governance workflows should be available to any team regardless
 ## Related ADRs
 
 - ADR-0001: Separate shared core from assistant-specific implementations — governs core/impl boundary
-- ADR-0002: Stable plugins/ dir as local marketplace registration target — governs registration path
+- ADR-0002: Stable dist/plugins/ dir as local marketplace registration target — governs registration path
 - ADR-0003: assemble target as composition primitive for build and install — governs build composition

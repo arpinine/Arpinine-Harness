@@ -71,7 +71,7 @@ Link each ADR to the relevant spec via the `governs:` field.
 → governs: `002-plugin-platform-abstraction`
 
 ```
-/arpinine-harness:at-adr new "Stable plugins/ dir as local marketplace registration target"
+/arpinine-harness:at-adr new "Stable dist/plugins/ dir as local marketplace registration target"
 ```
 → governs: `002-plugin-platform-abstraction`
 

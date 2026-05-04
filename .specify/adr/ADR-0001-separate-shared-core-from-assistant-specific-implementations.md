@@ -31,7 +31,7 @@ A `make assemble IMPLEMENTATION=<assistant>` step merges core + implementation i
 - Positive: Adding a new assistant implementation requires no changes to `src/arpinine-harness-core/`.
 - Positive: The governance workflow can be tested and reasoned about independently of any platform.
 - Positive: Platform-specific bugs are isolated to the implementation layer.
-- Negative: The `assemble` step is an indirection that developers must understand — files in `plugins/` and `dist/` are generated, not authoritative.
+- Negative: The `assemble` step is an indirection that developers must understand — files in `dist/` are generated, not authoritative.
 - Negative: If the core grows platform conditionals (e.g., `if claude: ...`), the boundary is violated. Discipline required.
 
 ## Alternatives Considered

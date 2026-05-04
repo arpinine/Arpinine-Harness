@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "arpinine-harness",
-      "source": "./plugins/arpinine-harness-claude",
+      "source": "./dist/plugins/arpinine-harness-claude",
       "description": "Shared product-engineering workflow with ADRs, drift detection, evaluation, and compounding rule learning"
     }
   ]

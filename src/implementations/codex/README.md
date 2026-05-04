@@ -37,7 +37,7 @@ Not implemented yet:
 - agent wrapper strategy for `product-owner`, `tech-architect`, `security-reviewer`, and `tdd-guide`
 - published plugin assets and richer install-surface metadata
 
-Build packaging intentionally strips test directories from assembled plugin artifacts so host/plugin validation does not re-run the shared core test suite from `plugins/`.
+Build packaging intentionally strips test directories from assembled plugin artifacts so host/plugin validation does not re-run the shared core test suite from `dist/plugins/`.
 
 ## Goal
 

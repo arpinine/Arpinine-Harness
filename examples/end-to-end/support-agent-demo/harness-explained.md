@@ -1,5 +1,10 @@
 # Harness Usage: What, Why, and How
 
+This is the example-specific walkthrough for the support triage demo.
+
+For the canonical runtime-selection and governance guidance, use [docs/harness-runtimes.md](../../../docs/harness-runtimes.md).
+For the operator checklist, use [docs/agent-application-checklist.md](../../../docs/agent-application-checklist.md).
+
 This document walks through the harness governance lifecycle end-to-end using the support triage demo as the concrete example.
 
 ---
