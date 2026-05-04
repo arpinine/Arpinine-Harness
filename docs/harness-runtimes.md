@@ -106,6 +106,40 @@ The governing rule is:
 
 > The plugin standardizes the evidence. The runtime only needs to be capable of producing that evidence directly or through an adapter.
 
+### Model-Harness-Fit
+
+In practice, a model is often post-trained not just against an API, but against a specific harness contract.
+
+That contract can include:
+
+- tool names and tool schemas
+- patch or edit formats
+- memory write and retrieval rituals
+- citation or provenance tags
+- skill and plugin file conventions
+- planning and approval protocols
+- system prompt section ordering and instruction hierarchy
+
+This means the same model weights can perform differently across different harnesses, even when the user-visible task looks identical.
+
+The governance implication is straightforward:
+
+- a model swap may require a harness review
+- a harness swap may behave like a model swap in practice
+- portability is a design choice, not a default property
+
+For Arpinine Harness, runtime choice should therefore be treated as an architectural decision rather than a package choice.
+
+Teams should document:
+
+- why this runtime fits the intended model family
+- which tool, memory, and prompt conventions are runtime-specific
+- what evidence proves the runtime behavior matches the declared contract
+- what degrades if the model or harness is swapped
+- whether the system is optimized for portability or pair-specific quality
+
+The plugin should not force one harness per model family. It should force explicitness about the tradeoff.
+
 ---
 
 ## Mandatory Capabilities
