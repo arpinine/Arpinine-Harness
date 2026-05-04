@@ -52,6 +52,7 @@ Steps to create a governed agent application using Arpinine Harness. Follow in o
   - [ ] Memory/state model: scope declared, reset condition named
   - [ ] Permission and safety model: which actions require approval, callback pattern described
   - [ ] Swap strategy: what changes if the harness is replaced (must be adapter only)
+- [ ] If no harness is needed, `## Harness Strategy` is still present and its body is exactly an explicit `N/A` rationale rather than removing or renaming the section
 - [ ] `## AI Design Decisions` is present if the spec uses LLMs or agent runtimes:
   - [ ] Model named and version pinned
   - [ ] System prompt defined or referenced
@@ -59,6 +60,7 @@ Steps to create a governed agent application using Arpinine Harness. Follow in o
   - [ ] Agent topology described (single vs multi-agent)
   - [ ] Failure modes identified (hallucination, tool misuse, context overflow)
 - [ ] `## Evaluation Strategy` links to `eval-plan.md`
+- [ ] Harness-specific evaluation lives in `## Evaluation Strategy` and `eval-plan.md`, not as an extra row inside `## Harness Strategy`
 - [ ] If deployed service: `## Deployment Strategy` present
 - [ ] If data pipeline or RAG: `## Data Pipeline` present
 

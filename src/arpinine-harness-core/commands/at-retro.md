@@ -107,6 +107,30 @@ For each lesson confirmed as a rule candidate:
 2. Confirm: "Rule [rule-id] created: [prevents value]"
 3. If the lesson traces to a specific drift finding with an ADR: set `source-adr` automatically
 
+**Harness rule auto-generation:** If `plan.md` contains `## Harness Strategy` and it names a runtime (not N/A), automatically write a boundary enforcement rule at `.specify/rules/harness/harness-<slug>.md` using this template:
+
+```yaml
+rule-id: harness-<slug>
+title: "<Runtime> imports must stay in the adapter layer"
+category: harness
+severity: HIGH
+active: true
+triggers: >
+  Any import of <runtime-package> outside of adapters/ — in domain/, application/,
+  or top-level modules.
+prevents: >
+  Harness SDK leaking into product code, breaking the swap path defined in
+  ## Harness Strategy of .specify/specs/<slug>/plan.md.
+forbidden_patterns:
+  - "^(from|import)\\s+<runtime-package>"
+allowed_paths:
+  - "adapters/"
+source-adr: "<ADR reference from ## ADRs Created During Planning, if present>"
+evidence-project: "<slug>"
+```
+
+Substitute `<runtime-package>` with the import root for the named runtime (e.g. `openharness` for OpenHarness, `langgraph` for LangGraph, `pydantic_ai` for Pydantic AI). Create `.specify/rules/harness/` if it does not exist. Confirm: "Harness boundary rule written: `.specify/rules/harness/harness-<slug>.md`"
+
 The user should not need to manually edit rule files unless they explicitly choose to override the generated wording.
 
 ### 7. Update ADR-INDEX if needed

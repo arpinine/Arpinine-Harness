@@ -1,4 +1,5 @@
 import asyncio
+import concurrent.futures
 import os
 from typing import Callable
 
@@ -102,7 +103,16 @@ class OpenHarnessAdapter(SupportAgentRuntime):
         self._engine = _build_engine(AnthropicApiClient(api_key=api_key), self._model)
 
     def draft_response(self, ticket: Ticket, category: str, priority: str) -> str:
-        return asyncio.run(self._draft_async(ticket, category, priority))
+        try:
+            asyncio.get_running_loop()
+            # Already inside a running event loop (web framework, async test suite).
+            # Run the coroutine in a fresh thread so it gets its own loop.
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                return pool.submit(
+                    asyncio.run, self._draft_async(ticket, category, priority)
+                ).result()
+        except RuntimeError:
+            return asyncio.run(self._draft_async(ticket, category, priority))
 
     async def _draft_async(self, ticket: Ticket, category: str, priority: str) -> str:
         prompt = (

@@ -25,15 +25,16 @@ It requires teams to document why a harness is needed, how it is isolated, and h
 
 ## Required Harness Strategy
 
-For harness-based features, the plan must define:
+For harness-based features, the `## Harness Strategy` section must define:
 - why a harness is needed
 - which runtime class is selected
 - what abstraction boundary isolates the application from the harness
 - what tools the harness can access
 - what memory/state model is allowed
 - how permissions and safety checks are handled
-- how the harness is evaluated and monitored
 - how the harness could be replaced later with bounded application change
+
+Harness-specific evaluation and monitoring must be defined in `## Evaluation Strategy` and the linked `eval-plan.md`, not as an extra row inside `## Harness Strategy`.
 
 ## Good Signs
 

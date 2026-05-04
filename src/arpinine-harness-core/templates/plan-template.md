@@ -27,18 +27,25 @@
 | [module] | [unit / contract / integration] | [mock adapter / in-memory fake / fixture] |
 
 ## Harness Strategy
-Use this section when the product feature depends on an agent harness or agent runtime.
-Delete this section or replace the table with `N/A` if no harness is needed.
 
+<!-- DECISION GATE — replace this section with BLOCK A or BLOCK B, then delete the other and these comments -->
+
+<!-- BLOCK A: No harness needed — paste this line as the entire section body:
+N/A — single LLM call sufficient. No agent loop, tool execution, or session state required.
+-->
+
+<!-- BLOCK B: Harness required — fill every row; harness-governor blocks /at-implement if any row is empty -->
 | Concern | Decision |
 |---------|----------|
-| Why harness is needed | [reason] |
-| Harness/runtime class | [hosted coding agent / embedded agent runtime / custom orchestration layer / other] |
-| Product abstraction boundary | [internal service / adapter / port] |
-| Tool access model | [which tools are allowed and why] |
-| Memory/state model | [session / persistent / none / bounded context] |
-| Permission and safety model | [approval flow / policy / limits] |
-| Swap strategy | [how to replace the harness later] |
+| Why harness is needed | [describe why a single LLM call is insufficient — e.g. multi-turn tool loop, mid-execution approval gate, session state required] |
+| Runtime selected | [e.g. OpenHarness (`pip install openharness-ai`) / LangGraph / Pydantic AI / Semantic Kernel / custom] |
+| Product abstraction boundary | [interface name and file path — e.g. `SupportAgentRuntime` in `app/support_triage/application/triage_service.py`] |
+| Tool access model | [explicit allowlist — name every tool and justify inclusion; no wildcard grants] |
+| Memory / state model | [scope: session-only / persistent / none — name reset mechanism, e.g. `engine.clear()` after each call] |
+| Permission and safety model | [which actions require human approval, approval callback pattern, any auto-approved read-only tools] |
+| Swap strategy | [what changes when runtime is replaced — must be adapter layer only; domain and application code unchanged] |
+
+Harness-specific evaluation belongs in `## Evaluation Strategy` and the linked `eval-plan.md`, not as an extra row in this table.
 
 ## Tasks
 - [ ] TASK-001: Write failing tests for [module] [team: codex]

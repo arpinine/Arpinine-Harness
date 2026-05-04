@@ -49,10 +49,31 @@ if not candidate_plans:
     sys.exit(0)
 
 SECTION_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
-NA_RE = re.compile(r"\bN/?A\b", re.IGNORECASE)
+
+# Matches only when the section intent is explicitly N/A — the first non-blank,
+# non-comment, non-table-separator line of the body starts with N/A or is N/A alone.
+# Prevents a single table row like "session state: N/A" from suppressing all checks.
+def _section_is_na(body: str) -> bool:
+    for line in body.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("<!--") or set(stripped) <= {"|", "-", " "}:
+            continue
+        return bool(re.match(r"N/?A\b", stripped, re.IGNORECASE))
+    return False
+
+# Covers both new template placeholders and old generic ones (e.g. "[approval flow / policy]").
 PLACEHOLDER_RE = re.compile(
-    r"\[(?:describe why|interface name|explicit allowlist|scope:|which actions|what changes"
-    r"|e\.g\.|runtime selected|e\.g\. OpenHarness|reason)\b",
+    r"\[(?:"
+    # new template — leading phrase fragments
+    r"describe why|interface name and file path|explicit allowlist|scope: session"
+    r"|which actions require|what changes when"
+    r"|e\.g\. OpenHarness|e\.g\. `SupportAgentRuntime`"
+    # old template — slash-separated option lists or known generic placeholders
+    r"|[^\]]*\s/\s[^\]]*"        # anything containing " / " (option lists)
+    r"|hosted coding agent|embedded agent runtime|custom orchestration"
+    r"|internal service|bounded context|approval flow|policy|limits"
+    r"|reason|module|choice|hosted|swap"
+    r")",
     re.IGNORECASE,
 )
 
@@ -100,7 +121,7 @@ for plan_path in candidate_plans:
         continue
 
     # N/A — harness intentionally absent, nothing to check
-    if NA_RE.search(harness_body):
+    if _section_is_na(harness_body):
         continue
 
     # Harness is required — validate all controls are documented
@@ -111,7 +132,7 @@ for plan_path in candidate_plans:
             "slug": slug_label,
             "message": (
                 "## Harness Strategy contains unfilled placeholders. "
-                "Complete all seven controls (runtime, boundary, tools, memory, permissions, swap path, why) "
+                "Complete all seven controls (why, runtime, boundary, tools, memory, permissions, swap path) "
                 "before implementation."
             ),
         })

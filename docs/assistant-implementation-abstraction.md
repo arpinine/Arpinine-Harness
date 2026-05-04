@@ -25,6 +25,17 @@ Separate Arpinine Harness into:
 - validation entrypoints
 - any future assistant adapter files that cannot live in the shared core
 
+## Source Vs Build Output
+
+Only `src/` is source-of-truth.
+
+- `src/arpinine-harness-core/` is the shared workflow source
+- `src/implementations/claude/` and `src/implementations/codex/` are thin assistant-specific overlays
+- `plugins/arpinine-harness-claude/` and `plugins/arpinine-harness-codex/` are assembled build outputs created by `make assemble`
+- `dist/` contains packaged artifacts created during build/release
+
+`plugins/` and `dist/` are generated from `src/` and can be safely removed and recreated. Do not treat them as an independent implementation source tree.
+
 ## Current Status
 
 - `claude/` contains the existing working implementation, including `.claude-plugin/plugin.json`

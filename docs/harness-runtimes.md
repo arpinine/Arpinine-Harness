@@ -108,7 +108,7 @@ The plugin is runtime-agnostic. It does not install, wrap, or call any harness S
 
 ### 1. Pre-Implementation Gate (`harness-governor` skill)
 
-Fires during `/at-plan` when `## Harness Strategy` names a runtime. Checks all seven controls are documented. Missing any = HIGH block, `/at-implement` cannot start.
+Fires during `/at-plan` when `## Harness Strategy` names a runtime. Checks all seven harness-strategy controls are documented: why, runtime, boundary, tools, memory, permissions, and swap path. Missing any = HIGH block, `/at-implement` cannot start. Harness-specific evaluation is checked separately in `## Evaluation Strategy` and `eval-plan.md`.
 
 When `plan.md` names OpenHarness specifically, three additional checks fire:
 

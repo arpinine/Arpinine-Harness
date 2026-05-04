@@ -53,9 +53,9 @@ build: assemble
 	@rm -rf $(BUILD_DIR)
 	@echo "✅ $(ZIP_PATH) ($$(du -h $(ZIP_PATH) | cut -f1))"
 
-## Remove dist/
+## Remove generated build outputs
 clean:
-	@rm -rf $(DIST_DIR) $(CLAUDE_PLUGIN_DIR) $(CODEX_PLUGIN_DIR)
+	@rm -rf $(DIST_DIR) plugins
 
 ## Regenerate .specify/delivery.md from plan task status
 delivery:
