@@ -166,6 +166,96 @@ class RunBenchmarkTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("did not produce result JSON for scenario s1", result.stderr)
 
+    def test_runner_fails_when_harness_observation_contract_fails(self) -> None:
+        (self.repo / ".specify" / "specs" / "001-demo").mkdir(parents=True)
+        (self.repo / ".specify" / "specs" / "001-demo" / "plan.md").write_text(
+            textwrap.dedent(
+                """
+                # Plan: Demo
+
+                ## Harness Strategy
+                | Concern | Decision |
+                |---------|----------|
+                | Why harness is needed | agent runtime |
+                | Runtime selected | OpenHarness |
+                | Product abstraction boundary | adapter |
+                | Tool access model | `draft_support_reply` only |
+                | Memory / state model | session-only |
+                | Permission and safety model | `create_case` requires approval |
+                | Swap strategy | adapter only |
+                """
+            ).strip()
+            + "\n",
+            encoding="utf-8",
+        )
+        (self.repo / ".specify" / "evals" / "001-demo" / "eval-plan.md").write_text(
+            textwrap.dedent(
+                """
+                # Evaluation Plan: Demo
+
+                ## Benchmark Policy
+                - Benchmark required: Yes
+                - Benchmark command: `python3 bench_fixture.py`
+                - Dataset manifest path: `.specify/evals/001-demo/dataset-manifest.json`
+                - Minimum scenario count for aggregated reporting: 3
+
+                ## Runtime Contract Assertions
+                - Allowed tools: [`draft_support_reply`]
+                - Protected actions requiring approval: [`create_case`]
+                - Memory scope invariant: session-only
+                - Session reset evidence: [`session_reset`]
+                - Required event types: [`model_turn_started`, `tool_requested`, `tool_executed`, `permission_check`, `memory_write`, `session_reset`]
+                - Required policy assertions: approval before protected write
+
+                ## Deterministic Replay
+                - Replay required: No
+                - Replay command: `pytest`
+                - Mock / fixture strategy: fixture
+                - Replay fixture path: `tests/fixtures`
+                """
+            ).strip()
+            + "\n",
+            encoding="utf-8",
+        )
+        (self.repo / "bench_fixture.py").write_text(
+            textwrap.dedent(
+                """
+                import json
+                import os
+                import pathlib
+
+                scenario_id = os.environ["ARPININE_HARNESS_SCENARIO_ID"]
+                result_path = pathlib.Path(os.environ["ARPININE_HARNESS_RESULT_PATH"])
+                observation_path = pathlib.Path(os.environ["ARPININE_HARNESS_OBSERVATION_PATH"])
+                result_path.write_text(json.dumps({"run_id": scenario_id, "result": "PASS"}) + "\\n", encoding="utf-8")
+                observation_path.write_text(
+                    json.dumps(
+                        {
+                            "run_id": scenario_id,
+                            "spec": "001-demo",
+                            "runtime_class": "fixture-runtime",
+                            "scenario_id": scenario_id,
+                            "timestamp": "2026-05-04T00:00:00Z",
+                            "events": [
+                                {"type": "model_turn_started"},
+                                {"type": "tool_requested", "tool": "draft_support_reply"},
+                                {"type": "tool_executed", "tool": "draft_support_reply"},
+                                {"type": "permission_check", "action": "create_case", "approved": True},
+                                {"type": "memory_write", "scope": "session"}
+                            ],
+                        }
+                    ) + "\\n",
+                    encoding="utf-8",
+                )
+                """
+            ).strip()
+            + "\n",
+            encoding="utf-8",
+        )
+        result = self.run_benchmark()
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("harness observation contract failed", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

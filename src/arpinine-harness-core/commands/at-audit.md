@@ -128,10 +128,13 @@ For each confirmed drift item, choose the right correction path based on attribu
 
 ### 9. Observation drift check
 - If `.specify/observations/<spec-slug>/trace.json` exists, compare observed behavior against `## Harness Strategy`
+- Run `scripts/check_harness_observation.py --slug <slug>` and treat failures as governed runtime-contract violations, not optional diagnostics
 - Report additional drift classes when found:
   - `TOOL_DRIFT`: observed tool use is outside the documented tool model
   - `PERMISSION_DRIFT`: observed approvals or denied actions contradict the documented permission model
   - `MEMORY_DRIFT`: observed state or memory behavior contradicts the documented memory model
+  - `SESSION_DRIFT`: observed lifecycle or reset behavior contradicts the documented session model
+  - `TRACE_GAP_DRIFT`: required observation events or telemetry are missing
   - `EVAL_COVERAGE_DRIFT`: observed scenario or failure path is not covered by the eval plan
   - `RUNTIME_BEHAVIOR_DRIFT`: observed runtime behavior contradicts the documented runtime or adapter assumptions
 - Use observation evidence to refine attribution:

@@ -14,6 +14,7 @@ import sys
 import tempfile
 
 from benchmark_report import build_report
+from check_harness_observation import evaluate_slug
 from measurement_artifacts import benchmark_session_id, eval_paths, observation_paths, write_eval_run, write_latest_session, write_observation_run
 
 
@@ -129,6 +130,19 @@ def run_scenario(
             observation.setdefault("scenario_id", scenario.get("scenario_id"))
             observation.setdefault("dataset_version", dataset_manifest.get("dataset_version"))
             write_observation_run(repo, slug, observation, session_id=session_id)
+            try:
+                contract = evaluate_slug(slug)
+            except FileNotFoundError:
+                contract = None
+            if contract and contract.get("harness_required") and contract.get("verdict") == "FAIL":
+                failed = "; ".join(
+                    f"{check['name']}: {check['detail']}"
+                    for check in contract.get("checks", [])
+                    if check.get("status") == "FAIL"
+                )
+                raise RuntimeError(
+                    f"harness observation contract failed for scenario {scenario.get('scenario_id', 'unknown')}: {failed}"
+                )
 
         return result
 

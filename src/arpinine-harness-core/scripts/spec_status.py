@@ -20,6 +20,11 @@ _module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_module)
 qdc = _module
 
+_checker_spec = importlib.util.spec_from_file_location("check_harness_observation", SCRIPT_DIR / "check_harness_observation.py")
+_checker_module = importlib.util.module_from_spec(_checker_spec)
+_checker_spec.loader.exec_module(_checker_module)
+cho = _checker_module
+
 
 def find_project_root(start: pathlib.Path) -> pathlib.Path | None:
     current = start.resolve()
@@ -186,6 +191,13 @@ def observation_state(slug: str) -> str:
     history_dir = OBS_ROOT / slug / "history"
     index = OBS_ROOT / slug / "index.jsonl"
     history_exists = history_dir.exists() and any(history_dir.iterdir()) if history_dir.exists() else False
+    if trace.exists():
+        try:
+            contract = cho.evaluate_slug(slug)
+        except FileNotFoundError:
+            contract = None
+        if contract and contract.get("harness_required") and contract.get("verdict") == "FAIL":
+            return "contract-fail"
     if latest.exists() and trace.exists():
         if history_exists and index.exists():
             return "history"
@@ -315,6 +327,8 @@ def blocked_work(rows: list[dict[str, object]], deps: dict[str, object]) -> list
             blocked.append(f"{row['slug']}: harness strategy missing or still placeholder")
         if row["drift"] != "CLEAN":
             blocked.append(f"{row['slug']}: unresolved drift or conformance hints need audit")
+        if row["obs"] == "contract-fail":
+            blocked.append(f"{row['slug']}: harness observation contract failed")
     return blocked
 
 

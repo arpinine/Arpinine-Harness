@@ -35,6 +35,11 @@ For harness-based features, the `## Harness Strategy` section must define:
 - how the harness could be replaced later with bounded application change
 
 Harness-specific evaluation and monitoring must be defined in `## Evaluation Strategy` and the linked `eval-plan.md`, not as an extra row inside `## Harness Strategy`.
+For harness-based systems, the eval plan must also define:
+- required runtime events and trace fields
+- policy assertions that prove tool, approval, memory, and session behavior
+- deterministic replay strategy for fixed scenarios without a live runtime
+- metrics and thresholds for both output quality and runtime contract compliance
 
 ## Good Signs
 
@@ -43,6 +48,8 @@ Harness-specific evaluation and monitoring must be defined in `## Evaluation Str
 - memory usage is bounded and intentional
 - swapping harnesses would change an adapter, not the whole product
 - evaluation covers task quality and harness-specific failure modes
+- the runtime emits enough structured evidence to audit tool, permission, memory, and session behavior
+- replay exists for deterministic regression checks
 
 ## Warning Signs
 
@@ -51,6 +58,7 @@ Harness-specific evaluation and monitoring must be defined in `## Evaluation Str
 - memory/state handling is undocumented
 - agent behavior cannot be reproduced or tested outside a full runtime
 - evaluation ignores harness-specific risks like tool misuse or uncontrolled autonomy
+- trace artifacts cannot prove whether approvals, resets, or memory scope behaved correctly
 
 ## OpenHarness-Specific Checks
 
@@ -78,12 +86,14 @@ Use them to check:
 | Plan does not define abstraction boundary around the harness | HIGH | Block implementation |
 | Tool, memory, permission, or swap strategy is undocumented | HIGH | Block implementation |
 | Product code is expected to call the harness directly rather than through an internal boundary | HIGH | Block implementation |
+| Eval plan omits runtime contract assertions, observation requirements, or replay strategy for a harness-based feature | HIGH | Block implementation |
 | Harness choice has long-term impact but no ADR exists | MEDIUM | Suggest ADR creation |
-| Evaluation plan ignores harness-specific behavior | MEDIUM | Require plan improvement |
+| Evaluation plan ignores harness-specific behavior | HIGH | Require plan improvement |
 | OpenHarness is selected but adapter-layer isolation is not defined | HIGH | Block implementation |
 | OpenHarness is selected but approval callback or permission flow is undocumented | HIGH | Block implementation |
 | OpenHarness is selected but session or state handling is undocumented | HIGH | Block implementation |
-| Observation artifacts show tool, permission, or memory behavior that contradicts the harness strategy | CRITICAL | Block completion |
+| Observation artifacts show tool, permission, memory, or session behavior that contradicts the harness strategy | CRITICAL | Block completion |
+| Observation artifacts lack required runtime events or telemetry declared in the eval plan | HIGH | Block completion |
 
 ## Review Questions
 
@@ -94,3 +104,5 @@ Use them to check:
 5. How would the team replace the harness later with minimal product change?
 6. If OpenHarness is used, which adapter owns the OpenHarness dependency?
 7. If OpenHarness is used, how are tool approvals and session lifecycle controlled?
+8. Which runtime events and assertions will prove the harness behaved correctly?
+9. How can the team replay a fixed scenario without the live runtime?

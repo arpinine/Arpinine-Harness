@@ -84,9 +84,23 @@ properties:
       required:
         - type
       properties:
+        event_id:
+          type: string
+        parent_event_id:
+          type: string
         type:
           type: string
           enum:
+            - model_turn_started
+            - model_turn_completed
+            - tool_requested
+            - tool_approved
+            - tool_denied
+            - tool_executed
+            - memory_read
+            - session_started
+            - session_reset
+            - session_ended
             - tool_call
             - permission_check
             - memory_write
@@ -95,13 +109,21 @@ properties:
             - session_lifecycle
         tool:
           type: string
+        tool_args:
+          type: object
         timestamp:
           type: string
         duration_ms:
           type: integer
+        turn_index:
+          type: integer
         approved:
           type: boolean
         action:
+          type: string
+        decision:
+          type: string
+        reason:
           type: string
         result:
           type: string
@@ -118,6 +140,10 @@ properties:
         scope:
           type: string
         key:
+          type: string
+        input_ref:
+          type: string
+        output_ref:
           type: string
         category:
           type: string

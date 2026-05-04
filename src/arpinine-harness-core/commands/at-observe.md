@@ -43,8 +43,11 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - tool call count
    - error count
    - tool calls
+   - model turn start / completion events when available
+   - tool request / approval / denial / execution events
    - permission or approval events
    - memory or state events
+   - session started / reset / ended events
    - failures
    - final outcome
 4. For decision-heavy systems, capture optional provenance fields:
@@ -63,18 +66,21 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 2. When available, inspect `history/` and `index.jsonl` to compare repeated runs rather than only one latest snapshot.
 3. If the eval plan declares latency, token, cost, or benchmarked regression thresholds, verify that the required telemetry fields are present in the observation trace or history records.
 4. If the system makes nontrivial AI decisions, verify that provenance fields are present when required by the spec or plan.
-2. Compare observed behavior against:
+5. Run `scripts/check_harness_observation.py --slug <slug>` when the plan declares a harness runtime. Use its assertions as governed evidence, not as optional diagnostics.
+6. Compare observed behavior against:
    - `spec.md`
    - `plan.md`
    - `## Harness Strategy`
    - evaluation plan
-5. Report observation drift classes when found:
+7. Report observation drift classes when found:
    - `TOOL_DRIFT`
    - `PERMISSION_DRIFT`
    - `MEMORY_DRIFT`
+   - `SESSION_DRIFT`
+   - `TRACE_GAP_DRIFT`
    - `EVAL_COVERAGE_DRIFT`
    - `RUNTIME_BEHAVIOR_DRIFT`
-6. Recommend whether the next action is:
+8. Recommend whether the next action is:
    - refine spec
    - update plan
    - update harness strategy
@@ -96,3 +102,4 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 - Trace missing required event data → "Normalize trace against observation-schema.yaml"
 - Perf-sensitive eval plan exists but telemetry fields are absent → "Populate runtime telemetry required by the eval plan before review can pass"
 - Provenance is required by the workflow but missing from the trace → "Record decision provenance fields before review can pass"
+- Harness runtime declared but required policy assertions fail → "Fix runtime behavior or update the governed harness strategy before review can pass"

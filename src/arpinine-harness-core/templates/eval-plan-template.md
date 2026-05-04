@@ -35,6 +35,20 @@
 | Hallucination / grounding | [metric name] | <= or >= [value] | refine prompts or retrieval |
 | Cost / latency | [metric name] | <= [value] | optimize execution |
 
+## Runtime Contract Assertions
+- Allowed tools: [`tool_name_1`, `tool_name_2`]
+- Protected actions requiring approval: [`create_case`, `issue_refund`]
+- Memory scope invariant: [session-only / persistent / none]
+- Session reset evidence: [`session_reset`] or [`session_ended` + new `session_started`]
+- Required event types: [`model_turn_started`, `tool_requested`, `tool_executed`, `permission_check`, `memory_write`, `session_reset`]
+- Required policy assertions: [approval before protected write / no persistent memory write / only allowed tools used]
+
+## Deterministic Replay
+- Replay required: [Yes / No]
+- Replay command: `[command to rerun the same scenario with mocked tools or fixed fixtures]`
+- Mock / fixture strategy: [fake tool registry / recorded tool outputs / stubbed runtime / seeded test data]
+- Replay fixture path: `[tests/replay/... or .specify/evals/.../fixtures]`
+
 ## Regression Policy
 - What counts as a regression?
 - Which metrics are release-blocking?

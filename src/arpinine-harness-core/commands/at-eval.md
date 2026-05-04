@@ -50,9 +50,20 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - regression policy
    - baseline comparison policy
    - execution command
+   - runtime contract assertions
+   - replay strategy
+   - required observation event types and telemetry fields
 6. If the workflow declares release-blocking latency, token, cost, or regression thresholds, mark benchmark mode as required rather than optional.
-7. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
-8. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
+7. For harness-based systems, require metrics that score runtime contract behavior in addition to output quality:
+   - task success rate
+   - tool call accuracy
+   - approval compliance rate
+   - memory scope violation count
+   - session reset compliance rate
+   - average turn count
+   - latency and token/cost metrics when relevant
+8. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
+9. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
 
 ## Workflow: `run`
 
@@ -84,7 +95,8 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - metric scores
    - thresholds
    - pass/fail result
-9. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
+9. For harness-based systems, also persist observation artifacts and run the governed observation checks before treating the run as complete.
+10. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
 
 ## Workflow: `benchmark`
 
@@ -112,6 +124,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    Benchmark history is append-only, but it is partitioned by benchmark session. The shared aggregate report defaults to the latest recorded session unless a specific session id is requested.
 7. Aggregate:
    - quality metrics
+   - runtime contract metrics such as tool-call accuracy, approval compliance, memory-scope violations, and session-reset compliance
    - latency percentiles
    - token and cost summaries
    - failure and retry rates
@@ -122,13 +135,14 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 ## Workflow: `review`
 
 1. Compare `latest-results.md` against the thresholds in `eval-plan.md`.
-2. When benchmark mode is required, confirm that the latest results came from benchmark aggregation rather than a single ad hoc run.
-3. When a baseline policy exists, confirm that the comparison used compatible dataset and variant dimensions.
-4. Report each metric as `PASS`, `WARN`, or `FAIL`.
-5. If any required threshold fails:
+2. For harness-based systems, confirm that observation artifacts exist and that `scripts/check_harness_observation.py --slug <slug>` passes.
+3. When benchmark mode is required, confirm that the latest results came from benchmark aggregation rather than a single ad hoc run.
+4. When a baseline policy exists, confirm that the comparison used compatible dataset and variant dimensions.
+5. Report each metric as `PASS`, `WARN`, or `FAIL`.
+6. If any required threshold fails:
    - block completion
    - identify whether the fix belongs in code, spec, plan, prompts, or ADRs
-6. If the system passes, summarize residual risks and uncovered scenarios.
+7. If the system passes, summarize residual risks and uncovered scenarios.
 
 ## Required Outputs
 

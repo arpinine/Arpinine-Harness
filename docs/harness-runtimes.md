@@ -81,6 +81,31 @@ This is why Arpinine Harness requires both:
 - `## Harness Strategy` in `plan.md`
 - harness-specific checks in `## Evaluation Strategy` and `eval-plan.md`
 
+### What The Plugin Governs Vs What The Runtime Provides
+
+The plugin governs the full evaluation contract.
+
+That means Arpinine Harness is responsible for requiring:
+
+- the observation schema
+- the trace fields
+- the runtime policy assertions
+- the eval-plan structure
+- the metrics and thresholds
+- the pass/fail review gate
+
+The runtime framework does not need to provide all of those capabilities natively.
+
+Instead:
+
+- if the framework provides a capability natively, use it
+- if it provides only part of it, the adapter must normalize it
+- if it does not provide it at all, the team must add auxiliary eval or observation tooling
+
+The governing rule is:
+
+> The plugin standardizes the evidence. The runtime only needs to be capable of producing that evidence directly or through an adapter.
+
 ---
 
 ## Mandatory Capabilities
@@ -133,15 +158,22 @@ Switching frameworks must require changing the adapter only. A framework that bl
 
 ## Framework Comparison
 
-| Capability | LangGraph | Pydantic AI | OpenHarness | Semantic Kernel | CrewAI |
-|---|---|---|---|---|---|
-| Explicit tool allowlist | Yes | Yes | Yes | Yes | Partial |
-| Approval callbacks | Yes (interrupt) | Partial | Yes | Partial | No |
-| Session-scoped memory | Yes | Yes | Needs config | Yes | Partial |
-| Observable event stream | Yes | Partial | Partial | Yes | No |
-| Wrappable behind interface | Yes | Yes | Likely | Yes | Yes |
-| Testable without runtime | Yes | Yes | Partial | Yes | Yes |
-| Clean swap path | Yes | Yes | Medium | Harder | Harder |
+The useful question is not only "does the framework have this?" but "where does the governed capability come from?"
+
+| Capability | Why plugin needs it | LangGraph | Pydantic AI | OpenHarness | Semantic Kernel | CrewAI |
+|---|---|---|---|---|---|---|
+| Explicit tool allowlist | compare observed tools vs declared allowlist | Native | Native | Native | Native | Partial |
+| Approval callbacks | prove protected writes were gated | Native | Partial | Native | Partial | Weak |
+| Session-scoped memory | verify state scope and reset | Native | Native | Needs config | Native | Partial |
+| Event log | record tool, permission, memory, and session events | Native | Partial | Partial | Partial | Weak |
+| Structured traces | audit runtime timeline and drift | Native | Partial | Adapter required | Partial | Weak |
+| Deterministic replay | rerun fixed scenarios safely | Adapter required | Adapter required | Adapter required | Adapter required | Custom infra required |
+| Eval runner | execute datasets and score pass/fail | External eval tooling | External eval tooling | External eval tooling | External eval tooling | External eval tooling |
+| Policy assertions | enforce runtime contract before completion | Plugin + adapter | Plugin + adapter | Plugin + adapter | Plugin + adapter | Plugin + adapter |
+| Metrics | release thresholds on quality, latency, and cost | Partial | Partial | Partial | Partial | Weak |
+| Wrappable behind interface | keep harness isolated in adapter layer | Native | Native | Likely | Native | Native |
+| Testable without full runtime | keep TDD and replay feasible | Native | Native | Partial | Native | Partial |
+| Clean swap path | change adapter, not product code | Yes | Yes | Medium | Harder | Harder |
 
 **LangGraph** and **Pydantic AI** satisfy all seven with no extra configuration. Best default choices.
 
@@ -150,36 +182,20 @@ Switching frameworks must require changing the adapter only. A framework that bl
 - Memory is cross-session by default (MEMORY.md persists across sessions). Teams must configure and document session scope in `## Harness Strategy` or `MEMORY_DRIFT` will fire.
 - 43+ tools available out of the box. Tool allowlist must be explicitly restricted at registration time. Broad default access fails the narrow-allowlist requirement.
 
-### What OpenHarness Provides In Practice
+In practice, OpenHarness is viable, but not governed by default:
 
-OpenHarness is viable, but not "governed by default." In the demo in this repo, some required evidence comes from OpenHarness and some is added by the adapter:
+- it provides the core agent loop, tool registration, and permission primitives
+- it only partially provides the evidence shape Arpinine Harness wants for audit and eval
+- the adapter must usually add normalized event recording, policy evidence, and replay-friendly seams
 
-| Capability | OpenHarness alone | In this repo's adapter |
-|---|---|---|
-| Tool loop | Yes | `QueryEngine.submit_message(...)` runs the loop |
-| Tool allowlist | Yes | `ToolRegistry` + `PermissionSettings(allowed_tools=[...])` narrow it |
-| Permission gate for tools | Yes | `PermissionChecker` enforces tool permission settings |
-| Session reset | Partial | `engine.clear()` is called explicitly after each triage run |
-| Structured tool event stream | Partial | adapter records `tool_call` when `ToolExecutionStarted` is observed |
-| Product-level approval evidence | No | adapter emits `permission_check` for `create_support_case` |
-| Memory-scope evidence | No direct proof by itself | adapter emits `memory_write` with `scope: "session"` |
-| Eval harness | No | repo adds `run_live_eval.py`, governed eval plan, and drift checks |
+### Reading The Table Correctly
 
-So the practical answer is:
+- **Native** means the framework can provide the capability directly in a way the adapter can expose cleanly.
+- **Partial** means the framework helps, but the adapter still needs to normalize or supplement the evidence.
+- **Adapter required** means the framework may support the behavior, but not in the governed shape the plugin requires.
+- **External eval tooling** means this sits outside the runtime itself and must be implemented in the product eval stack.
+- **Weak** means the framework is a poor fit for this governance requirement and will require substantial custom work.
 
-- **yes**, OpenHarness provides the core agent runtime loop, tool registration, and permission primitives
-- **partially**, it provides the observability needed for governance
-- **no**, it does not by itself satisfy the full Arpinine Harness evidence model unless your adapter adds the missing runtime signals
-
-In this repository's OpenHarness example, that missing evidence is intentionally added in `app/support_triage/adapters/openharness_adapter.py`.
-
-**Semantic Kernel** — approval callbacks and swap path require workarounds. Document them in `## Harness Strategy` before `harness-governor` passes.
-
-**CrewAI** — no approval callbacks, no structured event stream. Two hard gaps. Requires significant adapter work to satisfy governance controls. Not recommended without custom event instrumentation.
-
-Any framework not listed is valid. Governance controls apply regardless of runtime — the team documents the controls, `harness-governor` enforces that documentation exists and `drift-detector` verifies it against observations.
-
----
 
 ## How the Plugin Manages Frameworks
 

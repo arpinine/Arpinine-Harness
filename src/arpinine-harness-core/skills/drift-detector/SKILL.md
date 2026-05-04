@@ -70,15 +70,19 @@ For every CRITICAL or HIGH item not already covered by a rule:
 
 ### 6. Observation Check
 If observation artifacts exist for the spec:
+- run `scripts/check_harness_observation.py --slug <slug>` to validate the governed runtime contract
 - compare observed tool calls against the harness strategy tool model
 - compare observed approval events against the permission model
 - compare observed memory events against the memory/state model
+- compare observed session lifecycle events against the reset model
 - compare observed scenarios and failures against the eval plan
 
 Map observation mismatches to:
 - `TOOL_DRIFT`
 - `PERMISSION_DRIFT`
 - `MEMORY_DRIFT`
+- `SESSION_DRIFT`
+- `TRACE_GAP_DRIFT`
 - `EVAL_COVERAGE_DRIFT`
 - `RUNTIME_BEHAVIOR_DRIFT`
 

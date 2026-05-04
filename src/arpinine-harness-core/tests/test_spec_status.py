@@ -148,6 +148,90 @@ class SpecStatusTests(unittest.TestCase):
         row = payload["specs"][0]
         self.assertEqual(row["obs"], "history")
 
+    def test_observation_state_reports_contract_failures(self) -> None:
+        eval_dir = self.repo / ".specify" / "evals" / "001-demo"
+        obs_dir = self.repo / ".specify" / "observations" / "001-demo"
+        (self.repo / ".specify" / "specs" / "001-demo" / "plan.md").write_text(
+            textwrap.dedent(
+                """
+                # Plan: Demo
+
+                ## Module Boundaries
+                | Module / Component | Responsibility | Depends On | Interface / Adapter |
+                |--------------------|----------------|------------|---------------------|
+                | runtime | orchestration | none | adapter |
+
+                ## Dependency Rules
+                - Keep dependencies explicit
+
+                ## Testability By Boundary
+                | Boundary | Test Type | Isolation Strategy |
+                |----------|-----------|--------------------|
+                | runtime | unit | fixture |
+
+                ## Harness Strategy
+                | Concern | Decision |
+                |---------|----------|
+                | Why harness is needed | agent runtime |
+                | Runtime selected | OpenHarness |
+                | Product abstraction boundary | adapter |
+                | Tool access model | `draft_support_reply` only |
+                | Memory / state model | session-only |
+                | Permission and safety model | `create_case` requires approval |
+                | Swap strategy | adapter only |
+                """
+            ).strip()
+            + "\n",
+            encoding="utf-8",
+        )
+        (eval_dir / "eval-plan.md").write_text(
+            textwrap.dedent(
+                """
+                # Evaluation Plan: Demo
+
+                ## Runtime Contract Assertions
+                - Allowed tools: [`draft_support_reply`]
+                - Protected actions requiring approval: [`create_case`]
+                - Memory scope invariant: session-only
+                - Session reset evidence: [`session_reset`]
+                - Required event types: [`model_turn_started`, `tool_requested`, `tool_executed`, `permission_check`, `memory_write`, `session_reset`]
+                - Required policy assertions: approval before protected write
+
+                ## Deterministic Replay
+                - Replay required: No
+                - Replay command: `pytest`
+                - Mock / fixture strategy: fixture
+                - Replay fixture path: `tests/fixtures`
+                """
+            ).strip()
+            + "\n",
+            encoding="utf-8",
+        )
+        (obs_dir / "latest-observation.md").write_text("# Observation\n", encoding="utf-8")
+        (obs_dir / "trace.json").write_text(
+            json.dumps(
+                {
+                    "spec": "001-demo",
+                    "runtime_class": "fixture-runtime",
+                    "scenario_id": "s1",
+                    "timestamp": "2026-05-04T00:00:00Z",
+                    "events": [
+                        {"type": "model_turn_started"},
+                        {"type": "tool_requested", "tool": "draft_support_reply"},
+                        {"type": "tool_executed", "tool": "draft_support_reply"},
+                        {"type": "permission_check", "action": "create_case", "approved": True},
+                        {"type": "memory_write", "scope": "session"},
+                    ],
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        payload = self.run_status_json()
+        row = payload["specs"][0]
+        self.assertEqual(row["obs"], "contract-fail")
+        self.assertIn("001-demo: harness observation contract failed", payload["blocked_work"])
+
     def test_benchmark_state_is_reported_in_json(self) -> None:
         self.write_eval_plan(
             """
