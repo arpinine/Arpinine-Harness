@@ -72,7 +72,7 @@ register:
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
 		claude plugin marketplace add ./dist; \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		codex marketplace add ./dist; \
+		codex plugin marketplace add ./dist; \
 		echo "Codex marketplace registered from $(CODEX_MARKETPLACE_FILE)."; \
 		echo "Enable $(PLUGIN_NAME) from the Codex marketplace UI if your Codex client requires a separate confirmation step."; \
 	else \

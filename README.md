@@ -373,6 +373,12 @@ make register IMPLEMENTATION=codex
 
 This generates the Codex marketplace manifest at `dist/.agents/plugins/marketplace.json` and registers `./dist` as the local marketplace root.
 
+If you need the explicit Codex CLI command for your local client version, use:
+
+```bash
+codex plugin marketplace add ./dist
+```
+
 After registration, enable `arpinine-harness` from the Codex marketplace UI if your client requires a separate confirmation step.
 
 Cross-implementation registration:

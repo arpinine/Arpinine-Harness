@@ -19,7 +19,7 @@ Implemented now:
 - shared hook wiring through `hooks/hooks.json`, including automatic delivery-matrix refresh on `plan.md` writes
 - shared multi-team coordination inherited from the core, including task-claim enforcement and style-governance checks
 - generated marketplace manifest at `dist/.agents/plugins/marketplace.json`
-- real marketplace registration via `codex marketplace add ./dist`
+- real marketplace registration via `codex plugin marketplace add ./dist`
 - first Codex skills that wrap the shared Arpinine Harness workflows:
   - `at-bootstrap-from-code`
   - `at-adr`
