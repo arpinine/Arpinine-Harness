@@ -86,7 +86,7 @@ Scope is evaluated during `/at-plan` by reading what the spec and plan actually 
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
-| `/arpinine-harness:at-init` | Setup | Initialize the workflow, ADR structure, and rules directory |
+| `/arpinine-harness:at-init` | Setup | Initialize the workflow, ADR structure, and rules directory, and optionally scaffold a new project archetype |
 | `/arpinine-harness:at-new` | Define | Create a specification from a feature request |
 | `/arpinine-harness:at-bootstrap-from-code` | Define | Assess an existing repo and seed governed artifacts from implementation evidence |
 | `/arpinine-harness:at-review` | Refine | Tighten clarity, scope, and measurability |
@@ -107,6 +107,31 @@ The shared core is the source of truth for multi-team behavior. Claude, Codex, a
 - honor shared task claims and leases
 - follow shared style-governance rules
 - read and write the same governed artifacts — no assistant-local workflow state
+
+## Archetype Scaffolding
+
+`/arpinine-harness:at-init` can scaffold a new project before the normal governance setup runs.
+
+Current shared archetypes:
+
+- `agent-app` — starter structure for agent-oriented applications with `src/agents`, `src/tools`, `src/domain`, `evals`, and `tests`
+- `ml-pipeline` — starter structure for ML/data applications with `src/pipelines`, `src/features`, `src/models`, `data/`, `notebooks`, `evals`, and `tests`
+
+The archetype contract is intentionally narrow:
+
+- shared core defines structure and neutral conventions only
+- generated `PROJECT_CONVENTIONS.md` documents starter boundaries without binding the repo to a specific assistant
+- dependency installation, framework selection, and runtime-specific policy remain governed decisions for later `spec.md` and `plan.md` artifacts
+
+When an archetype is selected, the shared core also records `.specify/archetype.json`, appends an archetype addendum to the generated constitution, writes starter rules under `.specify/rules/archetype/`, and enables shared pre-edit enforcement through the common hook layer used by both Claude and Codex.
+
+The scaffold entrypoint is `scripts/scaffold_archetype.py`:
+
+```bash
+python3 scripts/scaffold_archetype.py --list
+python3 scripts/scaffold_archetype.py agent-app --target-dir . --skip-if-nonempty
+python3 scripts/scaffold_archetype.py ml-pipeline --target-dir . --force
+```
 
 ## Team Contract
 

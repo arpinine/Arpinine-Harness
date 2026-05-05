@@ -168,7 +168,7 @@ The agents don't own anything on this list. Your team does. The agents help you 
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
-| `/arpinine-harness:at-init` | Setup | Initialize the shared workflow and ADR structure |
+| `/arpinine-harness:at-init` | Setup | Initialize the shared workflow and ADR structure, and optionally scaffold a new project from an archetype |
 | `/arpinine-harness:at-new` | Define | Create a new specification from a product request |
 | `/arpinine-harness:at-bootstrap-from-code` | Define | Assess an existing codebase and seed the first governed spec, plan, eval, and ADR artifacts |
 | `/arpinine-harness:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
@@ -185,8 +185,11 @@ The agents don't own anything on this list. Your team does. The agents help you 
 ## Example Flow
 
 ```bash
-# Initialize team workflow
+# Initialize team workflow in an existing repo
 /arpinine-harness:at-init
+
+# Or initialize a new repo with an explicit archetype
+/arpinine-harness:at-init --archetype agent-app
 
 # Or bootstrap a governed slice from an existing codebase
 /arpinine-harness:at-bootstrap-from-code .
@@ -317,24 +320,103 @@ Claude also has native targets for install, uninstall, and validator-backed vali
 # 1. Install the default specification provider (spec-kit), or configure another provider later
 uvx --from git+https://github.com/github/spec-kit.git specify init --here --ai claude
 
-# 2. Initialize the workflow (run inside a Claude Code session)
+# 2a. New project: initialize the workflow with an explicit archetype
+/arpinine-harness:at-init --archetype agent-app
+
+# 2b. Existing project: initialize the workflow without scaffolding
 /arpinine-harness:at-init
 
 # 3. Reverse/bootstrap an existing codebase
 /arpinine-harness:at-bootstrap-from-code . --git-log
 ```
 
+When `at-init` runs in a repo that does not yet look like an application, it can scaffold a thin starter structure before creating `.specify/`. The current shared archetypes are:
+
+- `agent-app` — `src/agents`, `src/tools`, `src/domain`, `evals`, `tests`
+- `ml-pipeline` — `src/pipelines`, `src/features`, `src/models`, `src/domain`, `data/*`, `notebooks`, `evals`, `tests`
+
+## Archetypes
+
+Archetypes are starter project shapes for new repos. They exist to solve a specific problem: when a repo is empty, governance alone is not enough. You also need an initial structure that nudges the team toward clean boundaries before the first feature is implemented.
+
+An archetype does not try to generate a full application. It gives you a deliberate starting point:
+
+- a directory layout that matches a common application shape
+- a neutral `PROJECT_CONVENTIONS.md` file that explains the intended boundaries
+- a recorded archetype choice in `.specify/archetype.json`
+- constitution addenda and starter rules that keep the archetype’s core invariants active from the beginning
+
+This is why archetypes are intentionally thin. They do not pin frameworks, dependencies, model providers, or deployment tooling. Those are product and engineering choices that should still be made explicitly in governed artifacts such as `spec.md`, `plan.md`, and ADRs.
+
+The goal is not scaffolding for its own sake. The goal is to start from a structure that makes good boundaries easier to preserve and bad coupling harder to introduce.
+
+## Archetype Usage
+
+Use archetypes when you are starting a new repo and want Arpinine Harness to create a starter structure before governance artifacts are generated.
+
+Choose `agent-app` when the product is centered on agent workflows, tool orchestration, runtime adapters, or evaluation of agent behaviour.
+
+Choose `ml-pipeline` when the product is centered on data ingestion, feature transforms, model training, reproducibility, and evaluation/baseline workflows.
+
+Skip archetype scaffolding when:
+
+- the repo already has an application structure you want to preserve
+- you are reverse-bootstrapping an existing codebase with `/arpinine-harness:at-bootstrap-from-code`
+- the project shape is unusual enough that a generic starter structure would add noise
+
+Interactive usage through `at-init`:
+
+```text
+/arpinine-harness:at-init
+```
+
+Explicit usage through `at-init`:
+
+```text
+/arpinine-harness:at-init --archetype agent-app
+/arpinine-harness:at-init --archetype ml-pipeline
+```
+
+What happens during archetype init:
+
+1. Arpinine Harness checks whether the repo already looks like an application.
+2. If the repo looks empty, it can scaffold the selected archetype before the normal governance setup.
+3. The scaffold creates the starter directories and `PROJECT_CONVENTIONS.md`.
+4. The selected archetype is recorded in `.specify/archetype.json`.
+5. After the base constitution is generated, Arpinine Harness applies an archetype-specific addendum and starter rules.
+6. Shared pre-edit hook checks then enforce the supported archetype invariants in both Claude and Codex.
+
+Expected flow without an explicit archetype:
+
+1. `at-init` detects that the repo does not yet look like an application.
+2. It offers archetype scaffolding.
+3. You choose one of the shared archetypes or skip scaffolding.
+4. The scaffold runs before the normal `.specify/` setup.
+
+Direct shared script usage from the assembled plugin root:
+
+```bash
+python3 scripts/scaffold_archetype.py --list
+python3 scripts/scaffold_archetype.py agent-app --target-dir . --skip-if-nonempty
+python3 scripts/scaffold_archetype.py ml-pipeline --target-dir . --force
+```
+
+Use `--skip-if-nonempty` for safe first-run behavior in a repo that may already contain code. Use `--force` only when you intentionally want to scaffold into a non-empty repo.
+
+In practice, the direct script is useful for testing, automation, or debugging the scaffold contract itself. Most users should prefer `at-init`, because it wires scaffolding into the rest of the governance setup.
+
+When an archetype is selected during `at-init`, Arpinine Harness also:
+
+- records the selection in `.specify/archetype.json`
+- extends the generated constitution with an archetype-specific addendum
+- seeds starter rules under `.specify/rules/archetype/`
+- activates shared pre-edit hook checks that enforce the supported archetype invariants in both Claude and Codex
+
 ## Plugin Install
 
 ### Claude
 
 Use the Claude-native install flow.
-
-If this repo was previously registered under an older local marketplace name such as `agent-align-local`, remove that stale marketplace first:
-
-```bash
-claude plugin marketplace remove agent-align-local
-```
 
 Then install Arpinine Harness from this repo:
 
@@ -404,6 +486,8 @@ Once the plugin is installed and enabled, move into the target repo and run:
 /arpinine-harness:at-bootstrap-from-code . --git-log
 ```
 
+This flow is for an existing codebase. Archetype scaffolding is for new repos, not for reverse-bootstrapping code that already exists.
+
 This creates:
 - `.specify/bootstrap/latest-assessment.json`
 - `.specify/bootstrap/latest-assessment.md`
@@ -417,6 +501,8 @@ Then refine the reverse-engineered slice:
 /arpinine-harness:at-review .specify/specs/<slug>/spec.md
 /arpinine-harness:at-audit .specify/specs/<slug>/spec.md
 ```
+
+If the repo already contains code, `at-init` will skip archetype scaffolding unless you explicitly force it.
 
 ## Dependency Handling
 

@@ -8,9 +8,13 @@ Steps to create a governed agent application using Arpinine Harness. Follow in o
 
 - [ ] Install the Arpinine Harness plugin in Claude Code
 - [ ] Run `/arpinine-harness:at-init` from the project root
+  For a brand-new repo, optionally scaffold the `agent-app` archetype during init before drafting the first spec.
   - Confirms `.specify/` structure exists
+  - Records `.specify/archetype.json` if an archetype is selected
+  - Extends the constitution with archetype-specific invariants
   - Validates specification provider
   - Sets up `adr/`, `specs/`, `evals/`, `observations/`, `rules/`, `coordination/`
+  - Seeds starter archetype rules and shared hook enforcement
   - Installs pre-commit security hooks
 - [ ] Verify `scripts/check-dependencies.sh` passes (Python 3.10+, provider configured)
 - [ ] If using a real harness runtime: confirm it is installable (`pip install openharness-ai` or equivalent)

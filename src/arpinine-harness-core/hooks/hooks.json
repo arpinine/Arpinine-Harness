@@ -45,6 +45,15 @@
           "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-security-setup.sh",
           "timeout": 5
         }]
+      },
+      {
+        "description": "Block edits that violate active archetype governance checks",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-archetype-governance.sh",
+          "timeout": 5
+        }]
       }
     ],
     "PostToolUse": [

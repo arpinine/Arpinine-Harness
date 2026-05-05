@@ -15,6 +15,28 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 
 ## Workflow
 
+### Step 0 — Archetype scaffold (optional)
+
+If the user passed an explicit archetype choice, run:
+```
+python3 scripts/scaffold_archetype.py <archetype-name> --target-dir <project-root> --force
+```
+from the assembled plugin root. Report the created directories and files before continuing. This also records the selected archetype at `.specify/archetype.json`.
+
+Otherwise, probe whether the target looks like an existing project by running:
+```
+python3 scripts/scaffold_archetype.py --list
+```
+to show available archetypes, and:
+```
+python3 scripts/scaffold_archetype.py <archetype-name> --target-dir <project-root> --skip-if-nonempty
+```
+after the user picks one.
+
+If the script reports `Skipping scaffold: target already looks non-empty ...`, continue silently with the normal init flow.
+If the user declines archetype scaffolding, continue silently with the normal init flow.
+If the target is non-empty and the user still wants the archetype, re-run with `--force`.
+
 1. Run `check-dependencies.sh` from the plugin scripts directory, or perform equivalent environment validation and share the output.
 2. Ensure `.specify/specification-provider.json` exists. If it does not, create it from `templates/specification-provider-template.json`.
 3. Resolve the configured specification provider from `.specify/specification-provider.json`. By default this is `spec-kit`.
@@ -30,6 +52,14 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - `.specify/observations/`
    - `.specify/rules/`
    - `.specify/coordination/`
+7a. If `.specify/archetype.json` exists, run:
+```
+python3 scripts/apply_archetype_governance.py --repo <project-root>
+```
+from the assembled plugin root. This must:
+   - append or refresh an archetype-specific addendum in the generated constitution
+   - create or refresh starter rule files under `.specify/rules/archetype/`
+   - keep the operation idempotent across repeated `/at-init` runs
 8. If `ADR-INDEX.md` does not exist, create it with:
 
 ```md

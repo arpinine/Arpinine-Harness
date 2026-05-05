@@ -1,0 +1,32 @@
+{
+  "name": "agent-app",
+  "description": "AI agent application with tools, domain, and evaluation support",
+  "directories": [
+    "src/agents",
+    "src/tools",
+    "src/domain",
+    "evals",
+    "tests"
+  ],
+  "template_files": [
+    "PROJECT_CONVENTIONS.md"
+  ],
+  "constitution_principles": [
+    "Domain modules stay free of agent runtimes, frameworks, transport clients, and persistence-layer imports.",
+    "Agent orchestration composes tools and domain logic through explicit boundaries; business rules do not migrate into tools or runtime adapters."
+  ],
+  "starter_rules": [
+    {
+      "rule_id": "archetype-agent-app-domain-boundary",
+      "severity": "HIGH",
+      "prevents": "framework, runtime, or persistence leakage into domain modules",
+      "triggers": [
+        "domain-layer file gains framework, transport, persistence, or agent-runtime import",
+        "agent-app plan or implementation collapses domain and tooling boundaries"
+      ],
+      "rule": "Keep `src/domain/` framework-independent. Runtime SDKs, web frameworks, database clients, and transport libraries belong in tools or adapters, not in domain code.",
+      "detection_pattern": "Review edits under `src/domain/` for imports such as FastAPI, SQLAlchemy, OpenHarness, HTTP clients, or database drivers.",
+      "correct_pattern": "Domain modules expose pure business logic. Tooling and runtime integrations live in `src/tools/` or an adapter/infrastructure layer."
+    }
+  ]
+}

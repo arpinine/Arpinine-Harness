@@ -133,10 +133,12 @@ Create the shared governance structure for the repo.
 - initialize `.specify/`
 - create ADR index
 - confirm workflow conventions
+- optionally scaffold a thin starter structure for a new repo before governance files are created
 
 **Manual**
 - run the command
 - inspect the output for dependency warnings
+- if the repo is new, choose an archetype such as `agent-app` or `ml-pipeline`, or skip scaffolding
 
 **Automatic**
 - `.specify/specs/`
@@ -146,6 +148,8 @@ Create the shared governance structure for the repo.
 - `.specify/rules/`
 - `.specify/coordination/`
 - `ADR-INDEX.md` if missing
+- optional starter directories and `PROJECT_CONVENTIONS.md` when archetype scaffolding is selected
+- optional `.specify/archetype.json`, constitution addendum, and archetype starter rules when archetype scaffolding is selected
 
 **Expected Deliverable**
 - initialized governance workspace

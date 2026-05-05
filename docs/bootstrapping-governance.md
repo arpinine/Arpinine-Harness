@@ -18,6 +18,8 @@ Use this when the codebase already exists and you want to retrofit Arpinine Harn
 
 Creates `.specify/specs/`, `.specify/adr/`, `.specify/evals/`, `.specify/observations/`, `.specify/rules/`, and `ADR-INDEX.md`.
 
+Because this guide is for an existing codebase, archetype scaffolding should normally be skipped. `at-init` only scaffolds when the repo still looks empty, unless you explicitly force an archetype.
+
 Verify with:
 
 ```
