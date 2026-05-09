@@ -32,6 +32,9 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 7. Run the provider's `implement` action. For the default provider, this is `/speckit.implement`.
 8. Preserve the module boundaries and dependency direction defined in `plan.md`.
 9. If the feature uses a harness in the product application, preserve the harness abstraction boundary, tool model, memory model, and permission model defined in `## Harness Strategy`.
+   **Observability pre-implementation gate:** If `plan.md` contains `## Observability Strategy` and it is not N/A:
+   a. Run `python3 scripts/scaffold_observability_setup.py --spec <slug>` to create any missing provider files (`ObservationProvider` interface, default impl, noop provider, `EvaluationProvider` interface, default impl, noop provider) and update `.env.example`. The script is idempotent — it skips files that already exist.
+   b. Run `scripts/check-observability-setup.sh --spec <slug>`. Block implementation if any HIGH finding is reported. A HIGH finding after the scaffold ran means a provider file is absent or an SDK boundary is violated — do not proceed until resolved.
 10. For each task in `plan.md`:
    a. Before starting work on the task, claim the next eligible task through `scripts/claim_task.py --slug <slug>`. Override `--team-id` or `--instance-id` only when the host runtime cannot infer them correctly.
    b. Treat `.specify/coordination/<slug>.json` as the source of task ownership and lease state. `plan.md` remains the human-readable source of task intent and progress.
@@ -68,5 +71,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 17. If implementation breaks planned boundaries or introduces tight coupling, send the work back into planning or ADR refinement before completion.
 18. If harness behavior exceeds the documented tool, memory, or permission model, send the work back into planning or ADR refinement before completion.
 19. If AI design decisions (model, prompting, context management) are implemented differently from `## AI Design Decisions` in `plan.md`, send the work back into planning or ADR refinement before completion.
-20. If implementation changes the original intent or weakens the business case, send the work back into refinement by updating the spec or ADRs.
-21. Summarize what changed, which tests prove it, which evaluations passed, which acceptance criteria were satisfied, and which ADRs govern the implementation.
+20. If observability decisions (provider choice, instrumentation scope, flush strategy) deviate from `## Observability Strategy` in `plan.md`, send the work back into planning or ADR refinement before completion.
+21. Verify that Langfuse SDK imports do not appear outside the designated observation provider module (the path declared in `## Observability Strategy`, defaulting to `<root>/observability/langfuse.py`) and DeepEval SDK imports do not appear outside the designated evaluation provider module (the path declared in `## Observability Strategy`, defaulting to `<root>/evaluation/deepeval.py`). Report any boundary violations as HIGH findings and require remediation before completion.
+22. If implementation changes the original intent or weakens the business case, send the work back into refinement by updating the spec or ADRs.
+23. Summarize what changed, which tests prove it, which evaluations passed, which acceptance criteria were satisfied, and which ADRs govern the implementation.

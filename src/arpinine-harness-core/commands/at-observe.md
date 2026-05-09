@@ -28,7 +28,24 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - `.specify/observations/<spec-slug>/history/<run-id>.md`
    - `.specify/observations/<spec-slug>/history/<run-id>.json`
    - `.specify/observations/<spec-slug>/index.jsonl`
-3. Capture, at minimum:
+3. **Observation provider bridge:** If `## Observability Strategy` in `plan.md` declares `observation_provider = langfuse` (or Langfuse is the configured default), map observation trace fields to Langfuse schema before writing artifacts:
+
+   | Harness observation field | Langfuse primitive |
+   |--------------------------|-------------------|
+   | `run_id` | `trace.id` |
+   | `scenario_id` | `trace.name` or `trace.metadata.scenario_id` |
+   | `user_id` / `session_id` | `trace.userId` / `trace.sessionId` |
+   | LLM call event | `generation` (with `model`, `input`, `output`, `usage`) |
+   | Tool call event | `span` (with `name=tool_name`, `input=args`, `output=result`) |
+   | `latency_ms` | `generation.endTime - generation.startTime` |
+   | `token_input` / `token_output` | `generation.usage.input` / `generation.usage.output` |
+   | `cost` | `generation.usage.totalCost` (if available) |
+   | Eval metric score | `trace.score(name=metric_name, value=score)` |
+
+   Langfuse trace IDs must be recorded in `trace.json` under `langfuse_trace_id` for cross-referencing.
+   If the provider is not Langfuse, skip this mapping step and proceed directly with the normalized trace.
+
+4. Capture, at minimum:
    - run id
    - variant id
    - runtime class
@@ -47,15 +64,15 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - memory or state events
    - failures
    - final outcome
-4. For decision-heavy systems, capture optional provenance fields:
+5. For decision-heavy systems, capture optional provenance fields:
    - conversation ids
    - run-wide evidence refs
    - decision records with confidence, rationale, decision-level evidence refs, and review outcome
-5. Normalize the trace using `templates/schemas/observation-schema.yaml`.
-6. Update `latest-*` convenience artifacts and append immutable run artifacts under `history/`.
-7. Append a summary entry to `index.jsonl` so later review or benchmark workflows can aggregate multiple runs.
-8. Record raw runtime evidence only. Do not classify drift in this step.
-9. Leave `## Drift Signals` empty or marked `pending review` until `/arpinine-harness:at-observe review` runs.
+6. Normalize the trace using `templates/schemas/observation-schema.yaml`.
+7. Update `latest-*` convenience artifacts and append immutable run artifacts under `history/`.
+8. Append a summary entry to `index.jsonl` so later review or benchmark workflows can aggregate multiple runs.
+9. Record raw runtime evidence only. Do not classify drift in this step.
+10. Leave `## Drift Signals` empty or marked `pending review` until `/arpinine-harness:at-observe review` runs.
 
 ## Workflow: `review`
 
@@ -63,21 +80,24 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 2. When available, inspect `history/` and `index.jsonl` to compare repeated runs rather than only one latest snapshot.
 3. If the eval plan declares latency, token, cost, or benchmarked regression thresholds, verify that the required telemetry fields are present in the observation trace or history records.
 4. If the system makes nontrivial AI decisions, verify that provenance fields are present when required by the spec or plan.
-2. Compare observed behavior against:
+5. Compare observed behavior against:
    - `spec.md`
    - `plan.md`
    - `## Harness Strategy`
+   - `## Observability Strategy`
    - evaluation plan
-5. Report observation drift classes when found:
+6. Report observation drift classes when found:
    - `TOOL_DRIFT`
    - `PERMISSION_DRIFT`
    - `MEMORY_DRIFT`
    - `EVAL_COVERAGE_DRIFT`
    - `RUNTIME_BEHAVIOR_DRIFT`
-6. Recommend whether the next action is:
+   - `OBSERVABILITY_DRIFT` — LLM calls without traces, missing `flush()`, or eval scores not linked to traces
+7. Recommend whether the next action is:
    - refine spec
    - update plan
    - update harness strategy
+   - update observability strategy
    - create or update ADR
    - fix implementation
    - extend evaluation coverage

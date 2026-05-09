@@ -53,40 +53,59 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 11. Invoke the `architecture-governor` skill to enforce modular boundaries, dependency direction, and clean separation of concerns.
 12. Invoke the `harness-governor` skill for any product feature that depends on an agent harness.
 13. If `## Harness Strategy` names a runtime, run `scripts/check-harness-readiness.sh --spec <slug>` to verify the adapter boundary, tool registry isolation, session reset, and absence of harness imports outside `adapters/`. Block planning if any check fails.
-14. Invoke the `ai-engineer` agent on `plan.md` for any feature that uses AI, LLMs, or agent runtimes:
+14. **Observability strategy gate:** For any feature that makes LLM calls, uses an agent harness, or produces AI-driven output:
+
+   | Question | Signal |
+   | --- | --- |
+   | Does the feature call an LLM API (chat, completion, embeddings)? | Observation required — every LLM call must be traced |
+   | Does the feature use an agent harness or multi-step tool loop? | Observation required — trace each turn, generation, and tool span |
+   | Does the feature produce AI-driven output that must be quality-gated? | Evaluation required — define metrics and thresholds before ship |
+
+   - If **yes to any**: `## Observability Strategy` must be fully documented with all controls: observation required, `ObservationProvider` interface path, default implementation (Langfuse), env var configuration, evaluation required, `EvaluationProvider` interface path, default implementation (DeepEval), observation-evaluation bridge, and swap strategy. Write this determination into `plan.md` before invoking `observability-governor`.
+   - If **yes to any**: include an implementation handoff note in the plan outcome telling the team to run `python3 scripts/scaffold_observability_setup.py --spec <slug>` before `/arpinine-harness:at-implement` or at the start of `/arpinine-harness:at-implement`.
+   - If **no to all**: Set `## Observability Strategy` body to `N/A — feature makes no LLM calls and produces no AI-driven output. Standard logging is sufficient.`
+   - If **unclear**: ask the user the minimum question needed to resolve ambiguity before proceeding.
+
+   Invoke the `observability-governor` skill after writing `## Observability Strategy` to verify both provider abstractions are correctly specified.
+
+15. Invoke the `ai-engineer` agent on `plan.md` for any feature that uses AI, LLMs, or agent runtimes:
     - Review model selection, prompting strategy, context management, and agent topology decisions.
     - Flag AI-specific failure modes (hallucination risk, context overflow, tool misuse, prompt injection surface).
+    - Review that `## Observability Strategy` names both observation and evaluation providers and that provider boundaries are respected.
     - Suggest ADRs for model choice, orchestration pattern, and non-obvious prompting approaches.
     - Block planning if no model is named or if prompt injection surface is unmitigated.
-15. Invoke the `devops` agent on `plan.md` when the spec involves a deployed service, external API keys, secrets, or a CI/CD pipeline:
+16. Invoke the `devops` agent on `plan.md` when the spec involves a deployed service, external API keys, secrets, or a CI/CD pipeline:
     - Review deployment strategy, secrets management approach, environment configuration, and CI/CD pipeline.
+    - Verify `LANGFUSE_*` and `DEEPEVAL_API_KEY` env vars are documented and not hardcoded.
     - Flag hardcoded secrets, missing deployment path, or absent rollback plan.
     - Suggest ADRs for hosting platform, database provisioning, and secrets management strategy.
     - Block planning if no deployment path is defined or if secrets management is absent.
-16. Invoke the `data-engineer` agent on `plan.md` when the spec involves data pipelines, RAG, vector stores, ETL, or multi-source data ingestion:
+17. Invoke the `data-engineer` agent on `plan.md` when the spec involves data pipelines, RAG, vector stores, ETL, or multi-source data ingestion:
     - Review data pipeline architecture, schema design, migration strategy, and data quality gates.
     - For RAG: review chunking strategy, embedding model selection, vector store choice, and retrieval strategy.
     - Suggest ADRs for vector store platform, embedding model, and primary database choice.
     - Block planning if RAG pipeline has no embedding model named or no retrieval strategy defined.
-17. Invoke the `tech-architect` agent on `plan.md` to identify architectural decisions that deserve ADRs.
-18. For each significant decision:
+18. Invoke the `tech-architect` agent on `plan.md` to identify architectural decisions that deserve ADRs.
+19. For each significant decision:
     - capture a concise decision key such as `decision:001-user-login:session-storage`
     - either link an existing ADR or suggest `/arpinine-harness:at-adr new "..."`
-19. Ensure `plan.md` defines:
+20. Ensure `plan.md` defines:
     - `## Module Boundaries`
     - `## Dependency Rules`
     - `## Testability By Boundary`
     - `## Harness Strategy` when the feature uses a harness in the product application
+    - `## Observability Strategy` when the feature makes LLM calls or produces AI-driven output
     - `## Deployment Strategy` when the feature involves a deployed service, external APIs, or secrets
     - `## AI Design Decisions` when the feature uses LLMs or agent runtimes
     - `## Data Pipeline` when the feature involves data pipelines, RAG, vector stores, or ETL
-20. Invoke the `evaluation-governor` skill for agentic or AI-assisted workflows.
-21. Create or update `.specify/evals/<slug>/eval-plan.md` with metrics, thresholds, datasets, and the chosen framework command.
-22. Update `plan.md` so the `## Technical Decisions`, `## Harness Strategy`, `## Evaluation Strategy`, `## Deployment Strategy`, `## AI Design Decisions`, `## Data Pipeline`, and `## ADRs Created During Planning` sections reference the governing artifacts explicitly.
-23. When the team intends to run multiple assistant instances concurrently, annotate tasks with optional team tags such as `[team: claude]` or `[team: codex]` so ownership intent is explicit in `plan.md`.
-24. Explain that task execution uses a shared coordination registry under `.specify/coordination/` and that team tags restrict which assistant may claim a task.
-25. If architecture, task sequencing, harness strategy, AI design, data pipeline, deployment strategy, evaluation strategy, or team assignment remains unclear, ask the user the minimum focused planning questions required to complete the plan.
-26. Write the user's answers directly into `plan.md` and any related artifacts. Do not require the user to edit the plan manually.
-27. If no ADR is needed for a decision, state why.
-28. Confirm that planning preserved the spec intent rather than redefining it.
-29. Confirm: "Plan created at `.specify/specs/<slug>/plan.md`"
+21. Invoke the `evaluation-governor` skill for agentic or AI-assisted workflows.
+22. Create or update `.specify/evals/<slug>/eval-plan.md` with metrics, thresholds, datasets, and the chosen framework command. When DeepEval is the evaluation framework, confirm the eval plan references `EvaluationProvider` — not raw DeepEval calls — in execution instructions.
+23. Update `plan.md` so the `## Technical Decisions`, `## Harness Strategy`, `## Observability Strategy`, `## Evaluation Strategy`, `## Deployment Strategy`, `## AI Design Decisions`, `## Data Pipeline`, and `## ADRs Created During Planning` sections reference the governing artifacts explicitly.
+24. When the team intends to run multiple assistant instances concurrently, annotate tasks with optional team tags such as `[team: claude]` or `[team: codex]` so ownership intent is explicit in `plan.md`.
+25. Explain that task execution uses a shared coordination registry under `.specify/coordination/` and that team tags restrict which assistant may claim a task.
+26. If architecture, task sequencing, harness strategy, observability strategy, AI design, data pipeline, deployment strategy, evaluation strategy, or team assignment remains unclear, ask the user the minimum focused planning questions required to complete the plan.
+27. Write the user's answers directly into `plan.md` and any related artifacts. Do not require the user to edit the plan manually.
+28. If no ADR is needed for a decision, state why.
+29. Confirm that planning preserved the spec intent rather than redefining it.
+30. Confirm: "Plan created at `.specify/specs/<slug>/plan.md`"
+31. If `## Observability Strategy` is required, also confirm: "Next: run `python3 scripts/scaffold_observability_setup.py --spec <slug>` to scaffold observation/evaluation providers before implementation."

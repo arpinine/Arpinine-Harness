@@ -24,23 +24,27 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 ## Principles
 
 - The plugin enforces the evaluation contract, not a single evaluation vendor
-- Teams may use DeepEval, custom pytest suites, benchmark harnesses, or another framework
+- **Default framework: DeepEval.** Teams must justify a different choice in an ADR.
+- Evaluation code must use the `EvaluationProvider` abstraction in `src/evaluation/base.py` — never import DeepEval SDK directly from evaluation test helpers or agent code
+- `DeepEvalProvider` in `src/evaluation/deepeval.py` is the default implementation; it can be swapped by changing one file
 - Every agentic workflow must define metrics, datasets, thresholds, and a pass/fail policy
 
 ## Workflow: `plan`
 
 1. Locate `.specify/specs/<slug>/spec.md` and `.specify/specs/<slug>/plan.md`.
-2. Create or update `.specify/evals/<spec-slug>/eval-plan.md` from `templates/eval-plan-template.md`.
-3. Determine whether the spec produces agentic behavior, AI-assisted decisioning, or prompt-driven output.
-4. If yes, invoke the `ai-engineer` agent to define AI-specific evaluation metrics before writing the eval plan:
+2. Read `## Observability Strategy` in `plan.md`. If it declares an `EvaluationProvider`, confirm the eval plan's execution command uses the provider interface, not raw DeepEval imports.
+3. Create or update `.specify/evals/<spec-slug>/eval-plan.md` from `templates/eval-plan-template.md`.
+4. Determine whether the spec produces agentic behavior, AI-assisted decisioning, or prompt-driven output.
+5. If yes, invoke the `ai-engineer` agent to define AI-specific evaluation metrics before writing the eval plan:
    - Output quality: accuracy, coherence, factual grounding, instruction following
    - Tool use: correct tool selection rate, tool call correctness, unnecessary tool use rate
    - Reliability: failure rate, fallback trigger rate, retry rate
    - Performance: latency P50/P95, token cost per task
    - Safety: prompt injection resistance, output policy compliance
-5. If yes, define:
+6. If yes, define:
    - evaluation objective
-   - evaluation framework
+   - evaluation framework (default: DeepEval via `EvaluationProvider`; ADR required for alternatives)
+   - `EvaluationProvider` interface path (default: `src/evaluation/base.py`)
    - datasets or scenarios
    - whether benchmark mode is required
    - benchmark command when benchmark mode is required
@@ -49,18 +53,19 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - pass thresholds
    - regression policy
    - baseline comparison policy
-   - execution command
-6. If the workflow declares release-blocking latency, token, cost, or regression thresholds, mark benchmark mode as required rather than optional.
-7. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
-8. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
+   - execution command (must invoke `EvaluationProvider.evaluate()` + `assert_passes()`, not raw DeepEval)
+7. If the workflow declares release-blocking latency, token, cost, or regression thresholds, mark benchmark mode as required rather than optional.
+8. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
+9. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
 
 ## Workflow: `run`
 
 1. Read `.specify/evals/<spec-slug>/eval-plan.md`.
-2. Validate that the framework command exists in the current environment.
-3. If the command is unavailable, stop and report the missing dependency instead of attempting installation.
-4. **Command safety validation** before execution:
-   a. **Known safe patterns** — if the command matches one of these patterns, proceed to step 5 with a brief confirmation prompt showing the command:
+2. If the plan declares DeepEval as the framework, verify `src/evaluation/deepeval.py` exists and implements `EvaluationProvider`. If missing, scaffold from `templates/deepeval-evaluation-provider-template.py` before proceeding.
+4. Validate that the framework command exists in the current environment.
+5. If the command is unavailable, stop and report the missing dependency instead of attempting installation.
+6. **Command safety validation** before execution:
+   a. **Known safe patterns** — if the command matches one of these patterns, proceed to step 7 with a brief confirmation prompt showing the command:
       `pytest`, `python -m pytest`, `python -m unittest`, `deepeval run`, `deepeval test run`,
       `npm test`, `npm run test`, `npx vitest`, `npx jest`,
       `mvn test`, `mvn verify`, `gradle test`,
@@ -75,16 +80,17 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
       `rm -rf`, `rm -r /`, `mkfs`, `dd if=`, `:(){ :|:& };:`,
       `chmod 777`, `eval $(`, `python -c "import os; os.system`
       - Report: "BLOCKED: This command matches a known dangerous pattern and cannot be executed. Edit the eval-plan.md to use a safe framework command."
-5. Run the approved command.
-6. Save results to `.specify/evals/<spec-slug>/latest-results.md`.
-7. For repeatable or regression-sensitive workflows, recommend `/arpinine-harness:at-eval benchmark <slug>` when a single run cannot satisfy the declared thresholds.
-8. Summarize:
-   - framework used
-   - datasets or scenarios covered
-   - metric scores
-   - thresholds
-   - pass/fail result
-9. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
+7. Run the approved command.
+8. Save results to `.specify/evals/<spec-slug>/latest-results.md`.
+9. For repeatable or regression-sensitive workflows, recommend `/arpinine-harness:at-eval benchmark <slug>` when a single run cannot satisfy the declared thresholds.
+10. Summarize:
+    - framework used
+    - `EvaluationProvider` implementation used (e.g. `DeepEvalProvider`)
+    - datasets or scenarios covered
+    - metric scores
+    - thresholds
+    - pass/fail result
+11. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
 
 ## Workflow: `benchmark`
 

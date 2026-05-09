@@ -47,6 +47,29 @@ N/A — single LLM call sufficient. No agent loop, tool execution, or session st
 
 Harness-specific evaluation belongs in `## Evaluation Strategy` and the linked `eval-plan.md`, not as an extra row in this table.
 
+## Observability Strategy
+
+<!-- DECISION GATE — replace this section with BLOCK A or BLOCK B, then delete the other and these comments -->
+
+<!-- BLOCK A: No observability needed — paste this line as the entire section body:
+N/A — feature makes no LLM calls and produces no AI-driven output. Standard logging is sufficient.
+-->
+
+<!-- BLOCK B: Observability required — fill every row; observability-governor blocks /at-implement if any row is empty -->
+| Concern | Decision |
+|---------|----------|
+| Observation required | Yes |
+| ObservationProvider interface | [file path — e.g. `src/observability/base.py`] |
+| Default implementation | Langfuse — [justify if not Langfuse] |
+| Env var configuration | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` (documented in `.env.example`) |
+| Evaluation required | Yes |
+| EvaluationProvider interface | [file path — e.g. `src/evaluation/base.py`] |
+| Default implementation | DeepEval — [justify if not DeepEval] |
+| Observation-evaluation bridge | Attach eval metric scores to traces via `ObservationProvider.score()` |
+| Swap strategy | [what changes when provider is replaced — must be adapter file only; no agent, tool, or domain code changes] |
+
+Provider scaffolds: `templates/observation-provider-template.py`, `templates/langfuse-observation-provider-template.py`, `templates/evaluation-provider-template.py`, `templates/deepeval-evaluation-provider-template.py`
+
 ## Tasks
 - [ ] TASK-001: Write failing tests for [module] [team: codex]
 - [ ] TASK-002: Implement [module] [team: claude]
