@@ -68,7 +68,8 @@ N/A — feature makes no LLM calls and produces no AI-driven output. Standard lo
 | Observation-evaluation bridge | Attach eval metric scores to traces via `ObservationProvider.score()` |
 | Swap strategy | [what changes when provider is replaced — must be adapter file only; no agent, tool, or domain code changes] |
 
-Provider scaffolds: `templates/observation-provider-template.py`, `templates/langfuse-observation-provider-template.py`, `templates/evaluation-provider-template.py`, `templates/deepeval-evaluation-provider-template.py`
+Implementation handoff: run `python3 scripts/scaffold_observability_setup.py --spec <slug>` before `/arpinine-harness:at-implement` to scaffold provider files from this section.
+Provider templates: `templates/observation-provider-template.py`, `templates/langfuse-observation-provider-template.py`, `templates/evaluation-provider-template.py`, `templates/deepeval-evaluation-provider-template.py`
 
 ## Tasks
 - [ ] TASK-001: Write failing tests for [module] [team: codex]

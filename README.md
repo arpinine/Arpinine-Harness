@@ -97,7 +97,7 @@ These agents activate only when the spec signals their domain. They stay quiet o
 | `devops` | A deployed service, external API keys, secrets, or CI/CD pipeline |
 | `data-engineer` | Data pipelines, RAG, vector stores, ETL, or multi-source ingestion |
 
-Scope is evaluated during `/at-plan` by reading what the spec and plan actually describe. When a scoped agent activates, it also requires a corresponding section in `plan.md` — `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` — so the plan is complete for that domain before implementation starts.
+Scope is evaluated during `/at-plan` by reading what the spec and plan actually describe. When a scoped agent activates, it also requires a corresponding section in `plan.md` — `## Observability Strategy`, `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` as applicable — so the plan is complete for that domain before implementation starts.
 
 ## Team Workflow
 
@@ -151,6 +151,7 @@ The agents don't own anything on this list. Your team does. The agents help you 
 |----------|---------|
 | `spec.md` | What problem is being solved, for whom, and how success is measured |
 | `plan.md` | How the team intends to implement the work |
+| `observability strategy` | Contract for observation/evaluation providers, env vars, score linkage, and swap boundaries for AI/LLM features |
 | `harness strategy` | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
 | `module boundaries` | Architectural contract for responsibilities, dependency direction, and replaceable seams |
 | `eval-plan.md` | Quality gate: how you measure readiness, regressions, and release fitness |
@@ -203,6 +204,9 @@ The agents don't own anything on this list. Your team does. The agents help you 
 # Create implementation plan
 /arpinine-harness:at-plan .specify/specs/001-user-login/
 
+# If the plan requires AI observation/evaluation wiring, scaffold it now
+python3 scripts/scaffold_observability_setup.py --spec 001-user-login
+
 # Record important decision if needed
 /arpinine-harness:at-adr new "Session storage strategy"
 
@@ -218,6 +222,18 @@ The agents don't own anything on this list. Your team does. The agents help you 
 # Realign when implementation and intent diverge
 /arpinine-harness:at-audit .specify/specs/001-user-login/
 ```
+
+## Observation And Evaluation Scaffolding
+
+For AI, LLM, or agent-runtime features, the plugin now helps implementation directly instead of only describing the desired abstraction.
+
+The flow is:
+
+- `/arpinine-harness:at-plan` writes `## Observability Strategy` when observation/evaluation is required
+- `python3 scripts/scaffold_observability_setup.py --spec <slug>` scaffolds missing provider abstractions, default Langfuse/DeepEval implementations when the plan selects them, `noop` providers, and `.env.example`
+- `/arpinine-harness:at-implement` reruns that scaffold step, then blocks on `scripts/check-observability-setup.sh --spec <slug>` if provider files are missing or SDK imports leak outside the designated provider modules
+
+That keeps product code dependent on `ObservationProvider` and `EvaluationProvider`, not directly on Langfuse or DeepEval.
 
 ## End-to-End Demo
 

@@ -66,7 +66,7 @@ These agents activate only when the spec signals their domain. They stay quiet o
 | `devops` | A deployed service, external API keys, secrets, or CI/CD pipeline |
 | `data-engineer` | Data pipelines, RAG, vector stores, ETL, or multi-source ingestion |
 
-Scope is evaluated during `/at-plan` by reading what the spec and plan actually describe. When a scoped agent activates, it also requires a corresponding section in `plan.md` — `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` — so the plan is complete for that domain before implementation starts.
+Scope is evaluated during `/at-plan` by reading what the spec and plan actually describe. When a scoped agent activates, it also requires a corresponding section in `plan.md` — `## Observability Strategy`, `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` as applicable — so the plan is complete for that domain before implementation starts.
 
 ## Workflow
 
@@ -257,6 +257,18 @@ Arpinine Harness doesn't install external dependencies during plugin installatio
 
 If `## Harness Strategy` is `N/A`, no harness runtime is needed. Use `scripts/check-dependencies.sh` to check local readiness.
 
+## Observation And Evaluation Scaffolding
+
+For AI, LLM, or agent-runtime features, `/arpinine-harness:at-plan` writes `## Observability Strategy` into `plan.md` and hands implementation off to a scaffolder instead of relying on manual provider setup.
+
+Implementation path:
+
+- `/arpinine-harness:at-plan` decides whether observation and evaluation are required
+- `python3 scripts/scaffold_observability_setup.py --spec <slug>` creates missing provider abstractions, default Langfuse/DeepEval implementations when the plan selects them, `noop` providers, and `.env.example` entries
+- `scripts/check-observability-setup.sh --spec <slug>` verifies that provider files exist and SDK imports stay inside the designated provider modules before implementation continues
+
+The scaffolder is idempotent. Existing files are preserved and reported as skipped rather than overwritten.
+
 ## Script-Backed Governance
 
 Commands are stronger when they start from executable checks rather than prompt text alone.
@@ -264,6 +276,7 @@ Commands are stronger when they start from executable checks rather than prompt 
 Available helpers:
 - `scripts/check-dependencies.sh --json` — machine-readable environment readiness
 - `scripts/bootstrap_from_code.py --json --write-artifacts [--git-log]` — existing-codebase assessment with docs, tests, monorepo, and optional git-history intent signals
+- `scripts/scaffold_observability_setup.py --spec <slug>` — scaffold observation/evaluation provider layers from `## Observability Strategy`
 - `scripts/spec_status.py [--spec <slug>] [--onboard]` — project governance report
 - `scripts/quick_drift_check.py --spec .specify/specs/<slug>/spec.md` — lightweight drift and static conformance hints
 - `scripts/run_benchmark.py --slug <slug>` — execute required benchmark scenarios from `dataset-manifest.json` and emit the governed aggregate result
