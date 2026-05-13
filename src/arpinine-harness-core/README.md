@@ -25,6 +25,7 @@ The shared core also owns the cross-team coordination model. When multiple assis
 |------------|------|
 | Product alignment | `product-owner` keeps business cases, acceptance criteria, and execution aligned with `spec.md` |
 | Architecture | `tech-architect` and `architecture-governor` define modular boundaries and surface consequential decisions |
+| Domain language | `domain-linguist` and `vocabulary-guardian` keep bounded-context vocabulary consistent from spec through code |
 | Delivery | `tdd-guide` keeps implementation test-first and task-aligned |
 | Security | `security-reviewer` checks implementation risk before completion |
 | Evaluation | `evaluation-governor` enforces quality metrics, thresholds, and evidence |
@@ -51,6 +52,7 @@ These agents activate on every spec, no matter what. They cover concerns that ev
 | `product-owner` | Every spec has a business case and acceptance criteria worth protecting |
 | `tech-architect` | Every plan has architectural decisions worth surfacing |
 | `architecture-governor` | Every plan needs module boundary and dependency enforcement |
+| `domain-linguist` | Every plan needs bounded-context vocabulary enforced before generic technical naming hardens into structure |
 | `tdd-guide` | Every implementation needs test-first discipline |
 | `security-reviewer` | Every feature has a security surface |
 
@@ -67,6 +69,17 @@ These agents activate only when the spec signals their domain. They stay quiet o
 | `data-engineer` | Data pipelines, RAG, vector stores, ETL, or multi-source ingestion |
 
 Scope is evaluated during `/at-plan` by reading what the spec and plan actually describe. When a scoped agent activates, it also requires a corresponding section in `plan.md` — `## Observability Strategy`, `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` as applicable — so the plan is complete for that domain before implementation starts.
+
+## Domain Vocabulary
+
+Arpinine Harness now treats bounded-context language as an architectural constraint, not a style preference.
+
+- `spec.md` defines `## Domain Vocabulary`: canonical terms, definitions, forbidden synonyms, and disambiguation notes
+- `/arpinine-harness:at-plan` maps those terms into `## Vocabulary Decisions` in `plan.md`
+- `domain-linguist` reviews module, class, and interface naming for vocabulary drift and semantic conflation
+- `vocabulary-guardian` and `scripts/check_vocabulary_drift.py` enforce the declared vocabulary during planning and implementation
+
+This is meant to stop the common failure mode where good product language in the spec degrades into `Manager`, `Handler`, `Processor`, or other generic abstractions once coding starts.
 
 ## Workflow
 
@@ -139,6 +152,7 @@ python3 scripts/scaffold_archetype.py ml-pipeline --target-dir . --force
 |------|------|
 | Product | The problem, user value, scope, business case, and acceptance criteria in `spec.md` |
 | Engineering | `plan.md`, task breakdown, and implementation approach |
+| Engineering | Bounded-context vocabulary in `spec.md` and `## Vocabulary Decisions` in `plan.md` |
 | Engineering | Module boundaries, dependency rules, and testability by boundary |
 | Engineering | Harness strategy when product features depend on an agent runtime |
 | Engineering | Evaluation strategy, release thresholds, and runtime evidence expectations for agentic systems |
@@ -156,6 +170,7 @@ The agents don't own anything on this list. Your team does.
 |-------|-------------|----------------|
 | `product-owner` | Keeps business case, scope, and acceptance criteria aligned through planning, implementation, evaluation, and audit | `constitution-enforcer`, `evaluation-governor`, `drift-detector` |
 | `tech-architect` | Catches architecture decisions early and pushes them into ADRs before they become accidental code structure | `architecture-governor`, `adr-manager` |
+| `domain-linguist` | Enforces domain language as architecture by checking declared vocabulary against plan and implementation naming decisions | `vocabulary-guardian`, `drift-detector` |
 | `tdd-guide` | Keeps implementation task-aligned and test-first so changes stay traceable and verifiable | `constitution-enforcer` |
 | `security-reviewer` | Reviews plans and code for security gaps; blocks completion when risky behavior is undocumented or unsafe | `constitution-enforcer`, `rule-manager` |
 | `ai-engineer` | Owns LLM design: model selection, prompting strategy, context management, agent topology, failure modes, and AI-specific eval metrics. Fires only on AI/LLM features | `evaluation-governor`, `adr-manager` |
@@ -166,7 +181,9 @@ The agents don't own anything on this list. Your team does.
 ## Alignment Rules
 
 - `spec.md` is for product intent, not implementation detail
+- `## Domain Vocabulary` in `spec.md` is a first-class architectural input, not optional prose
 - `plan.md` is for engineering detail and execution order
+- `## Vocabulary Decisions` in `plan.md` maps domain terms to concrete modules, classes, and interfaces
 - architecture and modularity are enforced through plan boundaries, dependency rules, and ADRs
 - harness-based features must define harness choice, abstraction boundary, tool model, memory model, and permission model
 - eval plans define quality gates, metrics, thresholds, and results
@@ -276,12 +293,13 @@ Commands are stronger when they start from executable checks rather than prompt 
 Available helpers:
 - `scripts/check-dependencies.sh --json` — machine-readable environment readiness
 - `scripts/bootstrap_from_code.py --json --write-artifacts [--git-log]` — existing-codebase assessment with docs, tests, monorepo, and optional git-history intent signals
+- `scripts/check_vocabulary_drift.py --spec <slug> [--json|--all]` — enforce declared domain vocabulary against plan module names and code identifiers
 - `scripts/scaffold_observability_setup.py --spec <slug>` — scaffold observation/evaluation provider layers from `## Observability Strategy`
 - `scripts/spec_status.py [--spec <slug>] [--onboard]` — project governance report
 - `scripts/quick_drift_check.py --spec .specify/specs/<slug>/spec.md` — lightweight drift and static conformance hints
 - `scripts/run_benchmark.py --slug <slug>` — execute required benchmark scenarios from `dataset-manifest.json` and emit the governed aggregate result
 
-The post-write drift hook runs `quick_drift_check.py` automatically, so endpoint mismatches, stale eval runs, harness import leakage, and framework leakage into domain layers surface right after edits.
+The post-write drift hook runs `quick_drift_check.py` automatically, so endpoint mismatches, stale eval runs, harness import leakage, and framework leakage into domain layers surface right after edits. `/arpinine-harness:at-implement` adds an explicit vocabulary gate by running `check_vocabulary_drift.py` before completion.
 
 For benchmarked evaluation, `run_benchmark.py` runs the declared benchmark command once per required dataset scenario and passes scenario context through `ARPININE_HARNESS_*` environment variables. The benchmark tool remains product-specific; Arpinine Harness governs the artifact contract and aggregates the results.
 Benchmark history is partitioned by session under `.specify/evals/<slug>/history/<session-id>/` and `.specify/observations/<slug>/history/<session-id>/`. Aggregate reporting defaults to the latest recorded benchmark session.

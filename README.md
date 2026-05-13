@@ -19,6 +19,7 @@ Each command routes to the specialists that matter for that stage of work:
 
 - a `product-owner` that keeps your spec honest — scope, intent, and acceptance criteria
 - a `tech-architect` that catches architecture decisions before they become accidental code structure
+- a `domain-linguist` that protects bounded-context vocabulary so domain language survives contact with implementation
 - a `tdd-guide` that keeps implementation test-first and task-aligned
 - a `security-reviewer` that challenges anything risky or underspecified
 - an `ai-engineer` that owns your model choices, prompting strategy, and AI-specific failure modes — active when your feature uses AI or LLMs
@@ -56,6 +57,7 @@ That guide covers the day-to-day operating model for anyone using Arpinine Harne
 | --- | --- |
 | Product alignment | `product-owner` keeps business cases, acceptance criteria, and execution aligned with `spec.md` |
 | Architecture | `tech-architect` and `architecture-governor` define modular boundaries and surface consequential decisions |
+| Domain language | `domain-linguist` and `vocabulary-guardian` keep bounded-context vocabulary consistent from spec through code |
 | Delivery | `tdd-guide` keeps implementation test-first and task-aligned |
 | Security | `security-reviewer` checks implementation risk before completion |
 | AI design | `ai-engineer` owns model selection, prompting strategy, agent topology, and AI-specific failure modes — scoped to AI/LLM features |
@@ -82,6 +84,7 @@ These agents activate on every spec, no matter what. They cover concerns that ev
 | `product-owner` | Every spec has a business case and acceptance criteria worth protecting |
 | `tech-architect` | Every plan has architectural decisions worth surfacing |
 | `architecture-governor` | Every plan needs module boundary and dependency enforcement |
+| `domain-linguist` | Every plan needs bounded-context vocabulary enforced before implementation naming drifts into generic abstractions |
 | `tdd-guide` | Every implementation needs test-first discipline |
 | `security-reviewer` | Every feature has a security surface |
 
@@ -98,6 +101,17 @@ These agents activate only when the spec signals their domain. They stay quiet o
 | `data-engineer` | Data pipelines, RAG, vector stores, ETL, or multi-source ingestion |
 
 Scope is evaluated during `/at-plan` by reading what the spec and plan actually describe. When a scoped agent activates, it also requires a corresponding section in `plan.md` — `## Observability Strategy`, `## AI Design Decisions`, `## Deployment Strategy`, or `## Data Pipeline` as applicable — so the plan is complete for that domain before implementation starts.
+
+## Domain Vocabulary As Architecture
+
+Arpinine Harness now treats domain language as part of the system design, not as commentary that can be ignored once coding starts.
+
+- `spec.md` defines `## Domain Vocabulary`: canonical terms, definitions, forbidden synonyms, and disambiguation notes
+- `/arpinine-harness:at-plan` turns that into `## Vocabulary Decisions` in `plan.md`
+- `domain-linguist` reviews module, class, and interface naming against the declared vocabulary
+- `vocabulary-guardian` plus `python3 scripts/check_vocabulary_drift.py --spec <slug>` provide the executable enforcement path before completion
+
+This is the guardrail against specs saying `FulfillmentBatch` while the code quietly turns into `OrderProcessor`, `SettlementManager`, or other generic names that dissolve the domain model.
 
 ## Team Workflow
 
@@ -121,6 +135,7 @@ When multiple assistant teams are active, the same loop applies — but task own
 |------|------|
 | Product | The problem, user value, scope, business case, and acceptance criteria in `spec.md` |
 | Engineering | `plan.md`, task breakdown, and implementation approach |
+| Engineering | Bounded-context vocabulary in `spec.md` and `## Vocabulary Decisions` in `plan.md` |
 | Engineering | Module boundaries, dependency rules, and testability by boundary |
 | Engineering | Harness strategy when product features depend on an agent runtime |
 | Engineering | Evaluation strategy, release thresholds, and runtime evidence expectations for agentic systems |
@@ -138,6 +153,7 @@ The agents don't own anything on this list. Your team does. The agents help you 
 |-------|-------------|----------------|
 | `product-owner` | Keeps business case, scope, and acceptance criteria aligned through planning, implementation, evaluation, and audit | `constitution-enforcer`, `evaluation-governor`, `drift-detector` |
 | `tech-architect` | Catches architecture decisions early and pushes them into ADRs before they become accidental code structure | `architecture-governor`, `adr-manager` |
+| `domain-linguist` | Enforces domain language as architecture by checking declared vocabulary against plan and implementation naming decisions | `vocabulary-guardian`, `drift-detector` |
 | `tdd-guide` | Keeps implementation task-aligned and test-first so changes stay traceable and verifiable | `constitution-enforcer` |
 | `security-reviewer` | Reviews plans and code for security gaps; blocks completion when risky behavior is undocumented or unsafe | `constitution-enforcer`, `rule-manager` |
 | `ai-engineer` | Owns LLM design: model selection, prompting strategy, context management, agent topology, failure modes, and AI-specific eval metrics. Fires only on AI/LLM features | `evaluation-governor`, `adr-manager` |
@@ -150,7 +166,9 @@ The agents don't own anything on this list. Your team does. The agents help you 
 | Artifact | Purpose |
 |----------|---------|
 | `spec.md` | What problem is being solved, for whom, and how success is measured |
+| `## Domain Vocabulary` | Canonical bounded-context terms, forbidden synonyms, and concept disambiguation rules |
 | `plan.md` | How the team intends to implement the work |
+| `## Vocabulary Decisions` | Mapping from declared domain terms to code constructs and module locations |
 | `observability strategy` | Contract for observation/evaluation providers, env vars, score linkage, and swap boundaries for AI/LLM features |
 | `harness strategy` | Product-application contract for harness choice, abstraction boundary, tool access, memory, and permissions |
 | `module boundaries` | Architectural contract for responsibilities, dependency direction, and replaceable seams |
@@ -204,6 +222,12 @@ The agents don't own anything on this list. Your team does. The agents help you 
 # Create implementation plan
 /arpinine-harness:at-plan .specify/specs/001-user-login/
 
+# Review vocabulary-to-code mappings while the plan is still cheap to change
+# plan.md now includes ## Vocabulary Decisions and specialist vocabulary review
+
+# Before completion, enforce that code naming still matches the declared domain language
+python3 scripts/check_vocabulary_drift.py --spec 001-user-login
+
 # If the plan requires AI observation/evaluation wiring, scaffold it now
 python3 scripts/scaffold_observability_setup.py --spec 001-user-login
 
@@ -235,6 +259,15 @@ The flow is:
 
 That keeps product code dependent on `ObservationProvider` and `EvaluationProvider`, not directly on Langfuse or DeepEval.
 
+## Vocabulary Enforcement
+
+Bounded-context vocabulary is enforced in two stages:
+
+- planning: `domain-linguist` and `vocabulary-guardian` review plan module names and `## Vocabulary Decisions`
+- implementation: `python3 scripts/check_vocabulary_drift.py --spec <slug>` scans planned modules and referenced code for forbidden synonyms, generic naming drift, and missing vocabulary coverage
+
+HIGH findings block completion. MEDIUM findings require either a rename or an explicit vocabulary clarification in the governing spec.
+
 ## End-to-End Demo
 
 There are complete runnable demo products in the repo:
@@ -256,7 +289,9 @@ python3 ../../../src/arpinine-harness-core/scripts/run_benchmark.py --slug 001-s
 ## How Alignment Works
 
 - `spec.md` stays product-facing and measurable
+- `## Domain Vocabulary` keeps business concepts explicit and stable across planning and implementation
 - `plan.md` captures implementation detail and delivery steps
+- `## Vocabulary Decisions` ties those business concepts to concrete code structures before coding starts
 - architecture rules enforce modularity before coding starts
 - harness rules enforce how product applications depend on agent runtimes and how those runtimes are isolated
 - eval plans define metrics, thresholds, scenarios, and execution commands
