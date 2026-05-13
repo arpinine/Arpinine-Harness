@@ -15,6 +15,20 @@ As a [persona], I want [action], so that [value].
 ## Out of Scope
 - [Explicitly list excluded items to prevent scope creep]
 
+## Domain Vocabulary
+
+**Bounded Context**: [Name of the bounded context this spec belongs to — e.g., "Order Fulfillment", "Settlement", "Inventory"]
+
+| Term | Definition | Forbidden Synonyms |
+|------|-----------|-------------------|
+| [SettlementWindow] | [Precise meaning within this bounded context] | [Window, Period, Manager] |
+| [FulfillmentBatch] | [Precise meaning within this bounded context] | [Batch, Processor, Handler] |
+
+**Disambiguation Notes**:
+- [TermA] ≠ [TermB]: [explain why these concepts differ despite structural similarity]
+
+> Agents must treat this vocabulary as a primary architectural constraint. Prefer declared terms over generic alternatives (Manager, Handler, Processor, DataObject). Naming consistency is more important than technical cleverness.
+
 ## AI-Nativeness Assessment
 
 **AIN Target Level**: [1 = no AI / 2 = AI-assisted internal tooling / 3 = AI in workflow / 4 = AI-native product]

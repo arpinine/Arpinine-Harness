@@ -8,6 +8,15 @@
 |----------|-----------|-----|
 | [choice] | [why] | ADR-XXXX |
 
+## Vocabulary Decisions
+| Domain Term | Code Construct | Module | Deviation Justification |
+|-------------|---------------|--------|------------------------|
+| [FulfillmentBatch] | `FulfillmentBatch` | `fulfillment/domain/` | none — exact match |
+| [SettlementWindow] | `SettlementWindow` | `settlement/domain/` | none — exact match |
+
+New terms introduced during planning (requires spec `## Domain Vocabulary` update before implementation):
+- [none]
+
 ## Architecture
 [High-level component description or diagram]
 
