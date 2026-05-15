@@ -43,6 +43,28 @@ A typical setup:
 
 So there are two layers: specialist roles inside one session, and multiple assistant teams coordinated through one shared workflow.
 
+## How To Work With Arpinine Harness
+
+Arpinine Harness is not just a command set. It is a working team of specialist agents operating inside a governed delivery methodology.
+
+Your responsibility:
+
+- describe the product, problem, or intent
+- answer clarification questions
+- review generated outputs
+- approve promotions, scope changes, and major decisions
+
+The plugin's responsibility:
+
+- create and refine the spec
+- generate the implementation plan
+- surface ADRs when decisions matter
+- implement under the governed workflow
+- run evaluation, audit drift, and enforce the methodology
+
+You are the decision-maker and reviewer.
+The plugin is the delivery team.
+
 ## Start Here
 
 If you want to use Arpinine Harness rather than just read its files, start here:
@@ -54,6 +76,8 @@ That guide covers the day-to-day operating model for anyone using Arpinine Harne
 ## Getting Started By Situation
 
 Arpinine Harness works best as a workflow, not as a bag of unrelated commands.
+
+In normal use, you do not manually author the core delivery artifacts. The agent team creates and updates them. You guide the process by giving intent, answering questions, reviewing results, and approving important transitions.
 
 If you're new, do not start by memorizing every command. Start by identifying your situation:
 
@@ -220,6 +244,7 @@ When multiple assistant teams are active, the same loop applies — but task own
 
 | Role | Owns |
 |------|------|
+| User / Product Owner | Product intent, clarifications, review, approval, and final decisions |
 | Product | The problem, user value, scope, business case, and acceptance criteria in `spec.md` |
 | Engineering | `plan.md`, task breakdown, and implementation approach |
 | Engineering | Bounded-context vocabulary in `spec.md` and `## Vocabulary Decisions` in `plan.md` |
@@ -230,7 +255,7 @@ When multiple assistant teams are active, the same loop applies — but task own
 | Engineering | Prod-readiness — when the feature involves deployed services or secrets |
 | Engineering | Data architecture — when the feature involves data pipelines or RAG |
 | Tech Leads | Consequential decisions; ADR approval when needed |
-| AI Agents | Execution within the rules set by the spec, plan, ADRs, eval plan, and observation evidence |
+| AI Agents | Creation and refinement of governed artifacts, implementation execution, and workflow enforcement within the approved methodology and the rules set by the spec, plan, ADRs, eval plan, and observation evidence |
 
 The agents don't own anything on this list. Your team does. The agents help you hold the line.
 
