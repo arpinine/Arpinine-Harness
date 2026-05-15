@@ -72,7 +72,8 @@ Before asking the first discovery question:
 9. If the user declines to resume, start a fresh discovery session.
 10. If the user explicitly abandons discovery with an intent such as `cancel`, `stop`, or `forget it`:
    - update the discovery file to `state: abandoned`
-   - exclude that session from future resume scans unless the user reopens it deliberately
+   - exclude that session from future resume scans
+   - to reopen an abandoned session, manually edit the state back to `needs-clarification`
 
 For a fresh discovery session:
 
@@ -152,11 +153,12 @@ If a category is already clear from previous turns, move to the next most import
 
 ### 4. State model
 
-The workflow has three explicit states:
+The workflow has four explicit states:
 
 - `needs-clarification`: discovery is still in progress
 - `spec-ready-awaiting-confirmation`: the idea is refined enough, but spec generation has not been authorized yet
 - `promoted-to-spec`: the user explicitly confirmed the transition and the workflow should hand off to `/at-new`
+- `abandoned`: the user explicitly stopped discovery; the session is preserved as an audit artifact but excluded from resume scans
 
 ### 5. Completion criteria
 
