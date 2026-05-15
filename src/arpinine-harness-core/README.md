@@ -100,6 +100,7 @@ This is meant to stop the common failure mode where good product language in the
 | Command | Stage | Purpose |
 |---------|-------|---------|
 | `/arpinine-harness:at-init` | Setup | Initialize the workflow, ADR structure, and rules directory, and optionally scaffold a new project archetype |
+| `/arpinine-harness:at-discover` | Discover | Refine a raw idea into a spec-ready brief through a one-question-at-a-time product-owner conversation |
 | `/arpinine-harness:at-new` | Define | Create a specification from a feature request |
 | `/arpinine-harness:at-bootstrap-from-code` | Define | Assess an existing repo and seed governed artifacts from implementation evidence |
 | `/arpinine-harness:at-review` | Refine | Tighten clarity, scope, and measurability |
@@ -112,6 +113,17 @@ This is meant to stop the common failure mode where good product language in the
 | `/arpinine-harness:at-retro` | Learn | Extract lessons as compounding rules |
 | `/arpinine-harness:at-status` | Govern | Project-wide governance overview and onboarding brief |
 | `/arpinine-harness:at-ask` | Any stage | Ask a focused question to a named specialist agent with spec and plan as context |
+
+## Pre-Spec Discovery
+
+Use `/arpinine-harness:at-discover` when the user has an idea but not yet a specification-quality request.
+
+- routes the conversation through `product-owner`
+- asks exactly one question at a time
+- keeps the conversation product-facing instead of implementation-led
+- stops once the idea is sufficiently bounded and measurable
+- waits for explicit user confirmation to move forward
+- then hands off to `/arpinine-harness:at-new` with a spec-ready brief
 
 ## Multi-Team Note
 
@@ -200,6 +212,9 @@ The agents don't own anything on this list. Your team does.
 ```text
 .specify/
   specification-provider.json
+  discovery/
+    <slug>/
+      discovery.md
   specs/
     001-<slug>/
       spec.md
@@ -232,6 +247,8 @@ The agents don't own anything on this list. Your team does.
 ```
 
 Each ADR links to its governing spec via `governs:` and to a concrete decision or drift key via `covers:`.
+
+Discovery artifacts preserve pre-spec idea refinement, one-question-at-a-time Q&A history, the latest spec-ready brief, and promotion state before `spec.md` exists.
 
 Observation artifacts let you compare documented harness strategy against actual tool use, documented permission model against actual approval events, and documented memory model against actual state behavior.
 

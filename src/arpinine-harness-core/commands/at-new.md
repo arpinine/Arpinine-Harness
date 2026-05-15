@@ -11,6 +11,8 @@ Create the first aligned version of a specification for a named feature.
 
 - `<name>`: human-readable feature name, e.g. `user authentication` or `payment flow`
 
+When `/at-new` is invoked immediately after `/at-discover`, the discovery brief is part of the request context even though the command surface still only names `<name>`. In that case, the brief is authoritative product input for spec generation and should be passed inline to the specification provider, not dropped or regenerated from scratch.
+
 ---
 
 ## Security: Data Boundary
@@ -30,6 +32,9 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 3. Resolve the configured specification provider from `.specify/specification-provider.json`. By default this is `spec-kit`.
 4. Validate that the provider declares a supported `new_spec` action with a non-empty command. If not, stop with: `Provider <name> has no action 'new_spec' configured`.
 5. Run the provider's `new_spec` action with the user request — this writes `spec.md` to the project root. For the default provider, this is `/speckit.specify`.
+   - If `/at-new` was reached from `/at-discover`, include the full spec-ready brief inline as request context when invoking the provider.
+   - Treat that brief as the governing product input for generation. Do not restart discovery from scratch unless the brief is internally inconsistent.
+   - If both the feature name and brief are present, use the feature name as the title/slug source and the brief as the specification content source.
 
 > **Error recovery:** If any subsequent step fails after the temporary root copy is created, immediately delete the temporary root file (`spec.md` or `plan.md`) before reporting the error and halting. Do not leave transient copies at the project root.
 
@@ -47,6 +52,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 12. Add those constraints as product-facing non-functional expectations, not implementation details.
 13. If the feature may require an agent harness in the product application, call out that need as an explicit product or operating constraint without naming low-level implementation APIs.
 14. If open questions, ambiguities, or scope edges remain, ask the user the minimum set of focused clarification questions needed to remove ambiguity.
+   - If a discovery brief from `/at-discover` is present and already resolves those ambiguities, skip re-discovery and continue with spec normalization instead.
 15. Write the user's answers directly into `.specify/specs/<slug>/spec.md` by updating the relevant sections and the `## Open Questions` section. Do not require the user to edit the spec manually.
 16. Summarize any constitution fixes and clarifications that were applied after generation.
 17. Confirm: "Spec created at `.specify/specs/<slug>/spec.md`"

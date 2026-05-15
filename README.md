@@ -51,6 +51,93 @@ If you want to use Arpinine Harness rather than just read its files, start here:
 
 That guide covers the day-to-day operating model for anyone using Arpinine Harness with an AI coding assistant.
 
+## Getting Started By Situation
+
+Arpinine Harness works best as a workflow, not as a bag of unrelated commands.
+
+If you're new, do not start by memorizing every command. Start by identifying your situation:
+
+- you have only a rough idea
+- you know what you want to build, but nothing is structured yet
+- you already have a product or codebase and want to bring it under governance
+- you already have specs or plans and want to improve execution quality
+
+### Choose Your Path
+
+| Your Situation | Start With | Goal |
+| --- | --- | --- |
+| I have only an idea | `/arpinine-harness:at-discover` | turn a vague idea into a spec-ready brief |
+| I know what I want to build | `/arpinine-harness:at-new` | create the first governed `spec.md` |
+| I already have a codebase | `/arpinine-harness:at-bootstrap-from-code` | generate initial governed artifacts from implementation evidence |
+| I already have a spec but it is weak | `/arpinine-harness:at-review` | improve clarity, scope, and measurability |
+| I already have an approved spec | `/arpinine-harness:at-plan` | generate execution plan and tasks |
+
+### Recommended Methodology
+
+#### For A New Product
+
+1. Run `/arpinine-harness:at-init`.
+2. If the product idea is still vague, run `/arpinine-harness:at-discover`.
+3. When discovery reaches `spec-ready-awaiting-confirmation`, explicitly move to specification.
+4. Let `/arpinine-harness:at-new` create the first governed `spec.md`.
+5. Tighten the spec with `/arpinine-harness:at-review` if needed.
+6. Create the engineering plan with `/arpinine-harness:at-plan`.
+7. Capture consequential decisions with `/arpinine-harness:at-adr`.
+8. If the feature uses AI, agents, or LLMs, define evaluation with `/arpinine-harness:at-eval`.
+9. Implement with `/arpinine-harness:at-implement`.
+10. Use `/arpinine-harness:at-audit` when reality diverges from intent.
+11. Use `/arpinine-harness:at-retro` to turn lessons into lasting rules.
+
+#### For An Existing Product You Want To Structure
+
+1. Run `/arpinine-harness:at-init`.
+2. Run `/arpinine-harness:at-bootstrap-from-code`.
+3. Review the generated `spec.md`, `plan.md`, and related artifacts.
+4. Tighten product intent with `/arpinine-harness:at-review`.
+5. Re-run `/arpinine-harness:at-plan` if the plan needs to be regenerated from the improved spec.
+6. Continue with normal governed execution: ADRs, evals, implementation, audit, and retro.
+
+### Minimal First Session Examples
+
+#### Example A: I Want To Build Something New
+
+```bash
+/arpinine-harness:at-init
+/arpinine-harness:at-discover "I want to build a product that helps remote teams run better retrospectives"
+# answer the one-question-at-a-time discovery prompts
+# then say: move to specification
+/arpinine-harness:at-review .specify/specs/<slug>/spec.md
+/arpinine-harness:at-plan .specify/specs/<slug>/
+```
+
+#### Example B: I Already Have A Codebase
+
+```bash
+/arpinine-harness:at-init
+/arpinine-harness:at-bootstrap-from-code .
+/arpinine-harness:at-review .specify/specs/<slug>/spec.md
+/arpinine-harness:at-plan .specify/specs/<slug>/
+```
+
+### Command Roles
+
+- `/arpinine-harness:at-discover` turns vague ideas into a spec-ready brief.
+- `/arpinine-harness:at-new` creates the first governed `spec.md`.
+- `/arpinine-harness:at-review` improves an existing spec before execution.
+- `/arpinine-harness:at-plan` turns product intent into engineering work.
+- `/arpinine-harness:at-bootstrap-from-code` reverse-engineers governance from an existing product.
+- `/arpinine-harness:at-implement` executes under the plan with test-first and security discipline.
+- `/arpinine-harness:at-audit` checks drift between intent, code, and evidence.
+
+### Common Mistakes
+
+- Do not start with `/arpinine-harness:at-plan` before the spec is clear.
+- Do not use `/arpinine-harness:at-new` for vague ideas; use `/arpinine-harness:at-discover` first.
+- Do not use `/arpinine-harness:at-bootstrap-from-code` for greenfield work.
+- Do not treat the commands as isolated utilities; they are stages in one governed workflow.
+
+If you're unsure where to begin: run `/arpinine-harness:at-init`, then choose between `/arpinine-harness:at-discover`, `/arpinine-harness:at-new`, or `/arpinine-harness:at-bootstrap-from-code` depending on whether you have an idea, a request, or existing code.
+
 ## Agent Team
 
 | Capability | Role |
@@ -188,6 +275,7 @@ The agents don't own anything on this list. Your team does. The agents help you 
 | Command | Stage | Purpose |
 |---------|-------|---------|
 | `/arpinine-harness:at-init` | Setup | Initialize the shared workflow and ADR structure, and optionally scaffold a new project from an archetype |
+| `/arpinine-harness:at-discover` | Discover | Refine a raw idea into a spec-ready brief through a one-question-at-a-time product-owner conversation, then promote it to specification on explicit confirmation |
 | `/arpinine-harness:at-new` | Define | Create a new specification from a product request |
 | `/arpinine-harness:at-bootstrap-from-code` | Define | Assess an existing codebase and seed the first governed spec, plan, eval, and ADR artifacts |
 | `/arpinine-harness:at-review` | Refine | Improve clarity, measurability, and alignment before execution |
@@ -201,6 +289,45 @@ The agents don't own anything on this list. Your team does. The agents help you 
 | `/arpinine-harness:at-status` | Govern | Project-wide governance overview and onboarding brief |
 | `/arpinine-harness:at-ask` | Any stage | Ask a focused question to a named specialist agent with spec and plan as context |
 
+## Discovery Before Specification
+
+`/arpinine-harness:at-discover` exists for the gap before `spec.md`.
+
+Use it when the user has a raw idea, not yet a specification-quality request. Instead of generating `spec.md` immediately, the plugin routes the conversation through `product-owner`, asks exactly one question at a time, and keeps going until the idea is concrete enough to promote into `/arpinine-harness:at-new`.
+
+Why this exists:
+
+- early ideas are usually missing user, problem, scope, constraints, or measurable success
+- generating `spec.md` too early produces weak acceptance criteria and scope drift later
+- one-question-at-a-time discovery keeps the conversation focused and makes the handoff into specification explicit
+- the discovery state is persisted under `.specify/discovery/`, so the workflow can resume after an interrupted session
+
+How it works:
+
+1. `/arpinine-harness:at-discover "<idea>"` starts a pre-spec discovery conversation.
+2. `product-owner` asks one focused question at a time, based on the biggest remaining ambiguity.
+3. After every question-and-answer exchange, the plugin updates `.specify/discovery/<slug>/discovery.md`.
+4. If the session is interrupted, the next `/arpinine-harness:at-discover` can offer one or more resumable sessions from that directory.
+5. When the idea is sufficiently clear, the workflow returns `STATUS: spec-ready-awaiting-confirmation` and a spec-ready brief.
+6. The plugin does not create `spec.md` yet.
+7. When the user explicitly says something like `move to specification`, the workflow promotes the brief into `/arpinine-harness:at-new`.
+8. `/arpinine-harness:at-new` then creates `.specify/specs/<slug>/spec.md` from that refined brief, and the discovery artifact is renamed to the final spec slug when available.
+
+Responsibilities:
+
+- `at-discover`: refine raw ideas, surface ambiguity, bound scope, and produce a spec-ready brief
+- `at-discover`: write and resume `.specify/discovery/<slug>/discovery.md` after every turn
+- `product-owner`: lead discovery, protect product intent, and decide when the idea is ready to promote
+- user/team: answer the discovery questions and explicitly approve the move into specification
+- `at-new`: generate the first governed `spec.md` from the refined brief
+
+Goals:
+
+- avoid writing specs from half-formed ideas
+- keep discovery product-facing instead of implementation-led
+- make the transition from brainstorming to governed specification explicit
+- improve the quality of scope, acceptance criteria, and downstream planning
+
 ## Example Flow
 
 ```bash
@@ -213,7 +340,14 @@ The agents don't own anything on this list. Your team does. The agents help you 
 # Or bootstrap a governed slice from an existing codebase
 /arpinine-harness:at-bootstrap-from-code .
 
-# Define product intent
+# Refine a raw idea before generating the spec
+/arpinine-harness:at-discover "User login with email and password"
+
+# After the plugin reaches spec-ready-awaiting-confirmation
+# explicitly promote the idea into specification
+"move to specification"
+
+# Define product intent from the refined brief
 /arpinine-harness:at-new "User login with email and password"
 
 # Refine before engineering starts

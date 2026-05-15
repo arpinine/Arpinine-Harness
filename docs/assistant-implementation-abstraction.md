@@ -25,6 +25,21 @@ Separate Arpinine Harness into:
 - validation entrypoints
 - any future assistant adapter files that cannot live in the shared core
 
+## Feature Addition Strategy
+
+Every new feature should follow the same pattern:
+
+1. Define the workflow once in `src/arpinine-harness-core/`
+2. Keep agent behavior and command semantics assistant-agnostic
+3. Add only the minimum implementation overlay each host needs to expose that shared workflow
+4. Do not fork workflow logic between Claude and Codex unless the host contract forces a real divergence
+
+Applied concretely:
+
+- Claude consumes shared `commands/` directly through the assembled plugin
+- Codex consumes the same shared `commands/` through thin skill wrappers under `src/implementations/codex/skills/`
+- both implementations ship the same underlying workflow after `make assemble`
+
 ## Source Vs Build Output
 
 Only `src/` is source-of-truth.

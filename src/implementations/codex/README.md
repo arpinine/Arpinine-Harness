@@ -21,6 +21,7 @@ Implemented now:
 - generated marketplace manifest at `dist/.agents/plugins/marketplace.json`
 - real marketplace registration via `codex plugin marketplace add ./dist`
 - first Codex skills that wrap the shared Arpinine Harness workflows:
+  - `at-discover`
   - `at-bootstrap-from-code`
   - `at-adr`
   - `at-audit`
@@ -81,6 +82,7 @@ Codex is expected to participate in the same multi-team operating model as Claud
 5. Implement the smallest supported Codex feature set first.
    Initial target:
    - `/arpinine-harness:at-init`
+   - `/arpinine-harness:at-discover`
    - `/arpinine-harness:at-new`
    - `/arpinine-harness:at-review`
    - `/arpinine-harness:at-plan`
