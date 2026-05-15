@@ -37,7 +37,7 @@ Implemented now:
 
 Not implemented yet:
 - agent wrapper strategy for `product-owner`, `tech-architect`, `security-reviewer`, and `tdd-guide`
-- published plugin assets and richer install-surface metadata
+- richer install-surface metadata beyond the current marketplace registration flow
 
 Build packaging intentionally strips test directories from assembled plugin artifacts so host/plugin validation does not re-run the shared core test suite from `dist/plugins/`.
 
@@ -103,7 +103,6 @@ Codex is expected to participate in the same multi-team operating model as Claud
 2. `IMPLEMENTATION=codex` assembles successfully.
 3. Minimal command set works in Codex.
 4. Remaining commands and hooks are ported or explicitly marked unsupported.
-5. Docs and registration flow are complete.
 5. Docs and registration flow are complete.
 
 ## Key Decisions

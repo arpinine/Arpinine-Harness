@@ -314,45 +314,6 @@ The agents don't own anything on this list. Your team does. The agents help you 
 | `/arpinine-harness:at-status` | Govern | Project-wide governance overview and onboarding brief |
 | `/arpinine-harness:at-ask` | Any stage | Ask a focused question to a named specialist agent with spec and plan as context |
 
-## Discovery Before Specification
-
-`/arpinine-harness:at-discover` exists for the gap before `spec.md`.
-
-Use it when the user has a raw idea, not yet a specification-quality request. Instead of generating `spec.md` immediately, the plugin routes the conversation through `product-owner`, asks exactly one question at a time, and keeps going until the idea is concrete enough to promote into `/arpinine-harness:at-new`.
-
-Why this exists:
-
-- early ideas are usually missing user, problem, scope, constraints, or measurable success
-- generating `spec.md` too early produces weak acceptance criteria and scope drift later
-- one-question-at-a-time discovery keeps the conversation focused and makes the handoff into specification explicit
-- the discovery state is persisted under `.specify/discovery/`, so the workflow can resume after an interrupted session
-
-How it works:
-
-1. `/arpinine-harness:at-discover "<idea>"` starts a pre-spec discovery conversation.
-2. `product-owner` asks one focused question at a time, based on the biggest remaining ambiguity.
-3. After every question-and-answer exchange, the plugin updates `.specify/discovery/<slug>/discovery.md`.
-4. If the session is interrupted, the next `/arpinine-harness:at-discover` can offer one or more resumable sessions from that directory.
-5. When the idea is sufficiently clear, the workflow returns `STATUS: spec-ready-awaiting-confirmation` and a spec-ready brief.
-6. The plugin does not create `spec.md` yet.
-7. When the user explicitly says something like `move to specification`, the workflow promotes the brief into `/arpinine-harness:at-new`.
-8. `/arpinine-harness:at-new` then creates `.specify/specs/<slug>/spec.md` from that refined brief, and the discovery artifact is renamed to the final spec slug when available.
-
-Responsibilities:
-
-- `at-discover`: refine raw ideas, surface ambiguity, bound scope, and produce a spec-ready brief
-- `at-discover`: write and resume `.specify/discovery/<slug>/discovery.md` after every turn
-- `product-owner`: lead discovery, protect product intent, and decide when the idea is ready to promote
-- user/team: answer the discovery questions and explicitly approve the move into specification
-- `at-new`: generate the first governed `spec.md` from the refined brief
-
-Goals:
-
-- avoid writing specs from half-formed ideas
-- keep discovery product-facing instead of implementation-led
-- make the transition from brainstorming to governed specification explicit
-- improve the quality of scope, acceptance criteria, and downstream planning
-
 ## Example Flow
 
 ```bash
@@ -507,7 +468,7 @@ src/
   arpinine-harness-core/      # commands, agents, hooks, scripts, skills, templates
   implementations/
     claude/              # working Claude implementation
-    codex/               # Codex plugin implementation in progress
+    codex/               # Codex plugin implementation
 tools/
   style/                 # canonical cross-team style standards by language
 ```
