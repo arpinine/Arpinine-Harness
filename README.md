@@ -585,63 +585,83 @@ When an archetype is selected during `at-init`, Arpinine Harness also:
 
 ## Plugin Install
 
-### Claude
+### Claude — First Install
 
-Use the Claude-native install flow.
-
-Then install Arpinine Harness from this repo:
+Assemble, register the local marketplace, and install:
 
 ```bash
 make validate-structure IMPLEMENTATION=claude
+make install IMPLEMENTATION=claude
+```
+
+`make install` runs `make register` (which assembles and adds `./dist` as the local marketplace) then calls `claude plugin install arpinine-harness@arpinine-harness-local`.
+
+If `make install` fails due to a stale marketplace registration, run the steps manually:
+
+```bash
 make assemble IMPLEMENTATION=claude
 claude plugin marketplace add ./dist
 claude plugin install arpinine-harness@arpinine-harness-local
 ```
 
-`make assemble` generates both the assembled plugin at `dist/plugins/arpinine-harness-claude/` and the Claude marketplace manifest at `dist/.claude-plugin/marketplace.json`, so the registration target is now `./dist`, not the repo root.
-
-Verify the install:
+Verify:
 
 ```bash
 claude plugin list
 ```
 
-Expected result:
+Expected:
 
 ```text
 arpinine-harness@arpinine-harness-local
 Status: ✔ enabled
 ```
 
-If you prefer the convenience target, `make install IMPLEMENTATION=claude` is still supported, but the explicit sequence above is the most reliable way to recover from stale local marketplace registrations.
+### Claude — Update
 
-### Codex
+Uninstall the current version, then reinstall from the new build:
 
-Use the Codex marketplace registration flow:
+```bash
+make uninstall IMPLEMENTATION=claude
+make install IMPLEMENTATION=claude
+```
+
+`make uninstall` removes the plugin and the local marketplace entry. `make install` rebuilds, re-registers, and reinstalls. Restart Claude Code after the install completes.
+
+### Codex — First Install
+
+Assemble and register the local marketplace:
 
 ```bash
 make validate-structure IMPLEMENTATION=codex
 make register IMPLEMENTATION=codex
 ```
 
-This generates the Codex marketplace manifest at `dist/.agents/plugins/marketplace.json` and registers `./dist` as the local marketplace root.
+`make register` assembles the plugin, writes the Codex marketplace manifest at `dist/.agents/plugins/marketplace.json`, and calls `codex plugin marketplace add ./dist`. If your Codex client requires a separate confirmation step, enable `arpinine-harness` from the marketplace UI.
 
-If you need the explicit Codex CLI command for your local client version, use:
+### Codex — Update
 
-```bash
-codex plugin marketplace add ./dist
-```
-
-After registration, enable `arpinine-harness` from the Codex marketplace UI if your client requires a separate confirmation step.
-
-Cross-implementation registration:
+Re-run register — it rebuilds the bundle and refreshes the marketplace manifest in place:
 
 ```bash
-make register IMPLEMENTATION=claude
 make register IMPLEMENTATION=codex
 ```
 
-Session-only load without installing (dev/testing):
+Restart Codex after the command completes so the updated plugin is loaded.
+
+### Both Implementations
+
+Install or update both in one sequence:
+
+```bash
+make uninstall IMPLEMENTATION=claude
+make install IMPLEMENTATION=claude
+make register IMPLEMENTATION=codex
+```
+
+### Session-Only Load (Dev / Testing)
+
+Load the plugin for a single Claude session without touching the marketplace or installed plugins:
 
 ```bash
 make assemble IMPLEMENTATION=claude
