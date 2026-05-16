@@ -156,6 +156,78 @@ class TaskCoordinationTests(unittest.TestCase):
         allowed = self.run_script(HOOK, env=env, input_text=payload)
         self.assertEqual(allowed.returncode, 0, allowed.stdout + allowed.stderr)
 
+    def test_completed_task_preserves_claimer_history(self) -> None:
+        self.write_plan(["- [ ] TASK-001: Shared work"])
+
+        claim = self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "codex", "--instance-id", "codex-1")
+        self.assertEqual(claim.returncode, 0, claim.stdout + claim.stderr)
+
+        release = self.run_script(
+            RELEASE,
+            "--slug",
+            "001-demo",
+            "--task-id",
+            "TASK-001",
+            "--team-id",
+            "codex",
+            "--instance-id",
+            "codex-1",
+            "--state",
+            "completed",
+        )
+        self.assertEqual(release.returncode, 0, release.stdout + release.stderr)
+
+        registry = self.repo / ".specify" / "coordination" / "001-demo.json"
+        payload = json.loads(registry.read_text(encoding="utf-8"))
+        record = payload["tasks"]["TASK-001"]
+        self.assertEqual(record["state"], "completed")
+        self.assertEqual(record["team_id"], "codex")
+        self.assertEqual(record["instance_id"], "codex-1")
+        self.assertEqual(record["claimed_by"], "codex:codex-1")
+        self.assertEqual(record["completed_by"], "codex:codex-1")
+        self.assertIsNotNone(record["claimed_at"])
+        self.assertIsNotNone(record["completed_at"])
+        self.assertIsNone(record["lease_until"])
+
+    def test_plan_sync_does_not_clear_completed_claim_metadata(self) -> None:
+        self.write_plan(["- [ ] TASK-001: Shared work"])
+
+        claim = self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "codex", "--instance-id", "codex-1")
+        self.assertEqual(claim.returncode, 0, claim.stdout + claim.stderr)
+
+        release = self.run_script(
+            RELEASE,
+            "--slug",
+            "001-demo",
+            "--task-id",
+            "TASK-001",
+            "--team-id",
+            "codex",
+            "--instance-id",
+            "codex-1",
+            "--state",
+            "completed",
+        )
+        self.assertEqual(release.returncode, 0, release.stdout + release.stderr)
+
+        self.write_plan(["- [x] TASK-001: Shared work"])
+
+        blocked = self.run_script(
+            HOOK,
+            env={"ARPININE_HARNESS_TEAM_ID": "claude", "ARPININE_HARNESS_INSTANCE_ID": "claude-1"},
+            input_text=json.dumps({"tool_input": {"file_path": "src/demo.py"}}),
+        )
+        self.assertEqual(blocked.returncode, 1, blocked.stdout + blocked.stderr)
+
+        registry = self.repo / ".specify" / "coordination" / "001-demo.json"
+        payload = json.loads(registry.read_text(encoding="utf-8"))
+        record = payload["tasks"]["TASK-001"]
+        self.assertEqual(record["state"], "completed")
+        self.assertEqual(record["team_id"], "codex")
+        self.assertEqual(record["instance_id"], "codex-1")
+        self.assertEqual(record["claimed_by"], "codex:codex-1")
+        self.assertEqual(record["completed_by"], "codex:codex-1")
+
 
 if __name__ == "__main__":
     unittest.main()

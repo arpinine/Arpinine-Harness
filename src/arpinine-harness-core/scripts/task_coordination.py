@@ -142,11 +142,14 @@ def sync_registry_with_plan(registry: dict, plan_tasks: list[dict]) -> None:
         if task["status"] == "full":
             record["state"] = "completed"
             record["lease_until"] = None
+        elif task["status"] == "none" and record.get("state") == "completed":
+            record["state"] = "available"
             record["team_id"] = None
             record["instance_id"] = None
             record["claimed_by"] = None
-        elif task["status"] == "none" and record.get("state") == "completed":
-            record["state"] = "available"
+            record["claimed_at"] = None
+            record["completed_by"] = None
+            record["completed_at"] = None
 
     for task_id in list(tasks):
         if task_id not in plan_ids:

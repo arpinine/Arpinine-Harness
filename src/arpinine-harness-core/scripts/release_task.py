@@ -12,11 +12,13 @@ import pathlib
 from task_coordination import (
     claimer_id,
     find_project_root,
+    isoformat,
     locked_registry,
     parse_plan_tasks,
     plan_path,
     resolve_runtime_identity,
     sync_registry_with_plan,
+    utc_now,
 )
 
 
@@ -50,6 +52,7 @@ def main() -> int:
         return 1
 
     expected_claimer = claimer_id(team_id, instance_id)
+    now = utc_now()
 
     with locked_registry(repo, args.slug) as (_, registry):
         sync_registry_with_plan(registry, plan_tasks)
@@ -67,9 +70,20 @@ def main() -> int:
             return 2
 
         record["state"] = args.state
-        record["team_id"] = None if args.state == "available" else team_id
-        record["instance_id"] = None if args.state == "available" else instance_id
-        record["claimed_by"] = None
+        if args.state == "available":
+            record["team_id"] = None
+            record["instance_id"] = None
+            record["claimed_by"] = None
+            record["claimed_at"] = None
+            record["completed_by"] = None
+            record["completed_at"] = None
+        else:
+            record["team_id"] = team_id
+            record["instance_id"] = instance_id
+            record["claimed_by"] = current_claimer or expected_claimer
+            record.setdefault("claimed_at", isoformat(now))
+            record["completed_by"] = current_claimer or expected_claimer
+            record["completed_at"] = isoformat(now)
         record["lease_until"] = None
         print(
             json.dumps(
