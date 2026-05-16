@@ -6,5 +6,6 @@
     "name": "Arpinine"
   },
   "license": "MIT",
-  "keywords": ["speckit", "adr", "drift-detection", "spec-management", "evaluation", "agent-quality"]
+  "keywords": ["speckit", "adr", "drift-detection", "spec-management", "evaluation", "agent-quality"],
+  "skills": "./skills/"
 }
