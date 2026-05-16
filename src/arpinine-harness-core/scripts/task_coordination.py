@@ -132,16 +132,34 @@ def parse_plan_tasks(plan_file: pathlib.Path) -> list[dict]:
     return tasks
 
 
-def sync_registry_with_plan(registry: dict, plan_tasks: list[dict]) -> None:
+def sync_registry_with_plan(registry: dict, plan_tasks: list[dict]) -> list[dict]:
+    """Sync registry with plan state. Returns active claims evicted by plan changes."""
     plan_ids = {task["task_id"] for task in plan_tasks}
     tasks = registry.setdefault("tasks", {})
+    evicted: list[dict] = []
 
     for task in plan_tasks:
         record = tasks.setdefault(task["task_id"], {})
-        record["assigned_team"] = task["assigned_team"]
+        new_team = task["assigned_team"]
+
+        # Gap 2: team restriction tightened — revoke claims from ineligible team.
+        if new_team and is_live_lease(record) and record.get("team_id") != new_team:
+            record["state"] = "available"
+            record["team_id"] = None
+            record["instance_id"] = None
+            record["claimed_by"] = None
+            record["claimed_at"] = None
+            record["lease_until"] = None
+
+        record["assigned_team"] = new_team
+
         if task["status"] == "full":
             record["state"] = "completed"
             record["lease_until"] = None
+            # Gap 3: manual [x] without release_task — infer completed_by from active claimer.
+            if record.get("claimed_by") and not record.get("completed_by"):
+                record["completed_by"] = record["claimed_by"]
+                record["completed_at"] = isoformat(utc_now())
         elif task["status"] == "none" and record.get("state") == "completed":
             record["state"] = "available"
             record["team_id"] = None
@@ -151,9 +169,15 @@ def sync_registry_with_plan(registry: dict, plan_tasks: list[dict]) -> None:
             record["completed_by"] = None
             record["completed_at"] = None
 
+    # Gap 1: capture active claims evicted by task removal before deleting records.
     for task_id in list(tasks):
         if task_id not in plan_ids:
+            record = tasks[task_id]
+            if is_live_lease(record):
+                evicted.append({"task_id": task_id, **record})
             del tasks[task_id]
+
+    return evicted
 
 
 def claimer_id(team_id: str, instance_id: str | None) -> str:

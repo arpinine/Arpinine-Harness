@@ -21,9 +21,8 @@ from datetime import datetime
 from task_coordination import (
     find_project_root,
     is_live_lease,
-    load_registry,
+    locked_registry,
     parse_plan_tasks,
-    registry_path,
     sync_registry_with_plan,
 )
 
@@ -60,20 +59,20 @@ def main() -> int:
         except OSError:
             continue
 
-        registry = load_registry(registry_path(repo, slug), slug)
-        sync_registry_with_plan(registry, tasks)
+        with locked_registry(repo, slug) as (_, registry):
+            sync_registry_with_plan(registry, tasks)
 
-        for task in tasks:
-            status = task["status"]
-            total += 1
-            if status == "full":
-                count_full += 1
-            elif status == "partial":
-                count_partial += 1
+            for task in tasks:
+                status = task["status"]
+                total += 1
+                if status == "full":
+                    count_full += 1
+                elif status == "partial":
+                    count_partial += 1
 
-            record = registry.get("tasks", {}).get(task["task_id"], {})
-            task["claimed_by"] = record.get("claimed_by") if is_live_lease(record) else None
-            task["lease_until"] = record.get("lease_until") if is_live_lease(record) else None
+                record = registry.get("tasks", {}).get(task["task_id"], {})
+                task["claimed_by"] = record.get("claimed_by") if is_live_lease(record) else None
+                task["lease_until"] = record.get("lease_until") if is_live_lease(record) else None
 
         sections.append((slug, tasks))
 

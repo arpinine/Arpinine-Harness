@@ -14,9 +14,8 @@ from task_coordination import (
     claimer_id,
     find_project_root,
     is_live_lease,
-    load_registry,
+    locked_registry,
     parse_plan_tasks,
-    registry_path,
     resolve_runtime_identity,
     sync_registry_with_plan,
 )
@@ -52,26 +51,34 @@ def candidate_specs(spec_root: pathlib.Path, file_path: str) -> list[pathlib.Pat
     return []
 
 
-def active_claims_for_team(repo: pathlib.Path, slug: str, team_id: str, instance_id: str | None) -> list[str]:
+def active_claims_for_team(
+    repo: pathlib.Path, slug: str, team_id: str, instance_id: str | None
+) -> tuple[list[str], list[dict]]:
+    """Returns (active_task_ids, evicted_claim_records) for the given team/instance."""
     plan_file = repo / ".specify" / "specs" / slug / "plan.md"
     if not plan_file.exists():
-        return []
+        return [], []
 
     plan_tasks = parse_plan_tasks(plan_file)
-    registry = load_registry(registry_path(repo, slug), slug)
-    sync_registry_with_plan(registry, plan_tasks)
-
-    active: list[str] = []
     expected = claimer_id(team_id, instance_id) if instance_id else None
-    for task_id, record in registry.get("tasks", {}).items():
-        if not is_live_lease(record):
-            continue
-        if record.get("team_id") != team_id:
-            continue
-        if expected and record.get("claimed_by") != expected:
-            continue
-        active.append(task_id)
-    return sorted(active)
+    with locked_registry(repo, slug) as (_, registry):
+        evicted = sync_registry_with_plan(registry, plan_tasks)
+
+        active: list[str] = []
+        for task_id, record in registry.get("tasks", {}).items():
+            if not is_live_lease(record):
+                continue
+            if record.get("team_id") != team_id:
+                continue
+            if expected and record.get("claimed_by") != expected:
+                continue
+            active.append(task_id)
+
+        my_evicted = [
+            e for e in evicted
+            if e.get("team_id") == team_id and (not expected or e.get("claimed_by") == expected)
+        ]
+    return sorted(active), my_evicted
 
 
 def main() -> int:
@@ -99,14 +106,17 @@ def main() -> int:
         return 1
 
     allowed_claims: list[tuple[str, list[str]]] = []
-    missing = []
+    missing: list[str] = []
+    evicted_by_slug: dict[str, list[dict]] = {}
     for spec in specs:
         slug = spec.parent.name
-        active = active_claims_for_team(repo, slug, team_id, instance_id)
+        active, evicted = active_claims_for_team(repo, slug, team_id, instance_id)
         if active:
             allowed_claims.append((slug, active))
         else:
             missing.append(slug)
+            if evicted:
+                evicted_by_slug[slug] = evicted
 
     if allowed_claims:
         return 0
@@ -116,12 +126,20 @@ def main() -> int:
         print(f"Resolved identity: {team_id}:{instance_id}")
     else:
         print(f"Resolved identity: {team_id}")
-    print(f"Governing specs without active claims: {', '.join(missing)}")
-    print(
-        "Claim a task first with "
-        "`scripts/claim_task.py --slug <slug>` "
-        "and only then change implementation files."
-    )
+    if evicted_by_slug:
+        for slug, records in evicted_by_slug.items():
+            for r in records:
+                print(
+                    f"  Task {r['task_id']} in {slug} was removed from plan.md while your claim was active."
+                    " The task no longer exists — claim a current task from the updated plan."
+                )
+    else:
+        print(f"Governing specs without active claims: {', '.join(missing)}")
+        print(
+            "Claim a task first with "
+            "`scripts/claim_task.py --slug <slug>` "
+            "and only then change implementation files."
+        )
     return 1
 
 

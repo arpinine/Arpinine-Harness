@@ -58,12 +58,33 @@ def main() -> int:
         sync_registry_with_plan(registry, plan_tasks)
         record = registry["tasks"].setdefault(args.task_id, {})
         current_claimer = record.get("claimed_by")
+        assigned_team = record.get("assigned_team")
         if current_claimer and current_claimer != expected_claimer:
             print(
                 json.dumps(
                     {
                         "ok": False,
                         "error": f"task is claimed by {current_claimer}",
+                    }
+                )
+            )
+            return 2
+        if assigned_team and assigned_team != team_id:
+            print(
+                json.dumps(
+                    {
+                        "ok": False,
+                        "error": f"task is now assigned to {assigned_team}",
+                    }
+                )
+            )
+            return 2
+        if args.state == "completed" and current_claimer != expected_claimer:
+            print(
+                json.dumps(
+                    {
+                        "ok": False,
+                        "error": "task is no longer actively claimed by you",
                     }
                 )
             )

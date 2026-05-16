@@ -229,5 +229,110 @@ class TaskCoordinationTests(unittest.TestCase):
         self.assertEqual(record["completed_by"], "codex:codex-1")
 
 
+    def test_task_removed_from_plan_while_claimed_reports_task_name(self) -> None:
+        self.write_plan(["- [ ] TASK-001: Shared work"])
+
+        claim = self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "codex", "--instance-id", "codex-1")
+        self.assertEqual(claim.returncode, 0, claim.stdout + claim.stderr)
+
+        # Remove the task from the plan entirely.
+        self.write_plan([])
+
+        env = {"ARPININE_HARNESS_TEAM_ID": "codex", "ARPININE_HARNESS_INSTANCE_ID": "codex-1"}
+        blocked = self.run_script(HOOK, env=env, input_text=json.dumps({"tool_input": {"file_path": "src/demo.py"}}))
+
+        self.assertEqual(blocked.returncode, 1, blocked.stdout + blocked.stderr)
+        self.assertIn("TASK-001", blocked.stdout)
+        self.assertIn("removed from plan.md", blocked.stdout)
+
+    def test_team_tag_change_revokes_ineligible_claim(self) -> None:
+        # Claim with no team restriction.
+        self.write_plan(["- [ ] TASK-001: Shared work"])
+
+        claim = self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "codex", "--instance-id", "codex-1")
+        self.assertEqual(claim.returncode, 0, claim.stdout + claim.stderr)
+
+        # Restrict task to claude — codex claim should be revoked on next sync.
+        self.write_plan(["- [ ] TASK-001: Shared work [team: claude]"])
+
+        env = {"ARPININE_HARNESS_TEAM_ID": "codex", "ARPININE_HARNESS_INSTANCE_ID": "codex-1"}
+        blocked = self.run_script(HOOK, env=env, input_text=json.dumps({"tool_input": {"file_path": "src/demo.py"}}))
+
+        self.assertEqual(blocked.returncode, 1, blocked.stdout + blocked.stderr)
+        self.assertIn("without an active task claim", blocked.stdout)
+
+        # claude can now claim it.
+        new_claim = self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "claude", "--instance-id", "claude-1")
+        self.assertEqual(new_claim.returncode, 0, new_claim.stdout + new_claim.stderr)
+
+        registry = self.repo / ".specify" / "coordination" / "001-demo.json"
+        payload = json.loads(registry.read_text(encoding="utf-8"))
+        record = payload["tasks"]["TASK-001"]
+        self.assertEqual(record["team_id"], "claude")
+        self.assertEqual(record["claimed_by"], "claude:claude-1")
+
+    def test_reassigned_task_cannot_be_completed_by_revoked_claimer(self) -> None:
+        self.write_plan(["- [ ] TASK-001: Shared work"])
+
+        claim = self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "codex", "--instance-id", "codex-1")
+        self.assertEqual(claim.returncode, 0, claim.stdout + claim.stderr)
+
+        self.write_plan(["- [ ] TASK-001: Shared work [team: claude]"])
+
+        release = self.run_script(
+            RELEASE,
+            "--slug",
+            "001-demo",
+            "--task-id",
+            "TASK-001",
+            "--team-id",
+            "codex",
+            "--instance-id",
+            "codex-1",
+            "--state",
+            "completed",
+        )
+        self.assertEqual(release.returncode, 2, release.stdout + release.stderr)
+        self.assertIn("assigned to claude", release.stdout)
+
+    def test_manual_checkbox_completion_infers_completed_by(self) -> None:
+        self.write_plan(["- [ ] TASK-001: Shared work"])
+
+        claim = self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "codex", "--instance-id", "codex-1")
+        self.assertEqual(claim.returncode, 0, claim.stdout + claim.stderr)
+
+        # Manually mark task complete in plan without using release_task.
+        self.write_plan(["- [x] TASK-001: Shared work"])
+
+        # Trigger sync via claim attempt on any other task (there is none, so it returns 2,
+        # but sync runs and persists the registry).
+        self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "codex", "--instance-id", "codex-1")
+
+        registry = self.repo / ".specify" / "coordination" / "001-demo.json"
+        payload = json.loads(registry.read_text(encoding="utf-8"))
+        record = payload["tasks"]["TASK-001"]
+        self.assertEqual(record["state"], "completed")
+        self.assertEqual(record["completed_by"], "codex:codex-1")
+        self.assertIsNotNone(record["completed_at"])
+
+    def test_hook_persists_manual_completion_metadata(self) -> None:
+        self.write_plan(["- [ ] TASK-001: Shared work"])
+
+        claim = self.run_script(CLAIM, "--slug", "001-demo", "--team-id", "codex", "--instance-id", "codex-1")
+        self.assertEqual(claim.returncode, 0, claim.stdout + claim.stderr)
+
+        self.write_plan(["- [x] TASK-001: Shared work"])
+        env = {"ARPININE_HARNESS_TEAM_ID": "claude", "ARPININE_HARNESS_INSTANCE_ID": "claude-1"}
+        blocked = self.run_script(HOOK, env=env, input_text=json.dumps({"tool_input": {"file_path": "src/demo.py"}}))
+        self.assertEqual(blocked.returncode, 1, blocked.stdout + blocked.stderr)
+
+        registry = self.repo / ".specify" / "coordination" / "001-demo.json"
+        payload = json.loads(registry.read_text(encoding="utf-8"))
+        record = payload["tasks"]["TASK-001"]
+        self.assertEqual(record["state"], "completed")
+        self.assertEqual(record["completed_by"], "codex:codex-1")
+        self.assertIsNotNone(record["completed_at"])
+
+
 if __name__ == "__main__":
     unittest.main()
