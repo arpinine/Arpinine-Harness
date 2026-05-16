@@ -9,6 +9,5 @@ When using this skill in Codex:
 - execute the same review workflow defined in `commands/at-review.md`
 - keep findings structured by severity
 - focus on business case, scope, measurability, and planning readiness
-- call out any shared-agent steps that still need a Codex-native wrapper
 
 If the shared command file and this wrapper ever disagree, follow `commands/at-review.md`.

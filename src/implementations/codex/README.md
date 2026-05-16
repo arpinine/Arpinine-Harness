@@ -34,9 +34,17 @@ Implemented now:
   - `at-retro`
   - `at-status`
   - `at-plan`
+- Codex-native specialist skill wrappers for shared agent roles:
+  - `product-owner`
+  - `tech-architect`
+  - `security-reviewer`
+  - `ai-engineer`
+  - `devops`
+  - `data-engineer`
+  - `tdd-guide`
+  - `domain-linguist`
 
 Not implemented yet:
-- agent wrapper strategy for `product-owner`, `tech-architect`, `security-reviewer`, and `tdd-guide`
 - richer install-surface metadata beyond the current marketplace registration flow
 
 Build packaging intentionally strips test directories from assembled plugin artifacts so host/plugin validation does not re-run the shared core test suite from `dist/plugins/`.

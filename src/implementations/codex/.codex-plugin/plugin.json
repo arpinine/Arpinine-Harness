@@ -1,6 +1,6 @@
 {
   "name": "arpinine-harness",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Governed product-engineering workflow for Codex using shared Arpinine Harness artifacts",
   "author": {
     "name": "Arpinine"

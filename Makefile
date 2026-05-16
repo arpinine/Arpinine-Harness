@@ -98,6 +98,9 @@ validate-structure: assemble
 		test -f $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Missing .codex-plugin/plugin.json" && exit 1); \
 		grep -q '"hooks"[[:space:]]*:[[:space:]]*"./hooks/hooks.json"' $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Codex plugin manifest must declare hooks at ./hooks/hooks.json" && exit 1); \
 		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json" && exit 1); \
+		for agent in product-owner tech-architect security-reviewer ai-engineer devops data-engineer tdd-guide domain-linguist; do \
+			test -f "$(BUILD_DIR)/skills/$$agent/SKILL.md" || (echo "Missing Codex specialist wrapper: $$agent" && exit 1); \
+		done; \
 		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
 		for skill in $$(ls $(CORE_DIR)/commands/ | sed 's/\.md$$//'); do \
 			test -f "$(BUILD_DIR)/skills/$$skill/SKILL.md" || (echo "Missing Codex workflow wrapper: $$skill" && exit 1); \
