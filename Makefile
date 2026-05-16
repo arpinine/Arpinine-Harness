@@ -11,8 +11,9 @@ ZIP_NAME     := $(BUILD_NAME).zip
 ZIP_PATH     := $(DIST_DIR)/$(ZIP_NAME)
 MARKETPLACE  := arpinine-harness-local
 CLAUDE_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/arpinine-harness-claude
-CODEX_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/arpinine-harness-codex
+CODEX_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)
 CLAUDE_MARKETPLACE_FILE := $(DIST_DIR)/.claude-plugin/marketplace.json
+CODEX_MARKETPLACE_TEMPLATE := $(IMPLEMENTATION_DIR)/marketplace.json
 CODEX_MARKETPLACE_FILE := $(DIST_DIR)/.agents/plugins/marketplace.json
 
 .DEFAULT_GOAL := build
@@ -43,10 +44,10 @@ assemble: clean
 		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
 		cat .claude-plugin/marketplace.json | sed 's#\./dist/plugins/#./plugins/#g' > $(CLAUDE_MARKETPLACE_FILE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		mkdir -p .agents/plugins $(PLUGIN_DIST_DIR) $(DIST_DIR)/.agents/plugins; \
+		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.agents/plugins; \
 		rm -rf $(CODEX_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(CODEX_PLUGIN_DIR); \
-		cat .agents/plugins/marketplace.json | sed 's#\./dist/plugins/#./plugins/#g' > $(CODEX_MARKETPLACE_FILE); \
+		cat $(CODEX_MARKETPLACE_TEMPLATE) | sed 's#\./dist/plugins/#./plugins/#g' > $(CODEX_MARKETPLACE_FILE); \
 	fi; \
 	trap - EXIT
 

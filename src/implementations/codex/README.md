@@ -15,7 +15,7 @@ Codex participates in that shared contract. Claude-specific native operations su
 
 Implemented now:
 - `.codex-plugin/plugin.json` manifest for Codex
-- source marketplace template at `.agents/plugins/marketplace.json`
+- source marketplace template at `src/implementations/codex/marketplace.json`
 - shared hook wiring through `hooks/hooks.json`, including automatic delivery-matrix refresh on `plan.md` writes
 - shared multi-team coordination inherited from the core, including task-claim enforcement and style-governance checks
 - generated marketplace manifest at `dist/.agents/plugins/marketplace.json`

@@ -46,7 +46,8 @@ Only `src/` is source-of-truth.
 
 - `src/arpinine-harness-core/` is the shared workflow source
 - `src/implementations/claude/` and `src/implementations/codex/` are thin assistant-specific overlays
-- `dist/plugins/arpinine-harness-claude/` and `dist/plugins/arpinine-harness-codex/` are assembled build outputs created by `make assemble`
+- Codex marketplace source metadata lives in `src/implementations/codex/marketplace.json`
+- `dist/plugins/arpinine-harness-claude/` and `dist/plugins/arpinine-harness/` are assembled build outputs created by `make assemble`
 - `dist/.claude-plugin/marketplace.json` and `dist/.agents/plugins/marketplace.json` are generated marketplace manifests used for local registration
 - `dist/` contains all generated build and release artifacts
 
