@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+## [1.4.5] - 2026-05-17
+
+### Added
+- `domain-linguist` added to `/at-ask` routing so it can be queried directly during active development alongside all other specialist agents
+- `CODEX_PLUGIN_HOME` configurable Makefile variable (default `~/.agents`) controls where the Codex plugin is installed
+- `make install IMPLEMENTATION=codex` and `make uninstall IMPLEMENTATION=codex` targets; Codex deployment is now a first-class operation alongside Claude
+
+### Changed
+- Codex plugin now installs to `$(CODEX_PLUGIN_HOME)/plugins/arpinine-harness` (system directory) instead of `dist/`; `make clean` no longer breaks a live Codex installation
+- Codex marketplace manifest now references the installed system path as an absolute path instead of a relative `dist/` path
+- `validate-structure IMPLEMENTATION=codex` now also verifies the system plugin directory and its hooks file
+- README Codex install and update instructions updated to use `make install` / `make uninstall` + `make install`; order of Claude and Codex installs is no longer load-bearing
+- `make help` now shows `IMPLEMENTATION=claude|codex`, `CODEX_PLUGIN_HOME` default, and Claude-only target note
+
+### Removed
+- Empty `reverse-diff-audit` stub directory (consolidated into `drift-detector` in a prior release)
+
 ### Added
 - shared `src/arpinine-harness-core/` package plus `src/implementations/<assistant>/` overlays
 - `src/implementations/codex/README.md` placeholder to reserve the future Codex implementation seam

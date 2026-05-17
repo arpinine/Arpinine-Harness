@@ -11,8 +11,9 @@ ZIP_NAME     := $(BUILD_NAME).zip
 ZIP_PATH     := $(DIST_DIR)/$(ZIP_NAME)
 MARKETPLACE  := arpinine-harness-local
 CLAUDE_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/arpinine-harness-claude
-CODEX_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)
 CLAUDE_MARKETPLACE_FILE := $(DIST_DIR)/.claude-plugin/marketplace.json
+CODEX_PLUGIN_HOME ?= $(HOME)/.agents
+CODEX_SYSTEM_PLUGIN_DIR := $(CODEX_PLUGIN_HOME)/plugins/$(PLUGIN_NAME)
 CODEX_MARKETPLACE_TEMPLATE := $(IMPLEMENTATION_DIR)/marketplace.json
 CODEX_MARKETPLACE_FILE := $(DIST_DIR)/.agents/plugins/marketplace.json
 
@@ -44,10 +45,11 @@ assemble: clean
 		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
 		cat .claude-plugin/marketplace.json | sed 's#\./dist/plugins/#./plugins/#g' > $(CLAUDE_MARKETPLACE_FILE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.agents/plugins; \
-		rm -rf $(CODEX_PLUGIN_DIR); \
-		cp -r $(BUILD_DIR) $(CODEX_PLUGIN_DIR); \
-		cat $(CODEX_MARKETPLACE_TEMPLATE) | sed 's#\./dist/plugins/#./plugins/#g' > $(CODEX_MARKETPLACE_FILE); \
+		mkdir -p $(DIST_DIR)/.agents/plugins $(CODEX_PLUGIN_HOME)/plugins; \
+		rm -rf $(CODEX_SYSTEM_PLUGIN_DIR); \
+		cp -r $(BUILD_DIR) $(CODEX_SYSTEM_PLUGIN_DIR); \
+		cat $(CODEX_MARKETPLACE_TEMPLATE) | sed "s#\./dist/plugins/$(PLUGIN_NAME)#$(CODEX_SYSTEM_PLUGIN_DIR)#g" > $(CODEX_MARKETPLACE_FILE); \
+		echo "Codex plugin installed to $(CODEX_SYSTEM_PLUGIN_DIR)"; \
 	fi; \
 	trap - EXIT
 
@@ -105,31 +107,39 @@ validate-structure: assemble
 		for skill in $$(ls $(CORE_DIR)/commands/ | sed 's/\.md$$//'); do \
 			test -f "$(BUILD_DIR)/skills/$$skill/SKILL.md" || (echo "Missing Codex workflow wrapper: $$skill" && exit 1); \
 		done; \
-		echo "Codex plugin structure looks valid."; \
+		test -d $(CODEX_SYSTEM_PLUGIN_DIR) || (echo "Missing Codex system plugin dir: $(CODEX_SYSTEM_PLUGIN_DIR)" && exit 1); \
+		test -f "$(CODEX_SYSTEM_PLUGIN_DIR)/hooks/hooks.json" || (echo "Missing hooks in system plugin dir" && exit 1); \
+		echo "Codex plugin structure looks valid. Installed at $(CODEX_SYSTEM_PLUGIN_DIR)."; \
 	else \
 		echo "validate-structure target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
 	fi
 
-## Build + install plugin into Claude Code (Claude-only convenience target)
+## Build + install plugin (Claude Code for claude, Codex system dir for codex)
 install:
 	@set -e; \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
 		$(MAKE) register IMPLEMENTATION=claude; \
 		claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		$(MAKE) register IMPLEMENTATION=codex; \
 	else \
-		echo "install is Claude-only. Use 'make register IMPLEMENTATION=$(IMPLEMENTATION)' for the common cross-implementation flow."; \
+		echo "install is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
 	fi
 
-## Uninstall plugin and remove marketplace from Claude Code (Claude-only convenience target)
+## Remove plugin and deregister marketplace entry (Claude Code for claude, Codex for codex)
 uninstall:
 	@set -e; \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
 		claude plugin uninstall $(PLUGIN_NAME); \
 		claude plugin marketplace remove $(MARKETPLACE); \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		rm -rf $(CODEX_SYSTEM_PLUGIN_DIR); \
+		echo "Removed $(CODEX_SYSTEM_PLUGIN_DIR)"; \
+		codex plugin marketplace remove $(MARKETPLACE) 2>/dev/null && echo "Marketplace entry removed" || echo "No marketplace entry found (may need manual removal)"; \
 	else \
-		echo "uninstall is Claude-only. No common cross-implementation uninstall abstraction is available."; \
+		echo "uninstall is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
 	fi
 
@@ -150,7 +160,9 @@ help:
 	@grep -E '^##' Makefile | sed 's/## //'
 	@echo ""
 	@echo "Targets: build (default), clean, delivery, register, validate-structure, install, uninstall, validate"
-	@echo "Variables: IMPLEMENTATION=claude (default)"
+	@echo "Variables: IMPLEMENTATION=claude|codex (default: claude)"
+	@echo "           CODEX_PLUGIN_HOME=<path> (default: $(HOME)/.agents)"
+	@echo "Claude-only: validate (uses claude plugin validate)"
 
 ## Show canonical style config locations
 style-paths:

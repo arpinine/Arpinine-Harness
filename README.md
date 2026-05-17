@@ -630,33 +630,46 @@ make install IMPLEMENTATION=claude
 
 ### Codex — First Install
 
-Assemble and register the local marketplace:
+Build, install plugin files to the Codex system directory, and register the marketplace:
+
+```bash
+make install IMPLEMENTATION=codex
+```
+
+`make install` assembles the plugin, copies it to `~/.agents/plugins/arpinine-harness` (the default Codex plugin home), writes the marketplace manifest at `dist/.agents/plugins/marketplace.json` with an absolute path to the system directory, and calls `codex plugin marketplace add ./dist`. If your Codex client requires a separate confirmation step, enable `arpinine-harness` from the marketplace UI.
+
+To install to a custom location:
+
+```bash
+make install IMPLEMENTATION=codex CODEX_PLUGIN_HOME=/path/to/.agents
+```
+
+To validate the assembled structure before installing:
 
 ```bash
 make validate-structure IMPLEMENTATION=codex
-make register IMPLEMENTATION=codex
 ```
-
-`make register` assembles the plugin, writes the Codex marketplace manifest at `dist/.agents/plugins/marketplace.json`, and calls `codex plugin marketplace add ./dist`. If your Codex client requires a separate confirmation step, enable `arpinine-harness` from the marketplace UI.
 
 ### Codex — Update
 
-Re-run register — it rebuilds the bundle and refreshes the marketplace manifest in place:
+Uninstall the current version, then reinstall from the new build:
 
 ```bash
-make register IMPLEMENTATION=codex
+make uninstall IMPLEMENTATION=codex
+make install IMPLEMENTATION=codex
 ```
 
-Restart Codex after the command completes so the updated plugin is loaded.
+`make uninstall` removes the plugin files from the Codex system directory and deregisters the marketplace entry. `make install` rebuilds and reinstalls. Restart Codex after the install completes.
 
 ### Both Implementations
 
-Install or update both in one sequence:
+Install or update both independently — order does not matter:
 
 ```bash
 make uninstall IMPLEMENTATION=claude
 make install IMPLEMENTATION=claude
-make register IMPLEMENTATION=codex
+make uninstall IMPLEMENTATION=codex
+make install IMPLEMENTATION=codex
 ```
 
 ### Session-Only Load (Dev / Testing)
