@@ -14,6 +14,8 @@ CLAUDE_PLUGIN_DIR := $(PLUGIN_DIST_DIR)/arpinine-harness-claude
 CLAUDE_MARKETPLACE_FILE := $(DIST_DIR)/.claude-plugin/marketplace.json
 CODEX_PLUGIN_HOME ?= $(HOME)/.agents
 CODEX_SYSTEM_PLUGIN_DIR := $(CODEX_PLUGIN_HOME)/plugins/$(PLUGIN_NAME)
+CODEX_CACHE_DIR := $(HOME)/.codex/plugins/cache/$(MARKETPLACE)/$(PLUGIN_NAME)
+CODEX_CACHE_VERSION_DIR := $(CODEX_CACHE_DIR)/$(VERSION)
 CODEX_MARKETPLACE_TEMPLATE := $(IMPLEMENTATION_DIR)/marketplace.json
 CODEX_MARKETPLACE_FILE := $(DIST_DIR)/.agents/plugins/marketplace.json
 
@@ -45,11 +47,12 @@ assemble: clean
 		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
 		cat .claude-plugin/marketplace.json | sed 's#\./dist/plugins/#./plugins/#g' > $(CLAUDE_MARKETPLACE_FILE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		mkdir -p $(DIST_DIR)/.agents/plugins $(CODEX_PLUGIN_HOME)/plugins; \
-		rm -rf $(CODEX_SYSTEM_PLUGIN_DIR); \
+		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.agents/plugins $(CODEX_PLUGIN_HOME)/plugins; \
+		rm -rf $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME) $(CODEX_SYSTEM_PLUGIN_DIR); \
+		cp -r $(BUILD_DIR) $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME); \
 		cp -r $(BUILD_DIR) $(CODEX_SYSTEM_PLUGIN_DIR); \
-		cat $(CODEX_MARKETPLACE_TEMPLATE) | sed "s#\./dist/plugins/$(PLUGIN_NAME)#$(CODEX_SYSTEM_PLUGIN_DIR)#g" > $(CODEX_MARKETPLACE_FILE); \
-		echo "Codex plugin installed to $(CODEX_SYSTEM_PLUGIN_DIR)"; \
+		cat $(CODEX_MARKETPLACE_TEMPLATE) | sed 's#\./dist/plugins/#./plugins/#g' > $(CODEX_MARKETPLACE_FILE); \
+		echo "Codex plugin installed to $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME) and $(CODEX_SYSTEM_PLUGIN_DIR)"; \
 	fi; \
 	trap - EXIT
 
@@ -123,6 +126,10 @@ install:
 		claude plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
 		$(MAKE) register IMPLEMENTATION=codex; \
+		rm -rf $(CODEX_CACHE_DIR); \
+		mkdir -p $(CODEX_CACHE_VERSION_DIR); \
+		cp -r $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)/. $(CODEX_CACHE_VERSION_DIR)/; \
+		echo "Cache hydrated at $(CODEX_CACHE_VERSION_DIR)"; \
 	else \
 		echo "install is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
@@ -137,6 +144,8 @@ uninstall:
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
 		rm -rf $(CODEX_SYSTEM_PLUGIN_DIR); \
 		echo "Removed $(CODEX_SYSTEM_PLUGIN_DIR)"; \
+		rm -rf $(CODEX_CACHE_DIR); \
+		echo "Cleared cache $(CODEX_CACHE_DIR)"; \
 		codex plugin marketplace remove $(MARKETPLACE) 2>/dev/null && echo "Marketplace entry removed" || echo "No marketplace entry found (may need manual removal)"; \
 	else \
 		echo "uninstall is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \

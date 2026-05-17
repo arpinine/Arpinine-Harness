@@ -3,8 +3,11 @@
   "version": "1.4.5",
   "description": "Governed product-engineering workflow for Codex using shared Arpinine Harness artifacts",
   "author": {
-    "name": "Arpinine"
+    "name": "Arpinine",
+    "url": "https://github.com/Arpinine"
   },
+  "homepage": "https://github.com/Arpinine/specops",
+  "repository": "https://github.com/Arpinine/specops",
   "license": "MIT",
   "keywords": ["codex", "governance", "workflow", "spec-kit", "adr", "evaluation"],
   "skills": "./skills/",
@@ -12,10 +15,17 @@
   "interface": {
     "displayName": "Arpinine Harness",
     "shortDescription": "Governed workflow for product and engineering delivery",
-    "longDescription": "Adds shared specification, planning, review, and governance workflows to Codex using the Arpinine Harness core.",
+    "longDescription": "Adds shared specification, planning, review, and governance workflows to Codex using the Arpinine Harness core. Specialist agents cover product intent, architecture, domain language, TDD, security, AI design, DevOps, and data engineering.",
     "developerName": "Arpinine",
     "category": "Productivity",
     "capabilities": ["Read", "Write", "Execute"],
+    "websiteURL": "https://github.com/Arpinine/specops",
+    "privacyPolicyURL": "https://github.com/Arpinine/specops/blob/main/LICENSE",
+    "termsOfServiceURL": "https://github.com/Arpinine/specops/blob/main/LICENSE",
+    "brandColor": "#4F46E5",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.svg",
+    "screenshots": [],
     "defaultPrompt": [
       "Use Arpinine Harness to initialize a governed delivery workflow for this repository.",
       "Use Arpinine Harness to brainstorm an idea with the product-owner one question at a time before creating a spec. Run /arpinine-harness:at-discover to start.",
