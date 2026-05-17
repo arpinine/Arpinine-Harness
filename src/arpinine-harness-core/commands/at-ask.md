@@ -1,5 +1,5 @@
 ---
-description: Ask a focused question to a named specialist agent (product-owner, tech-architect, security-reviewer, ai-engineer, devops, data-engineer, tdd-guide) with current spec and plan as context. Returns a targeted answer without running the full workflow.
+description: Ask a focused question to a named specialist agent (product-owner, tech-architect, security-reviewer, ai-engineer, devops, data-engineer, tdd-guide, domain-linguist) with current spec and plan as context. Returns a targeted answer without running the full workflow.
 ---
 
 # /at-ask
@@ -13,7 +13,7 @@ Route a focused mid-development question to a specialist agent.
 /at-ask <agent> <slug> "<question>"
 ```
 
-- `<agent>`: one of `product-owner`, `tech-architect`, `security-reviewer`, `ai-engineer`, `devops`, `data-engineer`, `tdd-guide`
+- `<agent>`: one of `product-owner`, `tech-architect`, `security-reviewer`, `ai-engineer`, `devops`, `data-engineer`, `tdd-guide`, `domain-linguist`
 - `<slug>`: optional spec slug (e.g. `001-user-login`). If omitted, uses the most recently modified spec.
 - `<question>`: your question. Quotes optional if no spaces conflict.
 
@@ -57,6 +57,7 @@ Validate `<agent>` against the supported list:
 | `devops` | Deployment, secrets management, CI/CD, env config |
 | `data-engineer` | Data pipelines, RAG design, schema, vector stores |
 | `tdd-guide` | Test strategy, test-first discipline, coverage by boundary |
+| `domain-linguist` | Bounded-context vocabulary, naming consistency, domain language preservation |
 
 If the agent name does not match, list the supported agents and stop.
 
@@ -72,6 +73,7 @@ Load, in order:
 3. All `.specify/adr/ADR-*.md` files where the frontmatter `governs:` line contains the slug as a substring — this matches all valid path forms (`governs: specs/<slug>`, `governs: .specify/specs/<slug>/spec.md`, `governs: specs/<slug>/spec.md`). Load any that match.
 4. `.specify/evals/<slug>/eval-plan.md` — if it exists and the agent is `ai-engineer`, `data-engineer`, or `tdd-guide`
 5. `.specify/rules/` — all active rules, for `security-reviewer` and `tdd-guide`
+6. `## Domain Vocabulary` section of `spec.md` is the primary context for `domain-linguist`; also load any `## Vocabulary Decisions` section from `plan.md` if present
 
 If no spec is found at all: "No spec found. Run `/arpinine-harness:at-new` to create one."
 

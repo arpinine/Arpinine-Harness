@@ -1,6 +1,6 @@
 ---
 name: at-ask
-description: Ask a focused question to a named specialist agent (product-owner, tech-architect, security-reviewer, ai-engineer, devops, data-engineer, tdd-guide) with current spec and plan as context.
+description: Ask a focused question to a named specialist agent (product-owner, tech-architect, security-reviewer, ai-engineer, devops, data-engineer, tdd-guide, domain-linguist) with current spec and plan as context.
 ---
 
 Follow `commands/at-ask.md` from the assembled Arpinine Harness plugin root.
