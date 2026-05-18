@@ -28,7 +28,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - `.specify/observations/<spec-slug>/history/<run-id>.md`
    - `.specify/observations/<spec-slug>/history/<run-id>.json`
    - `.specify/observations/<spec-slug>/index.jsonl`
-3. **Observation provider bridge:** If `## Observability Strategy` in `plan.md` declares a concrete observation backend, map normalized runtime fields to the selected provider schema before writing artifacts.
+3. **Observation provider bridge:** OpenTelemetry is the default runtime telemetry backend. If `## Observability Strategy` in `plan.md` declares a concrete observation backend, map normalized runtime fields to the selected provider schema before writing artifacts.
 
    If the selected provider is OpenTelemetry, carry forward trace and span identifiers plus the normalized runtime attributes needed for cross-reference, such as:
    - root trace id
@@ -51,7 +51,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    | Eval metric score | `trace.score(name=metric_name, value=score)` |
 
    Langfuse trace IDs must be recorded in `trace.json` under `langfuse_trace_id` for cross-referencing.
-   If another provider is selected, record the provider name plus any stable trace/span identifiers needed to link governed artifacts back to the runtime telemetry system.
+   If another provider is selected, record the provider name plus any stable trace/span identifiers needed to link governed artifacts back to the runtime telemetry system. Langfuse is an optional LLM-focused overlay, not the base runtime telemetry default.
 
 4. Capture, at minimum:
    - run id

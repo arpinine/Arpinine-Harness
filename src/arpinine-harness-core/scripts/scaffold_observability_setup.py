@@ -14,8 +14,7 @@ import textwrap
 SECTION_RE = re.compile(r"^\s*##\s+(.+?)\s*$", re.MULTILINE)
 PLACEHOLDER_RE = re.compile(r"\[(?:file path|e\.g\.|TBD|TODO|FIXME)", re.IGNORECASE)
 OBS_ALT_PATTERNS = (
-    r"\bopentelemetry\b",
-    r"\botel\b",
+    r"\blangfuse\b",
     r"\blangsmith\b",
     r"\bphoenix\b",
     r"\barize\b",
@@ -24,6 +23,9 @@ OBS_ALT_PATTERNS = (
 OTEL_PATTERNS = (
     r"\bopentelemetry\b",
     r"\botel\b",
+)
+LANGFUSE_PATTERNS = (
+    r"\blangfuse\b",
 )
 EVAL_ALT_PATTERNS = (
     r"\bragas\b",
@@ -284,11 +286,12 @@ def scaffold_for_plan(repo: pathlib.Path, plan_path: pathlib.Path) -> dict[str, 
     script_dir = pathlib.Path(__file__).resolve().parent
     templates_dir = script_dir.parent / "templates"
 
-    obs_default, obs_alternative = plan_names_provider(body, OBS_ALT_PATTERNS, "langfuse")
+    obs_default, obs_alternative = plan_names_provider(body, OBS_ALT_PATTERNS, "opentelemetry")
     obs_opentelemetry, _ = plan_names_provider(body, OTEL_PATTERNS, "opentelemetry")
+    obs_langfuse, _ = plan_names_provider(body, LANGFUSE_PATTERNS, "langfuse")
     eval_default, eval_alternative = plan_names_provider(body, EVAL_ALT_PATTERNS, "deepeval")
-    scaffold_langfuse = obs_default or not obs_alternative
-    scaffold_opentelemetry = obs_opentelemetry
+    scaffold_opentelemetry = obs_opentelemetry or not obs_alternative
+    scaffold_langfuse = obs_langfuse
     scaffold_deepeval = eval_default or not eval_alternative
 
     created: list[str] = []

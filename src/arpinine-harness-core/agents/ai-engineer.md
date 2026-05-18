@@ -31,7 +31,7 @@ You own the AI and LLM design decisions inside the product the vibe coder is bui
 | Agent topology | Single vs multi-agent justified, orchestration pattern named, handoff points explicit |
 | Failure modes | Hallucination mitigation named, fallback on tool failure defined, retry limits set |
 | Evaluation | AI-specific metrics defined (accuracy, coherence, tool-call correctness, latency P95); `EvaluationProvider` wired; DeepEval default or ADR justifying alternative |
-| Observation semantics | `ObservationProvider` injected; every LLM call traced; tool spans, retries, and eval-to-trace linkage defined; OpenTelemetry or Langfuse selected explicitly, or ADR justifying another alternative |
+| Observation semantics | `ObservationProvider` injected; every LLM call traced; tool spans, retries, and eval-to-trace linkage defined; OpenTelemetry is the default runtime backend; Langfuse is optional for LLM-native inspection |
 | Provider boundaries | Observability SDK imports confined to the selected provider module under `src/observability/`; DeepEval imports confined to `src/evaluation/deepeval.py`; no SDK leakage into agents, tools, or domain |
 
 ## Ownership Boundary
@@ -60,7 +60,7 @@ Suggest an ADR when:
 | HIGH | Observability SDK or DeepEval SDK imported outside designated provider files | Require fix before proceeding |
 | MEDIUM | Model version unpinned, eval metrics missing for AI outputs | Suggest fix |
 | MEDIUM | AI workflow traces exist but do not carry enough semantic detail to support review or evaluation linkage | Suggest fix |
-| MEDIUM | Alternative to the documented OpenTelemetry/Langfuse and DeepEval defaults chosen without ADR | Require ADR |
+| MEDIUM | Alternative to the documented OpenTelemetry and DeepEval defaults chosen without ADR | Require ADR |
 | LOW | Minor prompting improvements available | Note only |
 
 ## Output Format

@@ -19,7 +19,7 @@ This skill ensures that every LLM or agentic application:
 1. Instruments runtime behavior through a stable **ObservationProvider** abstraction — not by calling an observability SDK directly from product code.
 2. Evaluates LLM output quality through a stable **EvaluationProvider** abstraction — not by calling DeepEval (or any SDK) directly from test code.
 
-The abstractions decouple product code from observability vendors. Swapping OpenTelemetry, Langfuse, or another backend, or swapping DeepEval for a custom harness, must require changing only the provider implementation file — not product or test code.
+The abstractions decouple product code from observability and evaluation vendors. Swapping OpenTelemetry, Langfuse, or another observability backend, or swapping DeepEval for a custom evaluation harness, must require changing only the provider implementation file — not product or test code.
 
 ## Ownership Boundary
 
@@ -45,8 +45,9 @@ Every LLM or agentic feature must define in `## Observability Strategy` of `plan
 |---------|-------------|
 | Observation required | Declared Yes or N/A with reason |
 | ObservationProvider interface | File path (e.g. `src/observability/base.py`) |
-| Default implementation | OpenTelemetry or Langfuse unless justified otherwise |
-| Env var configuration | Backend-specific env vars documented, e.g. `OTEL_SERVICE_NAME` + `OTEL_EXPORTER_OTLP_ENDPOINT` or `LANGFUSE_*` |
+| Default implementation | OpenTelemetry unless justified otherwise |
+| Specialized implementation | Langfuse only when LLM-specific observability is required |
+| Env var configuration | `OTEL_SERVICE_NAME` + `OTEL_EXPORTER_OTLP_ENDPOINT` documented; `LANGFUSE_*` only when Langfuse is selected |
 | Evaluation required | Declared Yes or N/A with reason |
 | EvaluationProvider interface | File path (e.g. `src/evaluation/base.py`) |
 | Default implementation | DeepEval unless justified otherwise |
@@ -58,8 +59,8 @@ Every LLM or agentic feature must define in `## Observability Strategy` of `plan
 
 - `src/observability/base.py` must define `ObservationProvider` as a `Protocol` or `ABC`
 - Required methods: `trace()`, `generation()`, `span()`, `score()`, `flush()`
-- If OpenTelemetry is the selected/default backend, `src/observability/opentelemetry.py` must contain `OpenTelemetryObservationProvider` implementing the protocol
-- If Langfuse is the selected/default backend, `src/observability/langfuse.py` must contain `LangfuseObservationProvider` implementing the protocol
+- `src/observability/opentelemetry.py` must contain `OpenTelemetryObservationProvider` as the default runtime telemetry implementation unless an ADR justifies another default
+- If Langfuse is selected for LLM-native observability, `src/observability/langfuse.py` must contain `LangfuseObservationProvider` implementing the protocol
 - `src/observability/noop.py` must contain `NoopObservationProvider` for test isolation
 - Product code (agents, tools, domain) must only import from `src/observability/base.py`
 - Observability SDK imports must not appear outside the selected provider module, normally `src/observability/opentelemetry.py` or `src/observability/langfuse.py`
@@ -102,7 +103,7 @@ Product code receives `ObservationProvider` and `EvaluationProvider` types — n
 | Observation provider wired but `flush()` never called at agent shutdown | MEDIUM | Require fix — events may be silently lost |
 | Evaluation provider exists but `evaluate()` never called in tests or eval runs | HIGH | Block completion |
 | Provider swap strategy is undocumented | MEDIUM | Require documentation |
-| Alternative to the documented OpenTelemetry/Langfuse and DeepEval defaults chosen without ADR | MEDIUM | Suggest ADR creation |
+| Alternative to the documented OpenTelemetry and DeepEval defaults chosen without ADR | MEDIUM | Suggest ADR creation |
 
 ## Good Signs
 
@@ -110,18 +111,19 @@ Product code receives `ObservationProvider` and `EvaluationProvider` types — n
 - Tests inject `NoopObservationProvider` — no observability SDK calls in unit tests
 - `flush()` is called in application shutdown handler or `atexit` hook
 - Evaluation suite injects `NoopEvaluationProvider` or `DeepEvalProvider` depending on scope
-- Backend-specific observability env vars and `DEEPEVAL_API_KEY` come from env vars, documented in `.env.example`
+- `OTEL_*` env vars and `DEEPEVAL_API_KEY` come from env vars, documented in `.env.example`
+- `LANGFUSE_*` env vars are documented only when Langfuse is selected as an additional LLM-observability backend
 
 ## Warning Signs
 
 - `from opentelemetry...` or `from langfuse import Langfuse` appears in agent or tool files
 - `from deepeval import evaluate` appears directly in test helpers
-- Observation traces are written to `.specify/observations/` but the selected provider trace/span identifiers are not linked
+- Observation traces are written to `.specify/observations/` but OpenTelemetry trace IDs or optional Langfuse trace IDs are not linked
 - Evaluation results exist in `.specify/evals/` but no `EvaluationProvider` is wired in code
 
 ## Observation-Evaluation Bridge
 
-`ObservationProvider.score()` should attach evaluation metric scores to the selected backend trace/span representation, closing the loop between runtime observation and offline evaluation. When both providers are configured:
+`ObservationProvider.score()` should attach evaluation metric scores to the selected backend trace/span representation, closing the loop between runtime observation and offline evaluation. OpenTelemetry is the default carrier. Langfuse may mirror the same score when selected for LLM-focused inspection. When both providers are configured:
 
 1. Run evaluation via `EvaluationProvider.evaluate()`
 2. For each `MetricResult`, call `ObservationProvider.score(trace, name=metric.name, value=metric.score)`
@@ -133,5 +135,5 @@ Product code receives `ObservationProvider` and `EvaluationProvider` types — n
 2. Is `flush()` guaranteed to be called before process exit?
 3. Which agent/tool calls are instrumented with `trace()` and `generation()`?
 4. Which eval metrics are mapped to `score()` calls on traces?
-5. How would swapping OpenTelemetry for Langfuse, or vice versa, affect product code?
+5. How would adding or removing Langfuse affect the product code if OpenTelemetry remains the default runtime telemetry backend?
 6. How would swapping DeepEval for a custom harness affect test code?

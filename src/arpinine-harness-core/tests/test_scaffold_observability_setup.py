@@ -38,7 +38,7 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
         plan_path = self.repo / ".specify" / "specs" / "001-demo" / "plan.md"
         plan_path.write_text(plan_with_strategy(body), encoding="utf-8")
 
-    def test_scaffolds_default_langfuse_and_deepeval_layout(self) -> None:
+    def test_scaffolds_default_opentelemetry_and_deepeval_layout(self) -> None:
         self.write_plan(
             textwrap.dedent(
                 """\
@@ -46,8 +46,8 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
                 |---------|----------|
                 | Observation required | Yes |
                 | ObservationProvider interface | `src/observability/base.py` |
-                | Default implementation | Langfuse |
-                | Env var configuration | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` |
+                | Default implementation | OpenTelemetry |
+                | Env var configuration | `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT` |
                 | Evaluation required | Yes |
                 | EvaluationProvider interface | `src/evaluation/base.py` |
                 | Default implementation | DeepEval |
@@ -62,13 +62,13 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
         payload = json.loads(result.stdout)
         self.assertEqual(payload["results"][0]["status"], "ok")
         self.assertTrue((self.repo / "src" / "observability" / "base.py").exists())
-        self.assertTrue((self.repo / "src" / "observability" / "langfuse.py").exists())
+        self.assertTrue((self.repo / "src" / "observability" / "opentelemetry.py").exists())
         self.assertTrue((self.repo / "src" / "observability" / "noop.py").exists())
         self.assertTrue((self.repo / "src" / "evaluation" / "base.py").exists())
         self.assertTrue((self.repo / "src" / "evaluation" / "deepeval.py").exists())
         self.assertTrue((self.repo / "src" / "evaluation" / "noop.py").exists())
         env_text = (self.repo / ".env.example").read_text(encoding="utf-8")
-        self.assertIn("LANGFUSE_PUBLIC_KEY=", env_text)
+        self.assertIn("OTEL_SERVICE_NAME=", env_text)
         self.assertIn("DEEPEVAL_API_KEY=", env_text)
 
     def test_skips_when_strategy_is_na(self) -> None:
@@ -113,8 +113,7 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
         self.assertIn("OTEL_EXPORTER_OTLP_ENDPOINT=", env_text)
         self.assertNotIn("LANGFUSE_PUBLIC_KEY=", env_text)
 
-    def test_partial_scaffold_creates_missing_files_only(self) -> None:
-        """base.py already exists — scaffold must create langfuse.py without overwriting base.py."""
+    def test_scaffolds_langfuse_only_when_explicitly_selected(self) -> None:
         self.write_plan(
             textwrap.dedent(
                 """\
@@ -122,8 +121,37 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
                 |---------|----------|
                 | Observation required | Yes |
                 | ObservationProvider interface | `src/observability/base.py` |
-                | Default implementation | Langfuse |
-                | Env var configuration | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` |
+                | Default implementation | OpenTelemetry |
+                | Specialized implementation | Langfuse |
+                | Env var configuration | `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` |
+                | Evaluation required | Yes |
+                | EvaluationProvider interface | `src/evaluation/base.py` |
+                | Default implementation | DeepEval |
+                | Observation-evaluation bridge | Attach eval metric scores to traces |
+                | Swap strategy | Replace adapter only |
+                """
+            )
+        )
+
+        result = self.run_script("--spec", "001-demo", "--json")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.repo / "src" / "observability" / "opentelemetry.py").exists())
+        self.assertTrue((self.repo / "src" / "observability" / "langfuse.py").exists())
+        env_text = (self.repo / ".env.example").read_text(encoding="utf-8")
+        self.assertIn("OTEL_SERVICE_NAME=", env_text)
+        self.assertIn("LANGFUSE_PUBLIC_KEY=", env_text)
+
+    def test_partial_scaffold_creates_missing_files_only(self) -> None:
+        """base.py already exists — scaffold must create opentelemetry.py without overwriting base.py."""
+        self.write_plan(
+            textwrap.dedent(
+                """\
+                | Concern | Decision |
+                |---------|----------|
+                | Observation required | Yes |
+                | ObservationProvider interface | `src/observability/base.py` |
+                | Default implementation | OpenTelemetry |
+                | Env var configuration | `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT` |
                 | Evaluation required | Yes |
                 | EvaluationProvider interface | `src/evaluation/base.py` |
                 | Default implementation | DeepEval |
@@ -144,8 +172,8 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
 
         # base.py was NOT overwritten
         self.assertEqual(obs_base.read_text(encoding="utf-8"), sentinel)
-        # langfuse.py WAS created
-        self.assertTrue((self.repo / "src" / "observability" / "langfuse.py").exists())
+        # opentelemetry.py WAS created
+        self.assertTrue((self.repo / "src" / "observability" / "opentelemetry.py").exists())
         # noop.py WAS created
         self.assertTrue((self.repo / "src" / "observability" / "noop.py").exists())
         # eval layer WAS fully created
@@ -164,8 +192,8 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
                 |---------|----------|
                 | Observation required | Yes |
                 | ObservationProvider interface | `src/observability/base.py` |
-                | Default implementation | Langfuse |
-                | Env var configuration | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` |
+                | Default implementation | OpenTelemetry |
+                | Env var configuration | `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT` |
                 | Evaluation required | Yes |
                 | EvaluationProvider interface | `src/evaluation/base.py` |
                 | Default implementation | DeepEval |
@@ -180,7 +208,7 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
         self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
         self.assertEqual(second.returncode, 0, second.stdout + second.stderr)
         env_text = (self.repo / ".env.example").read_text(encoding="utf-8")
-        self.assertEqual(env_text.count("LANGFUSE_PUBLIC_KEY="), 1)
+        self.assertEqual(env_text.count("OTEL_SERVICE_NAME="), 1)
         self.assertEqual(env_text.count("DEEPEVAL_API_KEY="), 1)
 
 

@@ -7,8 +7,8 @@
 - `src/domain/` — pure business logic; no framework or infrastructure imports
 - `src/observability/` — observation provider abstraction and implementations
   - `base.py` — `ObservationProvider` Protocol (the only import allowed outside this package)
-  - `opentelemetry.py` — `OpenTelemetryObservationProvider` (recommended generic default; all OpenTelemetry SDK imports stay here)
-  - `langfuse.py` — `LangfuseObservationProvider` (supported alternative; all Langfuse SDK imports stay here)
+  - `opentelemetry.py` — `OpenTelemetryObservationProvider` (default runtime telemetry implementation; all OpenTelemetry SDK imports stay here)
+  - `langfuse.py` — `LangfuseObservationProvider` (optional LLM-focused implementation; all Langfuse SDK imports stay here)
   - `noop.py` — `NoopObservationProvider` (use in unit tests and local dev without credentials)
 - `src/evaluation/` — evaluation provider abstraction and implementations
   - `base.py` — `EvaluationProvider` Protocol (the only import allowed outside this package)

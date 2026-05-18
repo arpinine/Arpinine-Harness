@@ -215,41 +215,41 @@ for plan_path in candidate_plans:
     plan_chose_opentelemetry = _plan_names_provider(obs_body, r'\bopentelemetry\b', r'\botel\b')
     plan_chose_alternative = _plan_names_provider(
         obs_body,
-        r'\bopentelemetry\b', r'\botel\b', r'\blangsmith\b',
+        r'\blangfuse\b', r'\blangsmith\b',
         r'\bphoenix\b', r'\barize\b', r'\bhoneyhive\b',
     )
 
     if obs_base_candidates:
-        if plan_chose_opentelemetry and not obs_otel_candidates:
+        if (plan_chose_opentelemetry or not plan_chose_alternative) and not obs_otel_candidates:
             findings.append({
                 "level": "HIGH",
                 "check": "opentelemetry-provider-missing",
                 "slug": slug_label,
                 "message": (
                     "ObservationProvider interface exists but no OpenTelemetryObservationProvider found. "
-                    "Create src/observability/opentelemetry.py and keep OpenTelemetry SDK imports there only. "
+                    "Create src/observability/opentelemetry.py (default implementation) and keep OpenTelemetry SDK imports there only. "
                     "Use templates/opentelemetry-observation-provider-template.py as scaffold."
                 ),
             })
-        elif (plan_chose_langfuse or not plan_chose_alternative) and not obs_langfuse_candidates:
+        if plan_chose_langfuse and not obs_langfuse_candidates:
             findings.append({
                 "level": "HIGH",
                 "check": "langfuse-provider-missing",
                 "slug": slug_label,
                 "message": (
                     "ObservationProvider interface exists but no LangfuseObservationProvider found. "
-                    "Create src/observability/langfuse.py (default implementation). "
+                    "Create src/observability/langfuse.py (specialized implementation). "
                     "Use templates/langfuse-observation-provider-template.py as scaffold. "
-                    "If using a non-Langfuse backend, declare it explicitly in ## Observability Strategy."
+                    "Declare Langfuse explicitly in ## Observability Strategy when LLM-specific observability is required."
                 ),
             })
-        elif plan_chose_alternative and not plan_chose_opentelemetry and not plan_chose_langfuse:
+        elif plan_chose_alternative and not plan_chose_langfuse:
             findings.append({
                 "level": "MEDIUM",
                 "check": "alternative-observation-provider-adr",
                 "slug": slug_label,
                 "message": (
-                    "## Observability Strategy names a non-default observation backend. "
+                    "## Observability Strategy names a non-default specialized observation backend. "
                     "Ensure an ADR exists justifying the alternative provider and that "
                     "the custom implementation satisfies the ObservationProvider Protocol."
                 ),
