@@ -70,7 +70,7 @@ N/A — feature makes no LLM calls and produces no AI-driven output. Standard lo
 | Observation required | Yes |
 | ObservationProvider interface | [file path — e.g. `src/observability/base.py`] |
 | Default implementation | OpenTelemetry — [justify if using another default backend] |
-| Specialized implementation | Langfuse — [optional; require it only when LLM-native trace inspection is needed] |
+| Specialized implementation | Langfuse — [optional for ordinary AI features; required when `## Harness Strategy` names a runtime unless an ADR governs another overlay] |
 | Env var configuration | [document `OTEL_SERVICE_NAME` and `OTEL_EXPORTER_OTLP_ENDPOINT` in `.env.example`; add `LANGFUSE_*` only when Langfuse is selected] |
 | Evaluation required | Yes |
 | EvaluationProvider interface | [file path — e.g. `src/evaluation/base.py`] |

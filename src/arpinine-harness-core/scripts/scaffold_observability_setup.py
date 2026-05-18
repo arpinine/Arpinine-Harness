@@ -268,6 +268,7 @@ def ensure_env_vars(
 def scaffold_for_plan(repo: pathlib.Path, plan_path: pathlib.Path) -> dict[str, object]:
     plan_text = plan_path.read_text(encoding="utf-8")
     body = section_body(plan_text, "Observability Strategy")
+    harness_body = section_body(plan_text, "Harness Strategy")
     if not body:
         return {"status": "skip", "reason": "plan has no Observability Strategy", "slug": plan_path.parent.name}
     if section_is_na(body):
@@ -290,9 +291,10 @@ def scaffold_for_plan(repo: pathlib.Path, plan_path: pathlib.Path) -> dict[str, 
     obs_opentelemetry, _ = plan_names_provider(body, OTEL_PATTERNS, "opentelemetry")
     obs_langfuse, _ = plan_names_provider(body, LANGFUSE_PATTERNS, "langfuse")
     eval_default, eval_alternative = plan_names_provider(body, EVAL_ALT_PATTERNS, "deepeval")
+    harness_required = bool(harness_body) and not section_is_na(harness_body)
     scaffold_opentelemetry = obs_opentelemetry or not obs_alternative
-    scaffold_langfuse = obs_langfuse
-    scaffold_deepeval = eval_default or not eval_alternative
+    scaffold_langfuse = obs_langfuse or harness_required
+    scaffold_deepeval = eval_default or not eval_alternative or harness_required
 
     created: list[str] = []
     skipped: list[str] = []
@@ -361,6 +363,7 @@ def scaffold_for_plan(repo: pathlib.Path, plan_path: pathlib.Path) -> dict[str, 
             "langfuse": scaffold_langfuse,
             "opentelemetry": scaffold_opentelemetry,
             "deepeval": scaffold_deepeval,
+            "harness_required": harness_required,
         },
     }
 

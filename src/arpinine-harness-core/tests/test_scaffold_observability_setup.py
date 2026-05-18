@@ -12,8 +12,14 @@ ROOT = pathlib.Path(__file__).resolve().parents[3]
 SCRIPT = ROOT / "src" / "arpinine-harness-core" / "scripts" / "scaffold_observability_setup.py"
 
 
-def plan_with_strategy(strategy_body: str) -> str:
-    return f"# Plan: Demo\n\n## Observability Strategy\n{strategy_body}\n"
+def plan_with_strategy(strategy_body: str, harness_body: str = "N/A — single LLM call sufficient.") -> str:
+    return (
+        "# Plan: Demo\n\n"
+        "## Harness Strategy\n"
+        f"{harness_body}\n\n"
+        "## Observability Strategy\n"
+        f"{strategy_body}\n"
+    )
 
 
 class ScaffoldObservabilitySetupTests(unittest.TestCase):
@@ -34,9 +40,9 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
             check=False,
         )
 
-    def write_plan(self, body: str) -> None:
+    def write_plan(self, body: str, harness_body: str = "N/A — single LLM call sufficient.") -> None:
         plan_path = self.repo / ".specify" / "specs" / "001-demo" / "plan.md"
-        plan_path.write_text(plan_with_strategy(body), encoding="utf-8")
+        plan_path.write_text(plan_with_strategy(body, harness_body=harness_body), encoding="utf-8")
 
     def test_scaffolds_default_opentelemetry_and_deepeval_layout(self) -> None:
         self.write_plan(
@@ -140,6 +146,39 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
         env_text = (self.repo / ".env.example").read_text(encoding="utf-8")
         self.assertIn("OTEL_SERVICE_NAME=", env_text)
         self.assertIn("LANGFUSE_PUBLIC_KEY=", env_text)
+
+    def test_harness_based_plan_scaffolds_otel_langfuse_and_deepeval(self) -> None:
+        self.write_plan(
+            textwrap.dedent(
+                """\
+                | Concern | Decision |
+                |---------|----------|
+                | Observation required | Yes |
+                | ObservationProvider interface | `src/observability/base.py` |
+                | Default implementation | OpenTelemetry |
+                | Specialized implementation | Langfuse |
+                | Env var configuration | `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` |
+                | Evaluation required | Yes |
+                | EvaluationProvider interface | `src/evaluation/base.py` |
+                | Default implementation | DeepEval |
+                | Observation-evaluation bridge | Attach eval metric scores to traces |
+                | Swap strategy | Replace adapter only |
+                """
+            ),
+            harness_body="- Runtime: OpenAI Agents\n- Why harness is needed: multi-step tool loop\n",
+        )
+
+        result = self.run_script("--spec", "001-demo", "--json")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        defaults = payload["results"][0]["scaffolded_defaults"]
+        self.assertTrue(defaults["harness_required"])
+        self.assertTrue(defaults["opentelemetry"])
+        self.assertTrue(defaults["langfuse"])
+        self.assertTrue(defaults["deepeval"])
+        self.assertTrue((self.repo / "src" / "observability" / "opentelemetry.py").exists())
+        self.assertTrue((self.repo / "src" / "observability" / "langfuse.py").exists())
+        self.assertTrue((self.repo / "src" / "evaluation" / "deepeval.py").exists())
 
     def test_partial_scaffold_creates_missing_files_only(self) -> None:
         """base.py already exists — scaffold must create opentelemetry.py without overwriting base.py."""

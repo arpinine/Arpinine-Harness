@@ -37,6 +37,11 @@ These responsibilities are complementary and must not duplicate one another. If 
 - Before implementation begins, to verify provider scaffolding is in place
 - During audit when observability gaps or missing evaluation coverage are detected
 
+Harness-based agent workflows are stricter than ordinary AI features:
+- OpenTelemetry remains the default runtime telemetry backend
+- Langfuse becomes required as the specialized LLM-observability backend
+- DeepEval remains the default required evaluation backend unless an ADR explicitly governs an alternative
+
 ## Required Observability Strategy
 
 Every LLM or agentic feature must define in `## Observability Strategy` of `plan.md`:
@@ -61,6 +66,7 @@ Every LLM or agentic feature must define in `## Observability Strategy` of `plan
 - Required methods: `trace()`, `generation()`, `span()`, `score()`, `flush()`
 - `src/observability/opentelemetry.py` must contain `OpenTelemetryObservationProvider` as the default runtime telemetry implementation unless an ADR justifies another default
 - If Langfuse is selected for LLM-native observability, `src/observability/langfuse.py` must contain `LangfuseObservationProvider` implementing the protocol
+- If the workflow is harness-based, `src/observability/langfuse.py` is required in addition to `src/observability/opentelemetry.py`
 - `src/observability/noop.py` must contain `NoopObservationProvider` for test isolation
 - Product code (agents, tools, domain) must only import from `src/observability/base.py`
 - Observability SDK imports must not appear outside the selected provider module, normally `src/observability/opentelemetry.py` or `src/observability/langfuse.py`
@@ -104,6 +110,7 @@ Product code receives `ObservationProvider` and `EvaluationProvider` types — n
 | Evaluation provider exists but `evaluate()` never called in tests or eval runs | HIGH | Block completion |
 | Provider swap strategy is undocumented | MEDIUM | Require documentation |
 | Alternative to the documented OpenTelemetry and DeepEval defaults chosen without ADR | MEDIUM | Suggest ADR creation |
+| Harness-based workflow omits Langfuse or replaces OpenTelemetry as the default runtime backend without ADR | HIGH | Block implementation |
 
 ## Good Signs
 

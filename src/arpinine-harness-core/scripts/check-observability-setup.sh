@@ -118,6 +118,8 @@ for plan_path in candidate_plans:
         continue
 
     obs_body = section_body(plan_text, "Observability Strategy")
+    harness_body = section_body(plan_text, "Harness Strategy")
+    harness_required = bool(harness_body) and not _section_is_na(harness_body)
 
     # No observability section — nothing declared, skip source checks
     if not obs_body:
@@ -231,7 +233,7 @@ for plan_path in candidate_plans:
                     "Use templates/opentelemetry-observation-provider-template.py as scaffold."
                 ),
             })
-        if plan_chose_langfuse and not obs_langfuse_candidates:
+        if (plan_chose_langfuse or harness_required) and not obs_langfuse_candidates:
             findings.append({
                 "level": "HIGH",
                 "check": "langfuse-provider-missing",
@@ -240,7 +242,7 @@ for plan_path in candidate_plans:
                     "ObservationProvider interface exists but no LangfuseObservationProvider found. "
                     "Create src/observability/langfuse.py (specialized implementation). "
                     "Use templates/langfuse-observation-provider-template.py as scaffold. "
-                    "Declare Langfuse explicitly in ## Observability Strategy when LLM-specific observability is required."
+                    "Harness-based agent workflows require Langfuse for LLM-specific observability; otherwise declare Langfuse explicitly in ## Observability Strategy when LLM-specific observability is required."
                 ),
             })
         elif plan_chose_alternative and not plan_chose_langfuse:
@@ -352,7 +354,7 @@ for plan_path in candidate_plans:
             r'\bragas\b', r'\btruelens\b', r'\bconfluent\b',
             r'\bphoenix\b', r'\brageval\b', r'\bcustom\s+eval\b',
         )
-        if plan_chose_deepeval or not plan_chose_alternative:
+        if plan_chose_deepeval or not plan_chose_alternative or harness_required:
             # Plan explicitly chose DeepEval, or no alternative was declared — require default impl
             findings.append({
                 "level": "HIGH",
@@ -362,7 +364,7 @@ for plan_path in candidate_plans:
                     "EvaluationProvider interface exists but no DeepEvalProvider found. "
                     "Create src/evaluation/deepeval.py (default implementation). "
                     "Use templates/deepeval-evaluation-provider-template.py as scaffold. "
-                    "If using a non-DeepEval framework, declare it explicitly in ## Observability Strategy."
+                    "Harness-based agent workflows require DeepEval unless an ADR explicitly governs another evaluation framework."
                 ),
             })
         else:
@@ -397,6 +399,17 @@ for plan_path in candidate_plans:
             "message": (
                 "DeepEval SDK imported outside src/evaluation/ — boundary violation:\n"
                 + "\n".join(f"  - {f}" for f in deepeval_leak_files)
+            ),
+        })
+
+    if harness_required and not plan_chose_opentelemetry and plan_chose_alternative:
+        findings.append({
+            "level": "HIGH",
+            "check": "harness-opentelemetry-default",
+            "slug": slug_label,
+            "message": (
+                "Harness-based agent workflows must keep OpenTelemetry as the default runtime telemetry backend. "
+                "Use Langfuse only as a specialized LLM-observability overlay, not as the base replacement."
             ),
         })
 

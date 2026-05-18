@@ -33,7 +33,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 8. Preserve the module boundaries and dependency direction defined in `plan.md`.
 9. If the feature uses a harness in the product application, preserve the harness abstraction boundary, tool model, memory model, and permission model defined in `## Harness Strategy`.
    **Observability pre-implementation gate:** If `plan.md` contains `## Observability Strategy` and it is not N/A:
-   a. Run `python3 scripts/scaffold_observability_setup.py --spec <slug>` to create any missing provider files (`ObservationProvider` interface, default impl, noop provider, `EvaluationProvider` interface, default impl, noop provider) and update `.env.example`. The script is idempotent — it skips files that already exist.
+   a. Run `python3 scripts/scaffold_observability_setup.py --spec <slug>` to create any missing provider files (`ObservationProvider` interface, default impl, optional Langfuse specialized impl when required, noop provider, `EvaluationProvider` interface, default impl, noop provider) and update `.env.example`. The script is idempotent — it skips files that already exist.
    b. Run `scripts/check-observability-setup.sh --spec <slug>`. Block implementation if any HIGH finding is reported. A HIGH finding after the scaffold ran means a provider file is absent or an SDK boundary is violated — do not proceed until resolved.
 10. For each task in `plan.md`:
    a. Before starting work on the task, claim the next eligible task through `scripts/claim_task.py --slug <slug>`. Override `--team-id` or `--instance-id` only when the host runtime cannot infer them correctly.
