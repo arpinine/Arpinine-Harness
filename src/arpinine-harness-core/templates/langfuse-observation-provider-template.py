@@ -1,5 +1,5 @@
 """
-LangfuseObservationProvider — default ObservationProvider implementation.
+LangfuseObservationProvider — specialized LLM-focused ObservationProvider implementation.
 
 Wraps the Langfuse SDK. All Langfuse imports stay in this file.
 Product code must import ObservationProvider from src/observability/base.py only.

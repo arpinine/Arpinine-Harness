@@ -73,9 +73,10 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 19. If AI design decisions (model, prompting, context management) are implemented differently from `## AI Design Decisions` in `plan.md`, send the work back into planning or ADR refinement before completion.
 20. If observability decisions (provider choice, instrumentation scope, flush strategy) deviate from `## Observability Strategy` in `plan.md`, send the work back into planning or ADR refinement before completion.
 21. Verify that observability SDK imports do not appear outside the designated observation provider module (the path declared in `## Observability Strategy`, defaulting to `<root>/observability/opentelemetry.py` or `<root>/observability/langfuse.py`) and DeepEval SDK imports do not appear outside the designated evaluation provider module (the path declared in `## Observability Strategy`, defaulting to `<root>/evaluation/deepeval.py`). Report any boundary violations as HIGH findings and require remediation before completion.
-22. If implementation changes the original intent or weakens the business case, send the work back into refinement by updating the spec or ADRs.
-23. Run `python3 scripts/check_vocabulary_drift.py --spec <slug>` to verify generated code reflects the spec's declared domain vocabulary:
+22. Re-run `scripts/check-observability-setup.sh --spec <slug>` after implementation tasks complete and before concluding the task. Block completion on any HIGH finding so SDK-boundary leaks or missing providers introduced during implementation are caught automatically.
+23. If implementation changes the original intent or weakens the business case, send the work back into refinement by updating the spec or ADRs.
+24. Run `python3 scripts/check_vocabulary_drift.py --spec <slug>` to verify generated code reflects the spec's declared domain vocabulary:
     - Block completion on any HIGH finding (forbidden synonym used as class name, generic name overriding a declared domain term).
     - MEDIUM findings must be addressed or explicitly acknowledged with a disambiguation note in spec `## Domain Vocabulary` before completion.
     - If new domain terms were introduced during implementation, update spec `## Domain Vocabulary` and plan `## Vocabulary Decisions` before marking the feature complete.
-24. Summarize what changed, which tests prove it, which evaluations passed, which acceptance criteria were satisfied, and which ADRs govern the implementation.
+25. Summarize what changed, which tests prove it, which evaluations passed, which acceptance criteria were satisfied, and which ADRs govern the implementation.

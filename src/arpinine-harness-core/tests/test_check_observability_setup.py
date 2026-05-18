@@ -54,6 +54,10 @@ class CheckObservabilitySetupTests(unittest.TestCase):
             check=False,
         )
 
+    def write_raw_plan(self, text: str) -> None:
+        plan_path = self.repo / ".specify" / "specs" / "001-demo" / "plan.md"
+        plan_path.write_text(text, encoding="utf-8")
+
     def test_harness_based_workflow_passes_when_scaffolded(self) -> None:
         self.write_plan(
             textwrap.dedent(
@@ -126,6 +130,20 @@ class CheckObservabilitySetupTests(unittest.TestCase):
         payload = json.loads(check.stdout)
         self.assertFalse(payload["passed"], payload)
         self.assertTrue(any(f["check"] == "langfuse-provider-missing" for f in payload["findings"]), payload)
+
+    def test_harness_based_workflow_fails_when_observability_section_missing(self) -> None:
+        self.write_raw_plan(
+            "# Plan: Demo\n\n"
+            "## Harness Strategy\n"
+            "- Runtime: OpenAI Agents\n"
+            "- Why harness is needed: multi-step tool loop\n"
+        )
+
+        check = self.run_check()
+        self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
+        payload = json.loads(check.stdout)
+        self.assertFalse(payload["passed"], payload)
+        self.assertTrue(any(f["check"] == "harness-observability-required" for f in payload["findings"]), payload)
 
 
 if __name__ == "__main__":

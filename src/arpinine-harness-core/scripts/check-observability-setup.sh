@@ -117,12 +117,23 @@ for plan_path in candidate_plans:
         })
         continue
 
-    obs_body = section_body(plan_text, "Observability Strategy")
     harness_body = section_body(plan_text, "Harness Strategy")
     harness_required = bool(harness_body) and not _section_is_na(harness_body)
+    obs_body = section_body(plan_text, "Observability Strategy")
 
     # No observability section — nothing declared, skip source checks
     if not obs_body:
+        if harness_required:
+            findings.append({
+                "level": "HIGH",
+                "check": "harness-observability-required",
+                "slug": slug_label,
+                "message": (
+                    "## Harness Strategy is present but ## Observability Strategy is missing or empty. "
+                    "Harness-based agent workflows require a fully documented Observability Strategy. "
+                    "Run /at-plan with observability-governor before /at-implement."
+                ),
+            })
         continue
 
     # N/A declared — intentionally opted out, nothing to check
