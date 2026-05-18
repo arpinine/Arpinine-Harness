@@ -16,7 +16,7 @@
   "constitution_principles": [
     "Domain modules stay free of agent runtimes, frameworks, transport clients, and persistence-layer imports.",
     "Agent orchestration composes tools and domain logic through explicit boundaries; business rules do not migrate into tools or runtime adapters.",
-    "Product code depends on ObservationProvider and EvaluationProvider abstractions only; Langfuse and DeepEval SDK imports stay inside src/observability/ and src/evaluation/ respectively.",
+    "Product code depends on ObservationProvider and EvaluationProvider abstractions only; observability and evaluation SDK imports stay inside src/observability/ and src/evaluation/ respectively.",
     "Observability and evaluation providers are injected at the composition root; no agent or tool module resolves its own provider."
   ],
   "starter_rules": [
@@ -35,13 +35,13 @@
     {
       "rule_id": "archetype-agent-app-observability-boundary",
       "severity": "HIGH",
-      "prevents": "Langfuse or DeepEval SDK leakage into agent, tool, domain, or test helper modules",
+      "prevents": "observability or DeepEval SDK leakage into agent, tool, domain, or test helper modules",
       "triggers": [
-        "agent, tool, or domain file gains a direct `from langfuse` or `from deepeval` import",
+        "agent, tool, or domain file gains a direct observability SDK import such as `from opentelemetry` or `from langfuse`, or a `from deepeval` import",
         "test helper outside src/evaluation/ imports deepeval directly"
       ],
-      "rule": "Keep Langfuse imports in `src/observability/langfuse.py` and DeepEval imports in `src/evaluation/deepeval.py`. All other modules depend on the Protocol interfaces in `src/observability/base.py` and `src/evaluation/base.py`.",
-      "detection_pattern": "Review edits under `src/agents/`, `src/tools/`, `src/domain/`, and `tests/` for `from langfuse` or `from deepeval` imports.",
+      "rule": "Keep observability SDK imports in the selected provider file under `src/observability/` and DeepEval imports in `src/evaluation/deepeval.py`. All other modules depend on the Protocol interfaces in `src/observability/base.py` and `src/evaluation/base.py`.",
+      "detection_pattern": "Review edits under `src/agents/`, `src/tools/`, `src/domain/`, and `tests/` for `from opentelemetry`, `from langfuse`, or `from deepeval` imports.",
       "correct_pattern": "Agent and tool constructors accept ObservationProvider and EvaluationProvider types. Provider instances are created at the composition root and injected."
     }
   ]

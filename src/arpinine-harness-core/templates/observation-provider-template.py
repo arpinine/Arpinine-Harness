@@ -1,8 +1,9 @@
 """
-ObservationProvider — abstract interface for LLM runtime observability.
+ObservationProvider — abstract interface for runtime observability and telemetry.
 
 Product code depends on this Protocol only. SDK-specific implementations
-(e.g. LangfuseObservationProvider) live in src/observability/<provider>.py
+(e.g. OpenTelemetryObservationProvider or LangfuseObservationProvider)
+live in src/observability/<provider>.py
 and are injected at the composition root.
 
 Swap the provider by changing the composition root import — no product code changes.
@@ -39,7 +40,7 @@ class SpanContext:
 @runtime_checkable
 class ObservationProvider(Protocol):
     """
-    Thin abstraction over LLM observability backends.
+    Thin abstraction over runtime observability backends.
 
     Implementations must be thread-safe and must not raise on flush failure
     (log the error and continue). Product code must never import from

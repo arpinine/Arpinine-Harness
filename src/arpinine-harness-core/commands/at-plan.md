@@ -61,7 +61,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    | Does the feature use an agent harness or multi-step tool loop? | Observation required — trace each turn, generation, and tool span |
    | Does the feature produce AI-driven output that must be quality-gated? | Evaluation required — define metrics and thresholds before ship |
 
-   - If **yes to any**: `## Observability Strategy` must be fully documented with all controls: observation required, `ObservationProvider` interface path, default implementation (Langfuse), env var configuration, evaluation required, `EvaluationProvider` interface path, default implementation (DeepEval), observation-evaluation bridge, and swap strategy. Write this determination into `plan.md` before invoking `observability-governor`.
+   - If **yes to any**: `## Observability Strategy` must be fully documented with all controls: observation required, `ObservationProvider` interface path, default implementation (OpenTelemetry, Langfuse, or justified alternative), env var configuration, evaluation required, `EvaluationProvider` interface path, default implementation (DeepEval), observation-evaluation bridge, and swap strategy. Write this determination into `plan.md` before invoking `observability-governor`.
    - If **yes to any**: include an implementation handoff note in the plan outcome telling the team to run `python3 scripts/scaffold_observability_setup.py --spec <slug>` before `/arpinine-harness:at-implement` or at the start of `/arpinine-harness:at-implement`.
    - If **no to all**: Set `## Observability Strategy` body to `N/A — feature makes no LLM calls and produces no AI-driven output. Standard logging is sufficient.`
    - If **unclear**: ask the user the minimum question needed to resolve ambiguity before proceeding.
@@ -76,7 +76,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
     - Block planning if no model is named or if prompt injection surface is unmitigated.
 16. Invoke the `devops` agent on `plan.md` when the spec involves a deployed service, external API keys, secrets, or a CI/CD pipeline:
     - Review deployment strategy, secrets management approach, environment configuration, and CI/CD pipeline.
-    - Verify `LANGFUSE_*` and `DEEPEVAL_API_KEY` env vars are documented and not hardcoded.
+   - Verify backend-specific observability env vars and `DEEPEVAL_API_KEY` are documented and not hardcoded.
     - Flag hardcoded secrets, missing deployment path, or absent rollback plan.
     - Suggest ADRs for hosting platform, database provisioning, and secrets management strategy.
     - Block planning if no deployment path is defined or if secrets management is absent.

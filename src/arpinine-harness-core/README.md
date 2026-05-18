@@ -298,7 +298,7 @@ For AI, LLM, or agent-runtime features, `/arpinine-harness:at-plan` writes `## O
 Implementation path:
 
 - `/arpinine-harness:at-plan` decides whether observation and evaluation are required
-- `python3 scripts/scaffold_observability_setup.py --spec <slug>` creates missing provider abstractions, default Langfuse/DeepEval implementations when the plan selects them, `noop` providers, and `.env.example` entries
+- `python3 scripts/scaffold_observability_setup.py --spec <slug>` creates missing provider abstractions, selected OpenTelemetry or Langfuse observation implementations, default DeepEval evaluation implementations when the plan selects them, `noop` providers, and `.env.example` entries
 - `scripts/check-observability-setup.sh --spec <slug>` verifies that provider files exist and SDK imports stay inside the designated provider modules before implementation continues
 
 The scaffolder is idempotent. Existing files are preserved and reported as skipped rather than overwritten.

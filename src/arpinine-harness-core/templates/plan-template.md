@@ -69,8 +69,8 @@ N/A — feature makes no LLM calls and produces no AI-driven output. Standard lo
 |---------|----------|
 | Observation required | Yes |
 | ObservationProvider interface | [file path — e.g. `src/observability/base.py`] |
-| Default implementation | Langfuse — [justify if not Langfuse] |
-| Env var configuration | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` (documented in `.env.example`) |
+| Default implementation | OpenTelemetry or Langfuse — [justify if using another backend] |
+| Env var configuration | [document backend env vars in `.env.example`, e.g. `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT` or `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST`] |
 | Evaluation required | Yes |
 | EvaluationProvider interface | [file path — e.g. `src/evaluation/base.py`] |
 | Default implementation | DeepEval — [justify if not DeepEval] |
@@ -78,7 +78,7 @@ N/A — feature makes no LLM calls and produces no AI-driven output. Standard lo
 | Swap strategy | [what changes when provider is replaced — must be adapter file only; no agent, tool, or domain code changes] |
 
 Implementation handoff: run `python3 scripts/scaffold_observability_setup.py --spec <slug>` before `/arpinine-harness:at-implement` to scaffold provider files from this section.
-Provider templates: `templates/observation-provider-template.py`, `templates/langfuse-observation-provider-template.py`, `templates/evaluation-provider-template.py`, `templates/deepeval-evaluation-provider-template.py`
+Provider templates: `templates/observation-provider-template.py`, `templates/opentelemetry-observation-provider-template.py`, `templates/langfuse-observation-provider-template.py`, `templates/evaluation-provider-template.py`, `templates/deepeval-evaluation-provider-template.py`
 
 ## Tasks
 - [ ] TASK-001: Write failing tests for [module] [team: codex]

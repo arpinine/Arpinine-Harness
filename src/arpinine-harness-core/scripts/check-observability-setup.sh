@@ -88,6 +88,7 @@ EVAL_PROVIDER_RE = re.compile(
 )
 
 LANGFUSE_IMPORT_RE = re.compile(r"^\s*(?:from|import)\s+langfuse\b", re.MULTILINE)
+OTEL_IMPORT_RE = re.compile(r"^\s*(?:from|import)\s+opentelemetry(?:\b|\.)", re.MULTILINE)
 DEEPEVAL_IMPORT_RE = re.compile(r"^\s*(?:from|import)\s+deepeval\b", re.MULTILINE)
 FLUSH_RE = re.compile(r"\.flush\(\)")
 
@@ -156,8 +157,10 @@ for plan_path in candidate_plans:
     # ── observation provider checks ─────────────────────────────────────────
     obs_base_candidates = []
     obs_langfuse_candidates = []
+    obs_otel_candidates = []
     obs_noop_candidates = []
     langfuse_leak_files = []
+    otel_leak_files = []
     flush_present = False
 
     for src_root in src_roots:
@@ -171,6 +174,8 @@ for plan_path in candidate_plans:
                     obs_base_candidates.append(rel)
                 if LANGFUSE_IMPORT_RE.search(text):
                     obs_langfuse_candidates.append(rel)
+                if OTEL_IMPORT_RE.search(text):
+                    obs_otel_candidates.append(rel)
                 if FLUSH_RE.search(text):
                     flush_present = True
                 # noop provider
@@ -191,6 +196,8 @@ for plan_path in candidate_plans:
             text = py_file.read_text(errors="replace")
             if LANGFUSE_IMPORT_RE.search(text):
                 langfuse_leak_files.append(rel)
+            if OTEL_IMPORT_RE.search(text):
+                otel_leak_files.append(rel)
 
     if not obs_base_candidates:
         findings.append({
@@ -204,15 +211,27 @@ for plan_path in candidate_plans:
             ),
         })
 
-    if obs_base_candidates and not obs_langfuse_candidates:
-        plan_chose_langfuse = _plan_names_provider(obs_body, r'\blangfuse\b')
-        plan_chose_alternative = _plan_names_provider(
-            obs_body,
-            r'\bopentelemetry\b', r'\botel\b', r'\blangsmith\b',
-            r'\bphoenix\b', r'\barize\b', r'\bhoneyhive\b',
-        )
-        if plan_chose_langfuse or not plan_chose_alternative:
-            # Plan explicitly chose Langfuse, or no alternative was declared — require default impl
+    plan_chose_langfuse = _plan_names_provider(obs_body, r'\blangfuse\b')
+    plan_chose_opentelemetry = _plan_names_provider(obs_body, r'\bopentelemetry\b', r'\botel\b')
+    plan_chose_alternative = _plan_names_provider(
+        obs_body,
+        r'\bopentelemetry\b', r'\botel\b', r'\blangsmith\b',
+        r'\bphoenix\b', r'\barize\b', r'\bhoneyhive\b',
+    )
+
+    if obs_base_candidates:
+        if plan_chose_opentelemetry and not obs_otel_candidates:
+            findings.append({
+                "level": "HIGH",
+                "check": "opentelemetry-provider-missing",
+                "slug": slug_label,
+                "message": (
+                    "ObservationProvider interface exists but no OpenTelemetryObservationProvider found. "
+                    "Create src/observability/opentelemetry.py and keep OpenTelemetry SDK imports there only. "
+                    "Use templates/opentelemetry-observation-provider-template.py as scaffold."
+                ),
+            })
+        elif (plan_chose_langfuse or not plan_chose_alternative) and not obs_langfuse_candidates:
             findings.append({
                 "level": "HIGH",
                 "check": "langfuse-provider-missing",
@@ -224,14 +243,13 @@ for plan_path in candidate_plans:
                     "If using a non-Langfuse backend, declare it explicitly in ## Observability Strategy."
                 ),
             })
-        else:
-            # Plan declared a non-Langfuse alternative — ADR advisory only
+        elif plan_chose_alternative and not plan_chose_opentelemetry and not plan_chose_langfuse:
             findings.append({
                 "level": "MEDIUM",
                 "check": "alternative-observation-provider-adr",
                 "slug": slug_label,
                 "message": (
-                    "## Observability Strategy names a non-Langfuse observation backend. "
+                    "## Observability Strategy names a non-default observation backend. "
                     "Ensure an ADR exists justifying the alternative provider and that "
                     "the custom implementation satisfies the ObservationProvider Protocol."
                 ),
@@ -248,13 +266,13 @@ for plan_path in candidate_plans:
             ),
         })
 
-    if obs_langfuse_candidates and not flush_present:
+    if (obs_langfuse_candidates or obs_otel_candidates) and not flush_present:
         findings.append({
             "level": "MEDIUM",
             "check": "observation-flush",
             "slug": slug_label,
             "message": (
-                "LangfuseObservationProvider exists but no .flush() call found. "
+                "Observation provider exists but no .flush() call found. "
                 "Ensure flush() is called at application shutdown (atexit or shutdown handler)."
             ),
         })
@@ -267,6 +285,17 @@ for plan_path in candidate_plans:
             "message": (
                 "Langfuse SDK imported outside src/observability/ — boundary violation:\n"
                 + "\n".join(f"  - {f}" for f in langfuse_leak_files)
+            ),
+        })
+
+    if otel_leak_files:
+        findings.append({
+            "level": "HIGH",
+            "check": "opentelemetry-boundary",
+            "slug": slug_label,
+            "message": (
+                "OpenTelemetry SDK imported outside src/observability/ — boundary violation:\n"
+                + "\n".join(f"  - {f}" for f in otel_leak_files)
             ),
         })
 

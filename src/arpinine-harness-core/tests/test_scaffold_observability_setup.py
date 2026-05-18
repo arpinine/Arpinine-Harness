@@ -80,7 +80,7 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
         self.assertEqual(payload["results"][0]["status"], "skip")
         self.assertFalse((self.repo / "src").exists())
 
-    def test_respects_app_root_and_alternative_providers(self) -> None:
+    def test_scaffolds_opentelemetry_provider_when_selected(self) -> None:
         self.write_plan(
             textwrap.dedent(
                 """\
@@ -102,12 +102,16 @@ class ScaffoldObservabilitySetupTests(unittest.TestCase):
         result = self.run_script("--spec", "001-demo", "--json")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertTrue((self.repo / "app" / "observability" / "base.py").exists())
+        self.assertTrue((self.repo / "app" / "observability" / "opentelemetry.py").exists())
         self.assertTrue((self.repo / "app" / "observability" / "noop.py").exists())
         self.assertFalse((self.repo / "app" / "observability" / "langfuse.py").exists())
         self.assertTrue((self.repo / "app" / "evaluation" / "base.py").exists())
         self.assertTrue((self.repo / "app" / "evaluation" / "noop.py").exists())
         self.assertFalse((self.repo / "app" / "evaluation" / "deepeval.py").exists())
-        self.assertFalse((self.repo / ".env.example").exists())
+        env_text = (self.repo / ".env.example").read_text(encoding="utf-8")
+        self.assertIn("OTEL_SERVICE_NAME=", env_text)
+        self.assertIn("OTEL_EXPORTER_OTLP_ENDPOINT=", env_text)
+        self.assertNotIn("LANGFUSE_PUBLIC_KEY=", env_text)
 
     def test_partial_scaffold_creates_missing_files_only(self) -> None:
         """base.py already exists — scaffold must create langfuse.py without overwriting base.py."""

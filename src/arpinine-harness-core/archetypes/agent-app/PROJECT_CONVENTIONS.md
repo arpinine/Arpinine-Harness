@@ -7,7 +7,8 @@
 - `src/domain/` — pure business logic; no framework or infrastructure imports
 - `src/observability/` — observation provider abstraction and implementations
   - `base.py` — `ObservationProvider` Protocol (the only import allowed outside this package)
-  - `langfuse.py` — `LangfuseObservationProvider` (default; all Langfuse SDK imports stay here)
+  - `opentelemetry.py` — `OpenTelemetryObservationProvider` (recommended generic default; all OpenTelemetry SDK imports stay here)
+  - `langfuse.py` — `LangfuseObservationProvider` (supported alternative; all Langfuse SDK imports stay here)
   - `noop.py` — `NoopObservationProvider` (use in unit tests and local dev without credentials)
 - `src/evaluation/` — evaluation provider abstraction and implementations
   - `base.py` — `EvaluationProvider` Protocol (the only import allowed outside this package)
@@ -22,15 +23,15 @@
 - Tool functions accept explicit dependencies; independently testable without an agent runtime.
 - No business logic in tools. No I/O in domain.
 - `ObservationProvider` and `EvaluationProvider` are injected at the composition root; never resolved inside agents, tools, or domain modules.
-- Langfuse SDK imports are confined to `src/observability/langfuse.py`. DeepEval SDK imports are confined to `src/evaluation/deepeval.py`. No exceptions.
+- Observability SDK imports are confined to the selected provider module under `src/observability/`. DeepEval SDK imports are confined to `src/evaluation/deepeval.py`. No exceptions.
 
 ## Observability
 
 - All LLM calls must be wrapped in `ObservationProvider.trace()` + `ObservationProvider.generation()`.
 - Non-trivial agent steps should be wrapped in `ObservationProvider.span()`.
 - `ObservationProvider.flush()` must be called on application shutdown.
-- Evaluation metric scores should be attached to traces via `ObservationProvider.score()` to surface them in the Langfuse dashboard alongside runtime data.
-- `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, and `LANGFUSE_HOST` must be documented in `.env.example`. Never hardcode credentials.
+- Evaluation metric scores should be attached to traces via `ObservationProvider.score()` to surface them alongside runtime data in the selected backend.
+- Backend-specific observability env vars must be documented in `.env.example`. Never hardcode credentials.
 
 ## Evaluation
 

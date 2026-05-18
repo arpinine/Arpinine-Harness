@@ -59,6 +59,7 @@ The workflow needs a generic operational-measurement layer so teams can benchmar
 ## Out of Scope
 
 - Choosing a single benchmark vendor or evaluation framework
+- Adding first-class `ObservationProvider` scaffolding, readiness gates, or SDK-specific wiring for a specific observability backend such as OpenTelemetry or Langfuse
 - Defining one domain-specific label schema for business opportunities, support tickets, or any other product category
 - Automatically approving or rotating baselines without human review
 - Building a complete data-labeling system inside Arpinine Harness
@@ -92,7 +93,8 @@ This feature extends governance artifact schemas and command definitions. It doe
 - Teams must be able to use benchmark governance without coupling the plugin to a specific agent runtime.
 - The artifact model must support both lightweight operator-readable summaries and machine-readable historical records.
 - Baseline comparisons must be explicit about comparable dimensions such as dataset version, model/runtime variant, prompt/config variant, and scenario set.
-- Telemetry fields are populated by the product runtime, harness adapter, or evaluation runner; Arpinine Harness governs their presence and review semantics but cannot synthesize missing runtime telemetry at artifact-write time.
+- Telemetry fields are populated by the product runtime, harness adapter, observability backend, or evaluation runner; Arpinine Harness governs their presence and review semantics but cannot synthesize missing runtime telemetry at artifact-write time.
+- Runtime teams may source telemetry through OpenTelemetry or other observability backends, but this spec governs the repository artifact contract rather than backend-specific provider integration.
 
 ## Open Questions
 
@@ -105,6 +107,7 @@ This feature extends governance artifact schemas and command definitions. It doe
 - RD-003: Operational measurement capabilities are generic governance capabilities and not a domain-specific product extension.
 - RD-004: Regression claims require matching dataset version, model/runtime variant, prompt/config variant, and scenario set between the baseline and the compared run.
 - RD-005: Benchmarked evaluation is mandatory when a plan declares release-blocking latency, token, cost, or regression thresholds; otherwise single-run evaluation remains acceptable.
+- RD-006: OpenTelemetry or other backend-specific observation-provider support is a separate concern from the artifact and benchmark governance defined by this spec.
 
 ## Related ADRs
 

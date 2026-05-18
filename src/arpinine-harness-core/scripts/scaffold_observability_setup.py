@@ -21,6 +21,10 @@ OBS_ALT_PATTERNS = (
     r"\barize\b",
     r"\bhoneyhive\b",
 )
+OTEL_PATTERNS = (
+    r"\bopentelemetry\b",
+    r"\botel\b",
+)
 EVAL_ALT_PATTERNS = (
     r"\bragas\b",
     r"\btruelens\b",
@@ -210,8 +214,14 @@ def ensure_file(path: pathlib.Path, content: str) -> bool:
     return True
 
 
-def ensure_env_vars(repo: pathlib.Path, need_langfuse: bool, need_deepeval: bool) -> bool:
-    if not need_langfuse and not need_deepeval:
+def ensure_env_vars(
+    repo: pathlib.Path,
+    *,
+    need_langfuse: bool,
+    need_opentelemetry: bool,
+    need_deepeval: bool,
+) -> bool:
+    if not need_langfuse and not need_opentelemetry and not need_deepeval:
         return False
 
     env_path = repo / ".env.example"
@@ -223,6 +233,17 @@ def ensure_env_vars(repo: pathlib.Path, need_langfuse: bool, need_deepeval: bool
             ("LANGFUSE_PUBLIC_KEY", ""),
             ("LANGFUSE_SECRET_KEY", ""),
             ("LANGFUSE_HOST", "https://cloud.langfuse.com"),
+        ):
+            if re.search(rf"^{re.escape(key)}=", existing, re.MULTILINE):
+                continue
+            additions.append(f"{key}={value}")
+
+    if need_opentelemetry:
+        for key, value in (
+            ("OTEL_SERVICE_NAME", "agent-runtime"),
+            ("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4318/v1/traces"),
+            ("OTEL_EXPORTER_OTLP_HEADERS", ""),
+            ("OTEL_RESOURCE_ATTRIBUTES", "deployment.environment=development"),
         ):
             if re.search(rf"^{re.escape(key)}=", existing, re.MULTILINE):
                 continue
@@ -264,8 +285,10 @@ def scaffold_for_plan(repo: pathlib.Path, plan_path: pathlib.Path) -> dict[str, 
     templates_dir = script_dir.parent / "templates"
 
     obs_default, obs_alternative = plan_names_provider(body, OBS_ALT_PATTERNS, "langfuse")
+    obs_opentelemetry, _ = plan_names_provider(body, OTEL_PATTERNS, "opentelemetry")
     eval_default, eval_alternative = plan_names_provider(body, EVAL_ALT_PATTERNS, "deepeval")
     scaffold_langfuse = obs_default or not obs_alternative
+    scaffold_opentelemetry = obs_opentelemetry
     scaffold_deepeval = eval_default or not eval_alternative
 
     created: list[str] = []
@@ -284,6 +307,13 @@ def scaffold_for_plan(repo: pathlib.Path, plan_path: pathlib.Path) -> dict[str, 
     if scaffold_langfuse:
         obs_provider_path = obs_dir / "langfuse.py"
         if ensure_file(obs_provider_path, rewrite_template(templates_dir / "langfuse-observation-provider-template.py", root_name)):
+            created.append(str(obs_provider_path.relative_to(repo)))
+        else:
+            skipped.append(str(obs_provider_path.relative_to(repo)))
+
+    if scaffold_opentelemetry:
+        obs_provider_path = obs_dir / "opentelemetry.py"
+        if ensure_file(obs_provider_path, rewrite_template(templates_dir / "opentelemetry-observation-provider-template.py", root_name)):
             created.append(str(obs_provider_path.relative_to(repo)))
         else:
             skipped.append(str(obs_provider_path.relative_to(repo)))
@@ -307,7 +337,12 @@ def scaffold_for_plan(repo: pathlib.Path, plan_path: pathlib.Path) -> dict[str, 
     else:
         skipped.append(str(eval_noop_path.relative_to(repo)))
 
-    env_updated = ensure_env_vars(repo, scaffold_langfuse, scaffold_deepeval)
+    env_updated = ensure_env_vars(
+        repo,
+        need_langfuse=scaffold_langfuse,
+        need_opentelemetry=scaffold_opentelemetry,
+        need_deepeval=scaffold_deepeval,
+    )
     if env_updated:
         created.append(".env.example")
     elif (repo / ".env.example").exists():
@@ -321,6 +356,7 @@ def scaffold_for_plan(repo: pathlib.Path, plan_path: pathlib.Path) -> dict[str, 
         "skipped": skipped,
         "scaffolded_defaults": {
             "langfuse": scaffold_langfuse,
+            "opentelemetry": scaffold_opentelemetry,
             "deepeval": scaffold_deepeval,
         },
     }
