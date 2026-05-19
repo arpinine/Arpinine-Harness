@@ -440,7 +440,7 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
       <div style="flex:1;background:var(--hdr);border-radius:8px;padding:14px 18px;display:flex;flex-direction:column;gap:6px;">
         <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:2px;">Two-Axis AI Engineering Maturity Framework</div>
         <p style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.6;">A diagnostic model that maps AI engineering maturity across two independent dimensions — how teams govern AI-assisted coding, and how products are architected to support AI agents. The framework identifies where a team sits today, names the failure pattern it produces, and defines the investment required to reach the Converged Frontier.</p>
-        <div style="margin-top:auto;font-size:11px;color:rgba(255,255,255,.45);font-style:italic;">Arpinine Intelligence · 2026</div>
+        <div style="margin-top:auto;font-size:10.5px;color:rgba(255,255,255,.45);font-style:italic;line-height:1.5;">Arpinine Intelligence · 2026<br><span style="font-size:10px;">Operationalises NIST AI RMF · ISO 42001 · EU AI Act at the engineering workflow level</span></div>
       </div>
 
       <!-- Arpinine Harness intro -->
@@ -448,7 +448,7 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
         <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gd);margin-bottom:2px;">Arpinine Harness</div>
         <p style="font-size:12px;color:var(--txt-m);line-height:1.6;">The Arpinine Harness operationalises the Two-Axis framework inside Claude Code and Codex. It replaces ad-hoc AI use with running infrastructure: ten specialist agents enforcing spec integrity, architecture boundaries, security gates, and eval contracts — automatically, on every session. Human role: confirm decisions surfaced by the infrastructure, not police every output.</p>
         <div style="margin-top:auto;display:flex;align-items:center;gap:8px;">
-          <span style="font-size:11px;font-weight:700;color:var(--gd);">90% automatic</span>
+          <span style="font-size:11px;font-weight:700;color:var(--gd);">90% automated in practice</span>
           <span style="font-size:10px;color:var(--txt-l);">·</span>
           <span style="font-size:11px;color:var(--txt-m);">works with Claude · Codex · any model</span>
         </div>
@@ -571,28 +571,45 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
     <div class="src"><span class="src-n">⁶</span> Sonnet 4.6 $3/$15/M (Anthropic May 2026) · 500K session benchmark (Sitepoint) · IBM Cost of a Data Breach 2025</div>
   </div>
   <div class="sdots" id="s2-dots"></div><div class="clix" id="s2-hint">click to reveal</div>
-</div>
-
-<div class="slide" id="s3" data-steps="2">
+</div><div class="slide" id="s3" data-steps="2">
   <div class="hdr"><div class="hdr-title">Why This Matters Now</div><div class="hdr-tag">Urgency</div></div>
-  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:44px;display:flex;flex-direction:column;gap:12px;">
-    <div class="ob r on"><strong>Six forces are converging.</strong> Each one alone is manageable. Together they create an architecture lock-in window that closes in the next 12–18 months.</div>
-    <div class="g3 r on" style="gap:11px;">
-      <div class="card cr"><h3>Context windows exploding</h3><p>Models now handle 200K–1M token windows. Without governance, that is not more power — it is more surface area for waste, drift, and silent failure.</p></div>
-      <div class="card ca"><h3>Agent autonomy increasing</h3><p>Agents now write code, run tests, open PRs, and trigger deployments. The blast radius of an ungoverned decision is no longer a bad comment — it is a production incident.</p></div>
-      <div class="card cr"><h3>Shadow AI already widespread</h3><p>63% of organisations have no AI governance policy. IBM 2025: shadow AI adds $670K to average breach cost. The risk is present now — not theoretical.</p></div>
-      <div class="card ca"><h3>Eval and governance lag adoption</h3><p>Every team is shipping AI features. Almost none have eval contracts, baseline snapshots, or prompt version control. Technical debt is accumulating invisibly.</p></div>
-      <div class="card cp"><h3>Architecture lock-in happening now</h3><p>The AIN 2→3 transition is cheap before you build. After the architecture is set, retrofitting AI-callable design is disruptive and expensive. The window is open now.</p></div>
-      <div class="card cfg"><h3>The governance layer is infrastructure</h3><p>Rules enforce automatically. ADRs block decisions before they become accidental code. Eval contracts gate completion without human review of every output. The harness runs — it doesn't ask permission.</p></div>
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:44px;display:flex;flex-direction:column;gap:16px;">
+    <div class="ob r on">
+      <strong>Six forces are converging right now.</strong> Together they are closing a critical architecture lock-in window in the next 12–18 months.
+    </div>
+    <div class="g2 r on" style="gap:12px;">
+      <div class="card cr">
+        <h3>Exploding context + agent power</h3>
+        <p>200K–1M token windows + agents that write code, open PRs and deploy. Without governance, this is not more capability — it is a dramatically larger risk surface.</p>
+      </div>
+      <div class="card cr">
+        <h3>Shadow AI is already here</h3>
+        <p>63% of organisations have no AI governance policy. IBM 2025: shadow AI adds +$670K to the average breach cost. The risk is present now — not in two years.</p>
+      </div>
+      <div class="card ca">
+        <h3>Architecture lock-in window closing</h3>
+        <p>AIN 2→3 (true agent operability) is cheap before you build — and very expensive after. The window is closing fast.</p>
+      </div>
+      <div class="card cp">
+        <h3>Regulatory enforcement arriving</h3>
+        <p>EU AI Act full enforcement: 2026. ISO 42001 certification demand rising. NIST AI RMF becoming the enterprise baseline. Governance is shifting from best practice to legal requirement.</p>
+      </div>
     </div>
     <div class="r" data-step="1">
-      <div style="background:var(--hdr);border-radius:7px;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
-        <p style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.6;">Teams that deploy governance infrastructure in the next six months will have a structural advantage that is very difficult to close. The infrastructure runs 24/7. <strong style="color:#fff;">The competitor's discipline doesn't.</strong></p>
-        <div style="flex-shrink:0;font-size:11px;color:rgba(255,255,255,.45);text-align:right;line-height:1.7;">Window open<br><strong style="color:rgba(255,255,255,.7);font-size:14px;">now</strong></div>
+      <div style="background:var(--hdr);color:#fff;border-radius:8px;padding:18px 24px;display:flex;align-items:center;gap:24px;">
+        <div style="flex:1;">
+          <p style="font-size:13.5px;line-height:1.6;">Teams that build governance infrastructure <strong>in the next 6 months</strong> will gain a structural, compounding advantage that is extremely difficult to close later.</p>
+        </div>
+        <div style="flex-shrink:0;text-align:center;border-left:1px solid rgba(255,255,255,.25);padding-left:24px;">
+          <div style="font-size:28px;font-weight:800;color:var(--green);">NOW</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;opacity:.7;">Window open</div>
+        </div>
       </div>
     </div>
     <div class="r" data-step="2">
-      <div class="qb c"><p>"The question is not whether to govern AI engineering. It is whether to govern it before or after the architecture lock-in. Before is cheap. After is a programme."</p></div>
+      <div class="qb c">
+        <p>"The question is not whether you will govern AI engineering. It is whether you do it before — or after — the architecture locks in."</p>
+      </div>
     </div>
   </div>
   <div class="logo">arpinine</div>
@@ -772,16 +789,16 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
         <h3>90% automatic — humans confirm, not comply</h3>
         <p>Rules enforce at commit time without human review of every output. The human sees what the infrastructure surfaced — and confirms the decision.</p>
       </div>
-      <div class="card ct" style="padding:14px 16px;">
-        <h3>Same artefacts, two assistants</h3>
-        <p>Claude and Codex share spec.md, plan.md, ADRs, and eval contracts. Lease-based ownership prevents collisions.</p>
+      <div class="card ct" style="padding:11px 14px;">
+        <h3>One source of truth, two assistants</h3>
+        <p>Claude and Codex share spec.md, plan.md, and ADRs. Lease-based task ownership — no collisions.</p>
       </div>
-      <div class="card cp" style="padding:14px 16px;">
+      <div class="card cp" style="padding:11px 14px;">
         <h3>Rules compound across projects</h3>
-        <p>Every retro extracts at least one persistent rule. The system gets smarter with every project — not just the practitioner.</p>
+        <p>Every retro extracts a persistent rule. The system gets smarter — not just the practitioner.</p>
       </div>
-      <div style="background:var(--hdr);border-radius:6px;padding:10px 14px;margin-top:2px;">
-        <p style="font-size:11.5px;color:rgba(255,255,255,.75);line-height:1.6;font-style:italic;">"The harness runs. The model reasons. The human confirms. That is the division of labour."</p>
+      <div style="background:var(--hdr);border-radius:6px;padding:9px 12px;margin-top:2px;">
+        <p style="font-size:11px;color:rgba(255,255,255,.75);line-height:1.5;font-style:italic;">"The harness runs. The model reasons. The human confirms."</p>
       </div>
     </div>
 
@@ -789,59 +806,230 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
   <div class="logo">arpinine</div>
 </div>
 
-<div class="slide" id="s8" data-steps="2">
-  <div class="hdr"><div class="hdr-title">The Arpinine Harness — One Plugin, Ten Specialist Agents</div><div class="hdr-tag">Arpinine Harness</div></div>
-  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:44px;display:flex;flex-direction:column;gap:10px;">
-    <p class="lead r on">One command triggers infrastructure. Ten specialist agents enforce automatically — spec integrity, architecture boundaries, security gates, vocabulary alignment. The human sees surfaced decisions, not raw output.</p>
-    <div class="ags r on">
-      <div class="ag"><div class="adot" style="background:#0EA5E9;"></div><div><span class="an">product-owner</span><span class="ad">Spec scope, intent, acceptance criteria</span></div><span class="abg ab-a">always</span></div>
-      <div class="ag"><div class="adot" style="background:#7F6BCA;"></div><div><span class="an">tech-architect</span><span class="ad">Architecture decisions before they become accidental code</span></div><span class="abg ab-a">always</span></div>
-      <div class="ag"><div class="adot" style="background:#F26B43;"></div><div><span class="an">domain-linguist</span><span class="ad">Bounded-context vocabulary survives implementation</span></div><span class="abg ab-a">always</span></div>
-      <div class="ag"><div class="adot" style="background:#EF4444;"></div><div><span class="an">security-reviewer</span><span class="ad">Blocks completion on unresolved risk</span></div><span class="abg ab-a">always</span></div>
-      <div class="ag"><div class="adot" style="background:#10B981;"></div><div><span class="an">tdd-guide</span><span class="ad">Implementation stays test-first and task-aligned</span></div><span class="abg ab-a">always</span></div>
-      <div class="ag"><div class="adot" style="background:#EF4444;"></div><div><span class="an">drift-detector</span><span class="ad">Code, plans, ADRs, and evidence still agree</span></div><span class="abg ab-a">always</span></div>
-      <div class="ag"><div class="adot" style="background:#F59E0B;"></div><div><span class="an">evaluation-governor</span><span class="ad">Quality gates — blocks on failing thresholds</span></div><span class="abg ab-s">scoped</span></div>
-      <div class="ag"><div class="adot" style="background:#60A5FA;"></div><div><span class="an">ai-engineer</span><span class="ad">Model choices, prompting strategy, AI failure modes</span></div><span class="abg ab-s">scoped</span></div>
-      <div class="ag"><div class="adot" style="background:#A78BFA;"></div><div><span class="an">devops</span><span class="ad">Deployment, secrets hygiene, CI/CD</span></div><span class="abg ab-s">scoped</span></div>
-      <div class="ag"><div class="adot" style="background:#34D399;"></div><div><span class="an">data-engineer</span><span class="ad">Pipelines, RAG, schema, vector stores</span></div><span class="abg ab-s">scoped</span></div>
-    </div>
-    <div class="g2 r" data-step="1">
-      <div class="card cft"><h3>Infrastructure runs. You confirm.</h3><p>Gates fire automatically on every write, every spec edit, every completion claim. You are not asked to police quality — you are shown what the infrastructure caught, and asked to confirm.</p></div>
-      <div class="qb c"><p>"The harness doesn't slow you down. It runs while you work. By the time you review output, the security check has already fired, the spec drift has already been flagged, and the architecture gate has already enforced. You confirm — you don't catch."</p></div>
-    </div>
-    <div class="r" data-step="2">
-      <div class="card cfg" style="padding:10px 14px;">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--txt-m);">
-          <strong style="color:var(--txt);font-size:11px;">Enforcement chain:</strong>
-          <code>at-discover</code><span>→</span><code>at-new</code><span>→</span><code>at-plan</code><span>→</span><code>at-eval</code><span>→</span><code>at-implement</code><span>→</span><code>at-audit</code><span>→</span><code>at-retro</code>
-        </div>
+<div class="slide" id="s8" data-steps="3">
+  <div class="hdr"><div class="hdr-title">The Arpinine Harness — A Product Engineering Squad, Not a Chatbot</div><div class="hdr-tag">Arpinine Harness</div></div>
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:44px;display:flex;flex-direction:column;gap:11px;">
+
+    <!-- Top concept line -->
+    <div class="ob r on" style="display:flex;align-items:center;justify-content:space-between;gap:20px;">
+      <div style="font-size:13px;line-height:1.6;flex:1;">One command activates a <strong>full product engineering squad</strong> — ten specialist agents applying the best practices of AI, product, and engineering simultaneously. They coordinate automatically. You confirm decisions.</div>
+      <div style="flex-shrink:0;display:flex;gap:7px;">
+        <span class="tg tgg">Spec-driven</span>
+        <span class="tg tgt">Always-on automation</span>
+        <span class="tg tgc">Risk mitigated</span>
       </div>
     </div>
+
+    <!-- Main visual: squad + shared docs + harness output -->
+    <div class="r on" style="flex:1;display:flex;gap:14px;min-height:0;">
+
+      <!-- LEFT: The Squad -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-l);">The Squad — grouped by discipline</div>
+
+        <!-- Product discipline -->
+        <div style="background:var(--tbg);border:1.5px solid var(--tbd);border-radius:8px;padding:10px 14px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:7px;">Product</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--tbd);border-radius:5px;padding:5px 10px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#0EA5E9;flex-shrink:0;"></div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt);">product-owner</div><div style="font-size:9.5px;color:var(--txt-m);">Spec · scope · acceptance criteria</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--tbd);border-radius:5px;padding:5px 10px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#F26B43;flex-shrink:0;"></div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt);">domain-linguist</div><div style="font-size:9.5px;color:var(--txt-m);">Domain vocabulary · bounded context</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engineering discipline — 3 core always-on -->
+        <div style="background:var(--gbg);border:1.5px solid var(--gbd);border-radius:8px;padding:10px 14px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gd);margin-bottom:7px;">Engineering <span style="font-weight:400;color:var(--txt-l);font-style:normal;">· always-on</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--gbd);border-radius:5px;padding:5px 10px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#7F6BCA;flex-shrink:0;"></div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt);">tech-architect</div><div style="font-size:9.5px;color:var(--txt-m);">Architecture decisions · ADRs</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--gbd);border-radius:5px;padding:5px 10px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#EF4444;flex-shrink:0;"></div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt);">security-reviewer</div><div style="font-size:9.5px;color:var(--txt-m);">Risk gates · blocks unresolved risk</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--gbd);border-radius:5px;padding:5px 10px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0;"></div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--txt);">tdd-guide + drift-detector</div><div style="font-size:9.5px;color:var(--txt-m);">Test-first · spec–code alignment</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scoped agents — compact strip -->
+        <div style="background:var(--ob-bg);border:1.5px solid var(--border);border-radius:7px;padding:8px 14px;">
+          <div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-l);margin-bottom:6px;">Scoped on demand</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--txt-m);"><span style="width:6px;height:6px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></span>eval-governor</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--txt-m);"><span style="width:6px;height:6px;border-radius:50%;background:#60A5FA;flex-shrink:0;"></span>ai-engineer</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--txt-m);"><span style="width:6px;height:6px;border-radius:50%;background:#A78BFA;flex-shrink:0;"></span>devops</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--txt-m);"><span style="width:6px;height:6px;border-radius:50%;background:#34D399;flex-shrink:0;"></span>data-engineer</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CENTRE: Shared living documents -->
+      <div class="r" data-step="1" style="width:168px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-l);">Shared living docs</div>
+
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:7px;padding:10px 12px;display:flex;flex-direction:column;gap:10px;flex:1;">
+
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:22px;height:22px;background:var(--tbg);border:1.5px solid var(--tbd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:800;color:var(--teal);">S</div>
+              <div style="font-size:11px;font-weight:700;color:var(--txt);">spec.md</div>
+            </div>
+            <p style="font-size:10px;color:var(--txt-m);line-height:1.4;padding-left:28px;">Living product spec. Acceptance criteria. Intent. Never implementation language.</p>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:22px;height:22px;background:var(--gbg);border:1.5px solid var(--gbd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:800;color:var(--gd);">P</div>
+              <div style="font-size:11px;font-weight:700;color:var(--txt);">plan.md</div>
+            </div>
+            <p style="font-size:10px;color:var(--txt-m);line-height:1.4;padding-left:28px;">Module boundaries. Dependency rules. Harness strategy. Gates implementation start.</p>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:22px;height:22px;background:var(--pbg);border:1.5px solid var(--pbd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:800;color:var(--purple);">A</div>
+              <div style="font-size:11px;font-weight:700;color:var(--txt);">ADRs</div>
+            </div>
+            <p style="font-size:10px;color:var(--txt-m);line-height:1.4;padding-left:28px;">Decision records. Why it was built this way. Agents read before touching anything.</p>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:22px;height:22px;background:var(--abg);border:1.5px solid var(--abd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:800;color:var(--amber);">E</div>
+              <div style="font-size:11px;font-weight:700;color:var(--txt);">eval-plan.md</div>
+            </div>
+            <p style="font-size:10px;color:var(--txt-m);line-height:1.4;padding-left:28px;">Quality thresholds. Baselines. Pass/fail policy. Required before any AI feature ships.</p>
+          </div>
+
+          <div style="margin-top:auto;background:var(--ob-bg);border-radius:5px;padding:6px 9px;font-size:9.5px;color:var(--txt-m);line-height:1.45;text-align:center;">All docs version-controlled.<br>All agents read the same source of truth.</div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: What the harness produces + multi-squad coordination -->
+      <div class="r" data-step="2" style="width:242px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--txt-l);">What the harness produces</div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+
+          <div style="background:var(--gbg);border:1.5px solid var(--gbd);border-radius:7px;padding:9px 12px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--gd);margin-bottom:3px;">Automated guardrails</div>
+            <p style="font-size:10px;color:var(--txt-m);line-height:1.45;">Hooks fire on every write. Spec, arch, security, eval gates enforced structurally — not by review.</p>
+          </div>
+
+          <div style="background:var(--tbg);border:1.5px solid var(--tbd);border-radius:7px;padding:9px 12px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--teal);margin-bottom:3px;">Compounding rules</div>
+            <p style="font-size:10px;color:var(--txt-m);line-height:1.45;">Every retro extracts persistent rules. The squad gets smarter with every project.</p>
+          </div>
+
+          <!-- Multi-squad coordination diagram -->
+          <div style="background:var(--ob-bg);border:1.5px solid var(--border2);border-radius:7px;padding:10px 12px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:8px;">Multi-squad · model-specialised</div>
+
+            <!-- Two squads -->
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+
+              <!-- Claude squad -->
+              <div style="flex:1;background:var(--pbg);border:1.5px solid var(--pbd);border-radius:6px;padding:7px 8px;text-align:center;">
+                <div style="font-size:10px;font-weight:800;color:var(--purple);margin-bottom:4px;">Claude</div>
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="font-size:8.5px;color:var(--txt-m);background:var(--white);border-radius:3px;padding:2px 5px;">Discovery</div>
+                  <div style="font-size:8.5px;color:var(--txt-m);background:var(--white);border-radius:3px;padding:2px 5px;">Planning</div>
+                  <div style="font-size:8.5px;color:var(--txt-m);background:var(--white);border-radius:3px;padding:2px 5px;">Architecture</div>
+                  <div style="font-size:8.5px;color:var(--txt-m);background:var(--white);border-radius:3px;padding:2px 5px;">Review</div>
+                </div>
+              </div>
+
+              <!-- Shared docs — coordination hub -->
+              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex-shrink:0;width:52px;">
+                <div style="width:1px;flex:1;background:repeating-linear-gradient(to bottom,var(--border2) 0 4px,transparent 4px 8px);"></div>
+                <div style="background:var(--hdr);border-radius:5px;padding:5px 6px;text-align:center;">
+                  <div style="font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);">shared</div>
+                  <div style="font-size:9px;font-weight:800;color:var(--green);line-height:1.2;">spec<br>plan<br>ADR</div>
+                  <div style="font-size:7.5px;color:rgba(255,255,255,.45);margin-top:2px;">task claims</div>
+                </div>
+                <div style="width:1px;flex:1;background:repeating-linear-gradient(to bottom,var(--border2) 0 4px,transparent 4px 8px);"></div>
+              </div>
+
+              <!-- Codex squad -->
+              <div style="flex:1;background:var(--tbg);border:1.5px solid var(--tbd);border-radius:6px;padding:7px 8px;text-align:center;">
+                <div style="font-size:10px;font-weight:800;color:var(--teal);margin-bottom:4px;">Codex</div>
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="font-size:8.5px;color:var(--txt-m);background:var(--white);border-radius:3px;padding:2px 5px;">Implementation</div>
+                  <div style="font-size:8.5px;color:var(--txt-m);background:var(--white);border-radius:3px;padding:2px 5px;">Testing</div>
+                  <div style="font-size:8.5px;color:var(--txt-m);background:var(--white);border-radius:3px;padding:2px 5px;">Refactoring</div>
+                  <div style="font-size:8.5px;color:var(--txt-m);background:var(--white);border-radius:3px;padding:2px 5px;">CI/CD hooks</div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Coordination rule -->
+            <div style="background:var(--white);border-radius:5px;padding:6px 8px;font-size:9.5px;color:var(--txt-m);line-height:1.45;text-align:center;">
+              Squads claim tasks on the shared plan.<br>
+              <strong style="color:var(--txt);">No overlap. No handoff. Automatic coordination.</strong>
+            </div>
+          </div>
+
+          <!-- Quote -->
+          <div style="background:var(--hdr);border-radius:7px;padding:9px 12px;margin-top:auto;">
+            <p style="font-size:9.5px;color:rgba(255,255,255,.75);line-height:1.5;font-style:italic;">"Use the best model for each task. Claude thinks, plans, and reviews. Codex implements and tests. The living documents keep them aligned — automatically."</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
   </div>
   <div class="logo">arpinine</div>
   <div class="sdots" id="s8-dots"></div><div class="clix" id="s8-hint">click to reveal</div>
 </div>
 
-<div class="slide" id="s9" data-steps="2">
-  <div class="hdr"><div class="hdr-title">Nine Stages — Infrastructure Runs, Humans Confirm at Key Decisions</div><div class="hdr-tag">Arpinine Harness · Automated Delivery Loop</div></div>
-  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:44px;display:flex;flex-direction:column;gap:10px;">
-    <div class="wf r on">
-      <div class="ws"><div class="wsn">01</div><div class="wsh">Discover</div><p class="wsp">Vague idea → spec-ready brief</p><div class="wsa">→</div></div>
-      <div class="ws"><div class="wsn">02</div><div class="wsh">Define</div><p class="wsp">Governed spec.md with measurable AC</p><div class="wsa">→</div></div>
-      <div class="ws"><div class="wsn">03</div><div class="wsh">Refine</div><p class="wsp">Tighten scope before engineering</p><div class="wsa">→</div></div>
-      <div class="ws"><div class="wsn">04</div><div class="wsh">Plan</div><p class="wsp">Module boundaries + dependency rules</p><div class="wsa">→</div></div>
-      <div class="ws"><div class="wsn">05</div><div class="wsh">Decide</div><p class="wsp">ADRs before decisions become code</p><div class="wsa">→</div></div>
-      <div class="ws"><div class="wsn">06</div><div class="wsh">Evaluate</div><p class="wsp">Eval plan required for AI features</p><div class="wsa">→</div></div>
-      <div class="ws"><div class="wsn">07</div><div class="wsh">Execute</div><p class="wsp">TDD + security review, hooks enforcing</p><div class="wsa">→</div></div>
-      <div class="ws"><div class="wsn">08</div><div class="wsh">Audit</div><p class="wsp">Detect drift across all artefacts</p><div class="wsa">→</div></div>
-      <div class="ws"><div class="wsn">09</div><div class="wsh">Learn</div><p class="wsp">Lessons → compounding persistent rules</p></div>
+<div class="slide" id="s9" data-steps="3">
+  <div class="hdr">
+    <div class="hdr-title">Nine Stages — Infrastructure Runs, Humans Confirm</div>
+    <div class="hdr-tag">Governed Delivery Loop</div>
+  </div>
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:44px;display:flex;flex-direction:column;gap:14px;">
+    <div class="wf r on" style="font-size:10.5px;">
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">01</div><div class="wsh">Discover</div><p class="wsp">Idea → brief</p><div class="wsa">→</div></div>
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">02</div><div class="wsh">Define</div><p class="wsp">spec.md + AC</p><div class="wsa">→</div></div>
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">03</div><div class="wsh">Refine</div><p class="wsp">Scope &amp; measurability</p><div class="wsa">→</div></div>
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">04</div><div class="wsh">Plan</div><p class="wsp">Boundaries + rules</p><div class="wsa">→</div></div>
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">05</div><div class="wsh">Decide</div><p class="wsp">ADRs</p><div class="wsa">→</div></div>
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">06</div><div class="wsh">Evaluate</div><p class="wsp">Quality gates</p><div class="wsa">→</div></div>
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">07</div><div class="wsh">Execute</div><p class="wsp">TDD + hooks</p><div class="wsa">→</div></div>
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">08</div><div class="wsh">Audit</div><p class="wsp">Drift detection</p><div class="wsa">→</div></div>
+      <div class="ws"><div class="wsn" style="font-size:10px;font-weight:800;">09</div><div class="wsh">Learn</div><p class="wsp">Extract rules</p></div>
     </div>
-    <div class="hks r" data-step="1">
-      <div class="hk g"><span class="hkl">Constitution</span><span class="hkt"><strong>Fires automatically on every write.</strong> Blocks implementation language in spec.md. Spec integrity is structural — not a review step.</span></div>
-      <div class="hk a"><span class="hkl">Arch readiness</span><span class="hkt"><strong>Fires automatically before any implementation write.</strong> Plan.md must define boundaries first. The gate runs — a human doesn't have to remember to check.</span></div>
-      <div class="hk t"><span class="hkl">Vocab drift</span><span class="hkt"><strong>Fires automatically on every naming decision.</strong> Domain vocabulary enforced at machine speed. No human review required to maintain language consistency.</span></div>
+    <div class="r" data-step="1">
+      <div style="background:var(--gbg);border:1.5px solid var(--gbd);border-radius:8px;padding:14px 16px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gd);margin-bottom:10px;">Key automated gates — fire without human trigger</div>
+        <div class="g2" style="gap:10px;">
+          <div class="hk g"><span class="hkl">Constitution</span><span class="hkt">Blocks implementation language in spec.md on every write</span></div>
+          <div class="hk a"><span class="hkl">Arch Readiness</span><span class="hkt">Blocks code until plan.md defines module boundaries</span></div>
+          <div class="hk t"><span class="hkl">Vocab + Drift</span><span class="hkt">Enforces domain language and spec alignment automatically</span></div>
+          <div class="hk r"><span class="hkl">Security + Eval</span><span class="hkt">Blocks completion on unresolved risk or failing quality thresholds</span></div>
+        </div>
+      </div>
     </div>
-    <div class="r" data-step="2"><div class="card cfg"><p><strong>The compliant path is the only easy path.</strong> Hooks enforce at machine speed before any artefact is created. Violating governance requires more effort than following it. Human role: confirm what the infrastructure surfaced — and reinforce good behaviour at the review gate.</p></div></div>
+    <div class="r" data-step="2">
+      <div class="card cfg">
+        <p><strong>The compliant path is now the easiest path.</strong> Governance is enforced by structure and automation at machine speed — not by human discipline or review. Humans confirm high-signal decisions surfaced by the infrastructure.</p>
+      </div>
+    </div>
   </div>
   <div class="logo">arpinine</div>
   <div class="sdots" id="s9-dots"></div><div class="clix" id="s9-hint">click to reveal</div>
@@ -930,7 +1118,7 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
 </div>
   <div class="sdots" id="s10-dots"></div><div class="clix" id="s10-hint">click to reveal</div>
 
-<div class="slide" id="s11" data-steps="3">
+<div class="slide" id="s11" data-steps="4">
   <div class="hdr">
     <div class="hdr-title">The Convergence Zone — One System, Two Powerful Uses</div>
     <div class="hdr-tag">EP + AIN Convergence</div>
@@ -975,6 +1163,7 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
 
     </div>
 
+    <!-- Quote — step 1 -->
     <div class="r" data-step="1">
       <div class="qb c" style="text-align:center;">
         <p style="font-size:13px;">"The product now carries the same governance structures that governed its construction — that is not a metaphor, it is an architectural property you design in or miss entirely."</p>
@@ -982,14 +1171,100 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
       </div>
     </div>
 
+    <!-- Regulatory alignment — step 2 -->
     <div class="r" data-step="2">
-      <div class="card cfn">
-        <h3 style="font-size:13px;margin-bottom:8px;">Convergence signals — track these to know it is working</h3>
-        <div class="g4" style="gap:12px;font-size:12px;">
-          <div><strong>Rule reuse rate</strong><br><span style="color:var(--txt-m);">&#8805;70% of new issues caught by existing rules</span></div>
-          <div><strong>Onboarding speed</strong><br><span style="color:var(--txt-m);">New engineers reach EP 4 quality in days, not months</span></div>
-          <div><strong>Cross-layer consistency</strong><br><span style="color:var(--txt-m);">Same rules govern both development and agent runtime</span></div>
-          <div><strong>Governance debt ratio</strong><br><span style="color:var(--txt-m);">System learns faster than it fails — ratio falling</span></div>
+      <div style="background:var(--ob-bg);border:1.5px solid var(--border2);border-radius:7px;padding:10px 16px;display:flex;gap:20px;align-items:center;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-l);flex-shrink:0;line-height:1.6;">Regulatory<br>alignment</div>
+        <div style="width:1px;background:var(--border);align-self:stretch;flex-shrink:0;"></div>
+        <div style="display:flex;gap:14px;flex:1;flex-wrap:wrap;font-size:11px;color:var(--txt-m);">
+          <div><strong style="color:var(--txt);">ISO 42001</strong> — EP axis maps to operational AI management controls</div>
+          <div><strong style="color:var(--txt);">EU AI Act</strong> — AIN 4 closed-loop architecture satisfies high-risk runtime governance requirements</div>
+          <div><strong style="color:var(--txt);">NIST AI RMF</strong> — compounding rules + eval contracts operationalise the Govern and Measure functions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OWASP mapping — step 3, inside the content container -->
+    <div class="r" data-step="3">
+      <div style="border:1.5px solid var(--border2);border-radius:8px;overflow:hidden;">
+        <div style="background:var(--hdr);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+          <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.65);">OWASP LLM Top 10 — how the Arpinine Harness reduces exposure</span>
+          <span style="background:var(--green);color:#fff;border-radius:4px;padding:3px 10px;font-size:10px;font-weight:700;flex-shrink:0;">EP 3 → EP 4 = biggest risk drop</span>
+        </div>
+        <div style="background:var(--white);display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;gap:0;">
+          <div style="padding:10px 13px;display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:flex-start;gap:7px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#EF4444;flex-shrink:0;margin-top:3px;"></div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--txt);">security-reviewer</div>
+                <div style="display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;">
+                  <span style="font-size:9px;font-weight:700;background:var(--rbg);color:var(--red);border:1px solid var(--rbd);border-radius:3px;padding:1px 5px;">LLM01 Prompt Injection</span>
+                  <span style="font-size:9px;font-weight:700;background:var(--rbg);color:var(--red);border:1px solid var(--rbd);border-radius:3px;padding:1px 5px;">LLM05 Improper Output</span>
+                  <span style="font-size:9px;font-weight:700;background:var(--rbg);color:var(--red);border:1px solid var(--rbd);border-radius:3px;padding:1px 5px;">LLM06 Excessive Agency</span>
+                </div>
+                <p style="font-size:10px;color:var(--txt-m);line-height:1.4;margin-top:3px;">Blocks on unresolved security findings. Challenges risky tool access before commit.</p>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:7px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#7F6BCA;flex-shrink:0;margin-top:3px;"></div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--txt);">tech-architect + constitution</div>
+                <div style="display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;">
+                  <span style="font-size:9px;font-weight:700;background:var(--pbg);color:var(--purple);border:1px solid var(--pbd);border-radius:3px;padding:1px 5px;">LLM06 Excessive Agency</span>
+                </div>
+                <p style="font-size:10px;color:var(--txt-m);line-height:1.4;margin-top:3px;">Architecture gates enforce least-privilege. Constitution prevents agents gaining implementation authority through spec drift.</p>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--border);"></div>
+          <div style="padding:10px 13px;display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:flex-start;gap:7px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#F59E0B;flex-shrink:0;margin-top:3px;"></div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--txt);">eval-governor</div>
+                <div style="display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;">
+                  <span style="font-size:9px;font-weight:700;background:var(--abg);color:var(--amber);border:1px solid var(--abd);border-radius:3px;padding:1px 5px;">LLM02 Insecure Output</span>
+                  <span style="font-size:9px;font-weight:700;background:var(--abg);color:var(--amber);border:1px solid var(--abd);border-radius:3px;padding:1px 5px;">LLM05 Improper Output</span>
+                  <span style="font-size:9px;font-weight:700;background:var(--abg);color:var(--amber);border:1px solid var(--abd);border-radius:3px;padding:1px 5px;">LLM09 Misinformation</span>
+                </div>
+                <p style="font-size:10px;color:var(--txt-m);line-height:1.4;margin-top:3px;">Eval contracts with locked baselines detect output regression before production.</p>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:7px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#EF4444;flex-shrink:0;margin-top:3px;"></div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--txt);">drift-detector</div>
+                <div style="display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;">
+                  <span style="font-size:9px;font-weight:700;background:var(--rbg);color:var(--red);border:1px solid var(--rbd);border-radius:3px;padding:1px 5px;">LLM04 Data Poisoning</span>
+                  <span style="font-size:9px;font-weight:700;background:var(--rbg);color:var(--red);border:1px solid var(--rbd);border-radius:3px;padding:1px 5px;">LLM08 Vector Weaknesses</span>
+                </div>
+                <p style="font-size:10px;color:var(--txt-m);line-height:1.4;margin-top:3px;">Flags divergence between spec, code, and ADRs — the governed context that defines safe behaviour.</p>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--border);"></div>
+          <div style="padding:10px 13px;display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:flex-start;gap:7px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:3px;"></div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--txt);">Shared artefacts</div>
+                <div style="display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;">
+                  <span style="font-size:9px;font-weight:700;background:var(--gbg);color:var(--gd);border:1px solid var(--gbd);border-radius:3px;padding:1px 5px;">spec.md</span>
+                  <span style="font-size:9px;font-weight:700;background:var(--gbg);color:var(--gd);border:1px solid var(--gbd);border-radius:3px;padding:1px 5px;">plan.md</span>
+                  <span style="font-size:9px;font-weight:700;background:var(--gbg);color:var(--gd);border:1px solid var(--gbd);border-radius:3px;padding:1px 5px;">ADRs</span>
+                  <span style="font-size:9px;font-weight:700;background:var(--gbg);color:var(--gd);border:1px solid var(--gbd);border-radius:3px;padding:1px 5px;">eval-plan.md</span>
+                </div>
+                <p style="font-size:10px;color:var(--txt-m);line-height:1.4;margin-top:3px;">Foundational defence across multiple risks. Version-controlled context prevents silent drift.</p>
+              </div>
+            </div>
+            <div style="background:var(--gbg);border:1px solid var(--gbd);border-radius:5px;padding:7px 9px;margin-top:auto;">
+              <div style="font-size:10px;font-weight:700;color:var(--gd);margin-bottom:2px;">EP 3 → EP 4 impact</div>
+              <p style="font-size:10px;color:var(--txt-m);line-height:1.4;">The automation threshold is also the OWASP exposure threshold. Gates enforce at machine speed — attack surface requiring human vigilance shrinks dramatically.</p>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--ob-bg);border-top:1px solid var(--border);padding:5px 14px;">
+          <span style="font-size:9px;color:var(--txt-l);">OWASP Top 10 for LLM Applications 2025 · owasp.org/www-project-top-10-for-large-language-model-applications</span>
         </div>
       </div>
     </div>
@@ -1008,8 +1283,7 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
         <h3 style="color:var(--txt-l);">The model layer</h3>
         <p style="margin-bottom:8px;font-size:11.5px;color:var(--txt-l);">Cursor · Copilot · Devin · Claude Code · AI IDEs</p>
         <ul class="bl" style="font-size:11px;gap:4px;">
-          <li>Provides intelligence by the token</li>
-          <li>Stateless between sessions</li>
+          <li>Intelligence by the token — stateless</li>
           <li>No persistent governance</li>
           <li>Commodity — easily switched</li>
         </ul>
@@ -1019,10 +1293,9 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
         <h3 style="color:var(--gd);">The Arpinine Harness layer</h3>
         <p style="margin-bottom:8px;font-size:11.5px;color:var(--gd);">Arpinine Harness · Governance infrastructure · Compounding rules</p>
         <ul class="bl" style="font-size:11px;gap:4px;">
-          <li>Capital that accumulates across projects</li>
-          <li>Persistent rules that compound</li>
-          <li>Works with any model underneath</li>
-          <li>Moat — cannot be copied by buying a subscription</li>
+          <li>Capital that accumulates · rules that compound</li>
+          <li>Model-agnostic — works with any LLM</li>
+          <li>Moat — cannot be copied by subscription</li>
         </ul>
       </div>
     </div>
@@ -1044,7 +1317,7 @@ code { font-size: 10.5px; background: var(--ob-bg); border: 1px solid var(--bord
         <div style="font-size:11px;color:var(--txt-m);">Engineering governance → product runtime policy. One system, two uses.</div>
       </div>
     </div>
-    <div style="background:var(--hdr);border-radius:7px;padding:14px 20px;display:flex;gap:20px;align-items:center;" class="r on d2"><div style="flex:1;"><p style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.6;"><strong style="color:#fff;">Not compliance theatre.</strong> <span>The Arpinine Harness infrastructure runs. Rules enforce at commit time. Gates fire automatically. The human confirms surfaced decisions — not every line of output.</span></p></div><div style="flex-shrink:0;border-left:1px solid rgba(255,255,255,.15);padding-left:20px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--green);line-height:1;">90%</div><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;">automatic</div></div></div>
+    <div style="background:var(--hdr);border-radius:7px;padding:14px 20px;display:flex;gap:20px;align-items:center;" class="r on d2"><div style="flex:1;"><p style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.6;"><strong style="color:#fff;">Not principles. Not checklists. Running infrastructure.</strong> <span>The Arpinine Harness operationalises NIST, ISO 42001, and the EU AI Act at the engineering workflow level. Rules enforce at commit time. Gates fire automatically. The human confirms surfaced decisions — not every line of output.</span></p></div><div style="flex-shrink:0;border-left:1px solid rgba(255,255,255,.15);padding-left:20px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--green);line-height:1;">~90%</div><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;">automatic</div></div></div>
   </div>
   <div class="logo">arpinine</div>
 </div>
