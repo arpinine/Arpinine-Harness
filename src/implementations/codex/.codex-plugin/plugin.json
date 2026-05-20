@@ -28,6 +28,7 @@
     "screenshots": [],
     "defaultPrompt": [
       "Use Arpinine Harness to initialize a governed delivery workflow for this repository.",
+      "Use Arpinine Harness to decompose a broad product goal into a project brief and feature backlog. Run /arpinine-harness:at-map to start.",
       "Use Arpinine Harness to brainstorm an idea with the product-owner one question at a time before creating a spec. Run /arpinine-harness:at-discover to start.",
       "Use Arpinine Harness to create or refine a spec before implementation starts."
     ]

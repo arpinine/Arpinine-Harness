@@ -90,6 +90,7 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 
 | Your Situation | Start With | Goal |
 | --- | --- | --- |
+| I have a broad product goal and need to break it into features | `/arpinine-harness:at-map` | produce a project brief and ordered feature backlog |
 | I have only an idea | `/arpinine-harness:at-discover` | turn a vague idea into a spec-ready brief |
 | I know what I want to build | `/arpinine-harness:at-new` | create the first governed `spec.md` |
 | I already have a codebase | `/arpinine-harness:at-bootstrap-from-code` | generate initial governed artifacts from implementation evidence |
@@ -101,16 +102,17 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 #### For A New Product
 
 1. Run `/arpinine-harness:at-init`.
-2. If the product idea is still vague, run `/arpinine-harness:at-discover`.
-3. When discovery reaches `spec-ready-awaiting-confirmation`, explicitly move to specification.
-4. Let `/arpinine-harness:at-new` create the first governed `spec.md`.
-5. Tighten the spec with `/arpinine-harness:at-review` if needed.
-6. Create the engineering plan with `/arpinine-harness:at-plan`.
-7. Capture consequential decisions with `/arpinine-harness:at-adr`.
-8. If the feature uses AI, agents, or LLMs, define evaluation with `/arpinine-harness:at-eval`.
-9. Implement with `/arpinine-harness:at-implement`.
-10. Use `/arpinine-harness:at-audit` when reality diverges from intent.
-11. Use `/arpinine-harness:at-retro` to turn lessons into lasting rules.
+2. If you are starting from a broad initiative, run `/arpinine-harness:at-map`.
+3. If you already have one feature-sized idea, run `/arpinine-harness:at-discover`.
+4. When discovery reaches `spec-ready-awaiting-confirmation`, explicitly move to specification.
+5. Let `/arpinine-harness:at-new` create the first governed `spec.md`.
+6. Tighten the spec with `/arpinine-harness:at-review` if needed.
+7. Create the engineering plan with `/arpinine-harness:at-plan`.
+8. Capture consequential decisions with `/arpinine-harness:at-adr`.
+9. If the feature uses AI, agents, or LLMs, define evaluation with `/arpinine-harness:at-eval`.
+10. Implement with `/arpinine-harness:at-implement`.
+11. Use `/arpinine-harness:at-audit` when reality diverges from intent.
+12. Use `/arpinine-harness:at-retro` to turn lessons into lasting rules.
 
 #### For An Existing Product You Want To Structure
 
@@ -127,9 +129,11 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 
 ```bash
 /arpinine-harness:at-init
-/arpinine-harness:at-discover "I want to build a product that helps remote teams run better retrospectives"
-# answer the one-question-at-a-time discovery prompts
-# then say: move to specification
+/arpinine-harness:at-map "I want to build a product that helps remote teams run better retrospectives"
+# answer the one-question-at-a-time mapping prompts
+# then say: promote features 1 and 2
+# the plugin will hand those off to /at-discover sequentially
+# within each feature discovery, say: move to specification
 /arpinine-harness:at-review .specify/specs/<slug>/spec.md
 /arpinine-harness:at-plan .specify/specs/<slug>/
 ```
@@ -145,6 +149,7 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 
 ### Command Roles
 
+- `/arpinine-harness:at-map` turns a broad product goal into a project brief and ordered feature backlog.
 - `/arpinine-harness:at-discover` turns vague ideas into a spec-ready brief.
 - `/arpinine-harness:at-new` creates the first governed `spec.md`.
 - `/arpinine-harness:at-review` improves an existing spec before execution.
@@ -156,11 +161,12 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 ### Common Mistakes
 
 - Do not start with `/arpinine-harness:at-plan` before the spec is clear.
+- Do not use `/arpinine-harness:at-discover` when the user really has a whole initiative to decompose; use `/arpinine-harness:at-map` first.
 - Do not use `/arpinine-harness:at-new` for vague ideas; use `/arpinine-harness:at-discover` first.
 - Do not use `/arpinine-harness:at-bootstrap-from-code` for greenfield work.
 - Do not treat the commands as isolated utilities; they are stages in one governed workflow.
 
-If you're unsure where to begin: run `/arpinine-harness:at-init`, then choose between `/arpinine-harness:at-discover`, `/arpinine-harness:at-new`, or `/arpinine-harness:at-bootstrap-from-code` depending on whether you have an idea, a request, or existing code.
+If you're unsure where to begin: run `/arpinine-harness:at-init`, then choose between `/arpinine-harness:at-map`, `/arpinine-harness:at-discover`, `/arpinine-harness:at-new`, or `/arpinine-harness:at-bootstrap-from-code` depending on whether you have a broad goal, a feature idea, a clear request, or existing code.
 
 ## Agent Team
 
@@ -300,6 +306,7 @@ The agents don't own anything on this list. Your team does. The agents help you 
 | Command | Stage | Purpose |
 |---------|-------|---------|
 | `/arpinine-harness:at-init` | Setup | Initialize the shared workflow and ADR structure, and optionally scaffold a new project from an archetype |
+| `/arpinine-harness:at-map` | Discover | Decompose a broad product goal into a project brief and ordered feature backlog before creating individual specs |
 | `/arpinine-harness:at-discover` | Discover | Refine a raw idea into a spec-ready brief through a one-question-at-a-time product-owner conversation, then promote it to specification on explicit confirmation |
 | `/arpinine-harness:at-new` | Define | Create a new specification from a product request |
 | `/arpinine-harness:at-bootstrap-from-code` | Define | Assess an existing codebase and seed the first governed spec, plan, eval, and ADR artifacts |
@@ -325,6 +332,9 @@ The agents don't own anything on this list. Your team does. The agents help you 
 
 # Or bootstrap a governed slice from an existing codebase
 /arpinine-harness:at-bootstrap-from-code .
+
+# Or decompose a broad initiative into feature-level discovery
+/arpinine-harness:at-map "User onboarding for a new B2B admin product"
 
 # Refine a raw idea before generating the spec
 /arpinine-harness:at-discover "User login with email and password"

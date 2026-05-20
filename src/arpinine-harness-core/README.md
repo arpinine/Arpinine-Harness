@@ -100,6 +100,7 @@ This is meant to stop the common failure mode where good product language in the
 | Command | Stage | Purpose |
 |---------|-------|---------|
 | `/arpinine-harness:at-init` | Setup | Initialize the workflow, ADR structure, and rules directory, and optionally scaffold a new project archetype |
+| `/arpinine-harness:at-map` | Discover | Decompose a broad product goal into a project brief and ordered feature backlog before creating individual specs |
 | `/arpinine-harness:at-discover` | Discover | Refine a raw idea into a spec-ready brief through a one-question-at-a-time product-owner conversation |
 | `/arpinine-harness:at-new` | Define | Create a specification from a feature request |
 | `/arpinine-harness:at-bootstrap-from-code` | Define | Assess an existing repo and seed governed artifacts from implementation evidence |
@@ -115,6 +116,14 @@ This is meant to stop the common failure mode where good product language in the
 | `/arpinine-harness:at-ask` | Any stage | Ask a focused question to a named specialist agent with spec and plan as context |
 
 ## Pre-Spec Discovery
+
+Use `/arpinine-harness:at-map` when the user has a broad project goal that still needs to be decomposed into multiple feature candidates.
+
+- routes the conversation through `product-owner`
+- asks exactly one question at a time at project level
+- produces a clarified project brief and an ordered feature backlog
+- waits for explicit user selection before promoting any feature
+- then hands selected features off to `/arpinine-harness:at-discover` sequentially
 
 Use `/arpinine-harness:at-discover` when the user has an idea but not yet a specification-quality request.
 

@@ -15,6 +15,8 @@ Turn an early idea into a specification-ready brief before generating `spec.md`.
 
 - `<idea>`: a raw feature, workflow, or product concept
 
+When `/at-discover` is invoked immediately after `/at-map`, the selected feature brief from the mapping artifact is part of the request context even though the command surface still only names `<idea>`. In that case, the map-derived feature brief is authoritative starting context for discovery and should be passed inline, not discarded and rediscovered from scratch.
+
 **Example**
 
 ```text
@@ -92,6 +94,7 @@ Route the conversation through the `product-owner` specialist with this framing:
 > Each question must build on prior answers and reduce ambiguity that would weaken a future spec.
 > Prioritize clarifying, in order: user, problem, value, trigger/use-case, boundaries, constraints, risks, measurable success, and domain vocabulary when the idea introduces terms that could harden into the future spec.
 > Avoid implementation details unless a product constraint cannot be understood without them.
+> If a map-derived feature brief from `/at-map` is present, treat it as authoritative starting context and refine from there instead of resetting to a blank discovery interview.
 > When the idea is refined enough for specification, stop asking discovery questions, produce a spec-ready brief, and wait for explicit user confirmation before handing off to `/at-new`.
 > Discovery mode needs a turn budget large enough to reach either `spec-ready-awaiting-confirmation` or an explicit stop from the user. Do not stop early because of the validation-oriented default turn cap.
 
