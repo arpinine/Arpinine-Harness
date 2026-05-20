@@ -99,6 +99,7 @@ This is meant to stop the common failure mode where good product language in the
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
+| `/arpinine-harness:at` | Facade | Inspect repo state, route the user's intent to the correct governed command, explain the choice, and delegate |
 | `/arpinine-harness:at-init` | Setup | Initialize the workflow, ADR structure, and rules directory, and optionally scaffold a new project archetype |
 | `/arpinine-harness:at-map` | Discover | Decompose a broad product goal into a project brief and ordered feature backlog before creating individual specs |
 | `/arpinine-harness:at-discover` | Discover | Refine a raw idea into a spec-ready brief through a one-question-at-a-time product-owner conversation |
@@ -114,6 +115,108 @@ This is meant to stop the common failure mode where good product language in the
 | `/arpinine-harness:at-retro` | Learn | Extract lessons as compounding rules |
 | `/arpinine-harness:at-status` | Govern | Project-wide governance overview and onboarding brief |
 | `/arpinine-harness:at-ask` | Any stage | Ask a focused question to a named specialist agent with spec and plan as context |
+
+## Facade Entry Point
+
+Use `/arpinine-harness:at` as the preferred front door when you do not already know which workflow command to run.
+
+- runs `scripts/route_at.py`, which reuses the shared state inspector and applies the shared routing policy deterministically
+- explains which underlying `/at-*` command it selected and why
+- delegates to that command without hiding the governed workflow
+
+Typical routed outcomes:
+
+- broad goal in a governed repo -> `/arpinine-harness:at-map`
+- feature-sized idea in a governed repo -> `/arpinine-harness:at-discover`
+- ungoverned repo -> `/arpinine-harness:at-init`
+- existing ungoverned codebase -> confirm between `/arpinine-harness:at-init` and `/arpinine-harness:at-bootstrap-from-code`
+- vague "what should I do next?" -> `/arpinine-harness:at-status`
+
+### Router Output Contract
+
+`scripts/route_at.py` is the executable decision layer behind `/arpinine-harness:at`.
+
+Invocation:
+
+```bash
+python3 scripts/route_at.py [--repo <path>] --intent "<intent>" [--indent <n>]
+```
+
+It emits one JSON object to stdout with these high-signal fields:
+
+- `route`: selected underlying command such as `/at-map` or `/at-status`
+- `confidence`: `high`, `medium`, or `low`
+- `reason`: one-sentence explanation of the route
+- `alternative`: optional secondary route
+- `command_class`: `handoff` or `return`
+- `mode`: `execute`, `confirm`, `clarify`, or `error`
+- `requires_confirmation`: whether the facade should pause before delegation
+- `question` and `options`: clarification or confirmation payload when routing is not direct
+- `state`: embedded normalized inspector output used to make the decision
+
+`commands/at.md` consumes this router output directly. The facade should not re-derive routing from raw repo reads once the router is available.
+
+### Facade Response Examples
+
+The facade should expose its routing decision before acting. Canonical examples:
+
+**Ungoverned repo**
+
+```text
+AT: facade
+STATE: ungoverned
+INTERPRETATION: ungoverned repository
+DECISION: /at-init
+WHY: No .specify/ directory exists, so governance must be initialized first.
+ACTION: invoking /at-init on your behalf
+```
+
+**Existing codebase without governance**
+
+```text
+AT: facade
+STATE: ungoverned, existing codebase detected
+INTERPRETATION: ungoverned existing codebase
+RECOMMENDATION: /at-init
+WHY: Governance is missing, but the repo already contains implementation that could be bootstrapped.
+ALTERNATIVE: /at-bootstrap-from-code
+CONFIRM: proceed with /at-init?
+```
+
+**Broad goal**
+
+```text
+AT: facade
+STATE: governed repo, no active sessions
+INTERPRETATION: broad product goal
+RECOMMENDATION: /at-map
+WHY: The request spans project-level decomposition rather than one feature spec.
+ALTERNATIVE: /at-discover
+CONFIRM: proceed with /at-map?
+```
+
+**Feature idea**
+
+```text
+AT: facade
+STATE: governed repo, no active sessions
+INTERPRETATION: single feature idea
+RECOMMENDATION: /at-discover
+WHY: The request is feature-sized and should be refined before spec creation.
+ALTERNATIVE: /at-new
+CONFIRM: proceed with /at-discover?
+```
+
+**What should I do next?**
+
+```text
+AT: facade
+STATE: governed repo, specs present
+INTERPRETATION: status or fallback intent
+DECISION: /at-status
+WHY: Status is the safest fallback when the request is vague or explicitly asks what to do next.
+ACTION: invoking /at-status on your behalf
+```
 
 ## Pre-Spec Discovery
 

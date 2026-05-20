@@ -2,6 +2,14 @@
 
 Steps to create a governed agent application using Arpinine Harness. Follow in order — each stage gates the next.
 
+If you want one front door instead of picking each command manually, start with:
+
+```
+/arpinine-harness:at "Help me create a governed agent application from scratch."
+```
+
+The facade will inspect repo state, choose the right next command, explain why, and delegate. The checklist below documents the explicit command-by-command path.
+
 ---
 
 ## Stage 1 — Setup

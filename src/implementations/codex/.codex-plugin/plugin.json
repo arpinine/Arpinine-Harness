@@ -27,9 +27,11 @@
     "logo": "./assets/logo.svg",
     "screenshots": [],
     "defaultPrompt": [
-      "Use Arpinine Harness to initialize a governed delivery workflow for this repository.",
-      "Use Arpinine Harness to decompose a broad product goal into a project brief and feature backlog. Run /arpinine-harness:at-map to start.",
-      "Use Arpinine Harness to brainstorm an idea with the product-owner one question at a time before creating a spec. Run /arpinine-harness:at-discover to start.",
+      "Use /arpinine-harness:at as the default front door. It now runs a deterministic router over repo state and user intent, explains the chosen command, and delegates.",
+      "If the repo is ungoverned, /arpinine-harness:at should route to /arpinine-harness:at-init before later workflow steps.",
+      "If the repo already has code but no governance, /arpinine-harness:at should present the init vs bootstrap-from-code choice instead of silently choosing.",
+      "If the user gives a broad product goal, /arpinine-harness:at should route to /arpinine-harness:at-map. If the user gives one feature-sized idea, it should route to /arpinine-harness:at-discover.",
+      "If the user asks what to do next, /arpinine-harness:at should normally route to /arpinine-harness:at-status unless a more specific state-driven route is required.",
       "Use Arpinine Harness to create or refine a spec before implementation starts."
     ]
   }

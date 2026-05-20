@@ -12,6 +12,14 @@ The process assumes:
 - the repository uses the `.specify/` artifact model
 - the user wants fast AI-assisted delivery without losing control of scope, architecture, or quality
 
+If the user does not already know which workflow command to run, the preferred front door is:
+
+```text
+/arpinine-harness:at "<intent>"
+```
+
+The facade inspects repo state, applies the written routing policy, explains the choice, and delegates to the correct underlying workflow command. The rest of this document describes the explicit command-level process.
+
 ## You Are Working With A Virtual Delivery Team
 
 Arpinine Harness is not a single assistant command wrapper.

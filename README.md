@@ -86,10 +86,21 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 - you already have a product or codebase and want to bring it under governance
 - you already have specs or plans and want to improve execution quality
 
+If you do not want to choose the command yourself, start with `/arpinine-harness:at` and describe what you want. It will inspect repo state, choose the correct workflow command, explain the decision, and delegate.
+
+What the routed facade should do in practice:
+
+- broad goal in a governed repo: route to `/arpinine-harness:at-map`
+- feature-sized idea in a governed repo: route to `/arpinine-harness:at-discover`
+- ungoverned repo: route to `/arpinine-harness:at-init`
+- existing ungoverned codebase: offer `/arpinine-harness:at-init` or `/arpinine-harness:at-bootstrap-from-code`
+- vague "what next?" request: route to `/arpinine-harness:at-status`
+
 ### Choose Your Path
 
 | Your Situation | Start With | Goal |
 | --- | --- | --- |
+| I want one front door that chooses the right workflow step | `/arpinine-harness:at` | inspect repo state, route correctly, explain the choice, and delegate |
 | I have a broad product goal and need to break it into features | `/arpinine-harness:at-map` | produce a project brief and ordered feature backlog |
 | I have only an idea | `/arpinine-harness:at-discover` | turn a vague idea into a spec-ready brief |
 | I know what I want to build | `/arpinine-harness:at-new` | create the first governed `spec.md` |
@@ -102,17 +113,18 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 #### For A New Product
 
 1. Run `/arpinine-harness:at-init`.
-2. If you are starting from a broad initiative, run `/arpinine-harness:at-map`.
-3. If you already have one feature-sized idea, run `/arpinine-harness:at-discover`.
-4. When discovery reaches `spec-ready-awaiting-confirmation`, explicitly move to specification.
-5. Let `/arpinine-harness:at-new` create the first governed `spec.md`.
-6. Tighten the spec with `/arpinine-harness:at-review` if needed.
-7. Create the engineering plan with `/arpinine-harness:at-plan`.
-8. Capture consequential decisions with `/arpinine-harness:at-adr`.
-9. If the feature uses AI, agents, or LLMs, define evaluation with `/arpinine-harness:at-eval`.
-10. Implement with `/arpinine-harness:at-implement`.
-11. Use `/arpinine-harness:at-audit` when reality diverges from intent.
-12. Use `/arpinine-harness:at-retro` to turn lessons into lasting rules.
+2. If you want the plugin to choose the workflow step for you, use `/arpinine-harness:at` with your intent.
+3. If you are starting from a broad initiative, run `/arpinine-harness:at-map`.
+4. If you already have one feature-sized idea, run `/arpinine-harness:at-discover`.
+5. When discovery reaches `spec-ready-awaiting-confirmation`, explicitly move to specification.
+6. Let `/arpinine-harness:at-new` create the first governed `spec.md`.
+7. Tighten the spec with `/arpinine-harness:at-review` if needed.
+8. Create the engineering plan with `/arpinine-harness:at-plan`.
+9. Capture consequential decisions with `/arpinine-harness:at-adr`.
+10. If the feature uses AI, agents, or LLMs, define evaluation with `/arpinine-harness:at-eval`.
+11. Implement with `/arpinine-harness:at-implement`.
+12. Use `/arpinine-harness:at-audit` when reality diverges from intent.
+13. Use `/arpinine-harness:at-retro` to turn lessons into lasting rules.
 
 #### For An Existing Product You Want To Structure
 
@@ -128,6 +140,8 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 #### Example A: I Want To Build Something New
 
 ```bash
+/arpinine-harness:at "I want to build a product that helps remote teams run better retrospectives"
+# expected route: /at-map
 /arpinine-harness:at-init
 /arpinine-harness:at-map "I want to build a product that helps remote teams run better retrospectives"
 # answer the one-question-at-a-time mapping prompts
@@ -141,14 +155,126 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 #### Example B: I Already Have A Codebase
 
 ```bash
+/arpinine-harness:at "We already have code. Bootstrap governance from this repo."
+# expected route: medium-confidence choice between /at-init and /at-bootstrap-from-code
 /arpinine-harness:at-init
 /arpinine-harness:at-bootstrap-from-code .
 /arpinine-harness:at-review .specify/specs/<slug>/spec.md
 /arpinine-harness:at-plan .specify/specs/<slug>/
 ```
 
+#### Example C: I Need The Next Safe Step
+
+```bash
+/arpinine-harness:at "what should I do next?"
+# expected route: /at-status
+```
+
+### Facade Response Examples
+
+These examples show the expected user-visible response shape from `/arpinine-harness:at`.
+
+#### Ungoverned Repo
+
+Intent:
+
+```text
+/arpinine-harness:at "set up governance for this repo"
+```
+
+Expected facade response:
+
+```text
+AT: facade
+STATE: ungoverned
+INTERPRETATION: ungoverned repository
+DECISION: /at-init
+WHY: No .specify/ directory exists, so governance must be initialized first.
+ACTION: invoking /at-init on your behalf
+```
+
+#### Existing Codebase Without Governance
+
+Intent:
+
+```text
+/arpinine-harness:at "we already have code here"
+```
+
+Expected facade response:
+
+```text
+AT: facade
+STATE: ungoverned, existing codebase detected
+INTERPRETATION: ungoverned existing codebase
+RECOMMENDATION: /at-init
+WHY: Governance is missing, but the repo already contains implementation that could be bootstrapped.
+ALTERNATIVE: /at-bootstrap-from-code
+CONFIRM: proceed with /at-init?
+```
+
+#### Broad Goal
+
+Intent:
+
+```text
+/arpinine-harness:at "I want to build a product for remote retrospectives"
+```
+
+Expected facade response:
+
+```text
+AT: facade
+STATE: governed repo, no active sessions
+INTERPRETATION: broad product goal
+RECOMMENDATION: /at-map
+WHY: The request spans project-level decomposition rather than one feature spec.
+ALTERNATIVE: /at-discover
+CONFIRM: proceed with /at-map?
+```
+
+#### Feature Idea
+
+Intent:
+
+```text
+/arpinine-harness:at "I want users to be able to add auth before I write a spec"
+```
+
+Expected facade response:
+
+```text
+AT: facade
+STATE: governed repo, no active sessions
+INTERPRETATION: single feature idea
+RECOMMENDATION: /at-discover
+WHY: The request is feature-sized and should be refined before spec creation.
+ALTERNATIVE: /at-new
+CONFIRM: proceed with /at-discover?
+```
+
+#### What Should I Do Next?
+
+Intent:
+
+```text
+/arpinine-harness:at "what should I do next?"
+```
+
+Expected facade response:
+
+```text
+AT: facade
+STATE: governed repo, specs present
+INTERPRETATION: status or fallback intent
+DECISION: /at-status
+WHY: Status is the safest fallback when the request is vague or explicitly asks what to do next.
+ACTION: invoking /at-status on your behalf
+```
+
 ### Command Roles
 
+- `/arpinine-harness:at` is the preferred front door when you want the plugin to choose the right governed workflow step.
 - `/arpinine-harness:at-map` turns a broad product goal into a project brief and ordered feature backlog.
 - `/arpinine-harness:at-discover` turns vague ideas into a spec-ready brief.
 - `/arpinine-harness:at-new` creates the first governed `spec.md`.
@@ -166,7 +292,7 @@ If you're new, do not start by memorizing every command. Start by identifying yo
 - Do not use `/arpinine-harness:at-bootstrap-from-code` for greenfield work.
 - Do not treat the commands as isolated utilities; they are stages in one governed workflow.
 
-If you're unsure where to begin: run `/arpinine-harness:at-init`, then choose between `/arpinine-harness:at-map`, `/arpinine-harness:at-discover`, `/arpinine-harness:at-new`, or `/arpinine-harness:at-bootstrap-from-code` depending on whether you have a broad goal, a feature idea, a clear request, or existing code.
+If you're unsure where to begin: run `/arpinine-harness:at` and describe what you want, or run `/arpinine-harness:at-init` and then choose between `/arpinine-harness:at-map`, `/arpinine-harness:at-discover`, `/arpinine-harness:at-new`, or `/arpinine-harness:at-bootstrap-from-code` depending on whether you have a broad goal, a feature idea, a clear request, or existing code.
 
 ## Agent Team
 
@@ -305,6 +431,7 @@ The agents don't own anything on this list. Your team does. The agents help you 
 
 | Command | Stage | Purpose |
 |---------|-------|---------|
+| `/arpinine-harness:at` | Facade | Inspect repo state, route the user's intent to the correct governed command, explain the choice, and delegate |
 | `/arpinine-harness:at-init` | Setup | Initialize the shared workflow and ADR structure, and optionally scaffold a new project from an archetype |
 | `/arpinine-harness:at-map` | Discover | Decompose a broad product goal into a project brief and ordered feature backlog before creating individual specs |
 | `/arpinine-harness:at-discover` | Discover | Refine a raw idea into a spec-ready brief through a one-question-at-a-time product-owner conversation, then promote it to specification on explicit confirmation |

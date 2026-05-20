@@ -21,6 +21,7 @@ Implemented now:
 - generated marketplace manifest at `dist/.agents/plugins/marketplace.json`
 - real marketplace registration via `codex plugin marketplace add ./dist`
 - first Codex skills that wrap the shared Arpinine Harness workflows:
+  - `at`
   - `at-map`
   - `at-discover`
   - `at-bootstrap-from-code`
@@ -90,12 +91,15 @@ Codex is expected to participate in the same multi-team operating model as Claud
 
 5. Implement the smallest supported Codex feature set first.
    Initial target:
+   - `/arpinine-harness:at`
    - `/arpinine-harness:at-init`
    - `/arpinine-harness:at-map`
    - `/arpinine-harness:at-discover`
    - `/arpinine-harness:at-new`
    - `/arpinine-harness:at-review`
    - `/arpinine-harness:at-plan`
+
+   `/arpinine-harness:at` is not just a documentation alias. It is expected to run the shared `scripts/route_at.py` router, expose the chosen governed command, and then delegate.
 
 6. Add Codex-specific shims only where required.
    Keep shared prompts and workflow assets in the core unless Codex imposes a real limitation.

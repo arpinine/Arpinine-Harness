@@ -2,6 +2,14 @@
 
 Use this when the codebase already exists and you want to retrofit Arpinine Harness governance retroactively.
 
+If you do not want to choose the workflow command yourself, start with:
+
+```
+/arpinine-harness:at "We already have code. Bootstrap governance from this repo."
+```
+
+The facade will inspect repo state, explain the recommendation, and then hand off to the right underlying command. The rest of this guide shows the explicit raw-command path.
+
 ## Prerequisites
 
 - Arpinine Harness plugin installed (`make install`)
