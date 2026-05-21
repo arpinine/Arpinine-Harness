@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+## [1.4.6] - 2026-05-21
+
+### Added
+- `/at` facade — single entry point that inspects repo state, applies `routing-policy.md` deterministically via `scripts/route_at.py`, explains the routing decision, and delegates to the correct `/at-*` command
+- `scripts/route_at.py` — executable router backing the facade; combines inspector output with user intent to produce a normalized routing decision (route, confidence, reason, alternative, command class, confirmation mode)
+- `scripts/inspect_state.py` — deterministic state inspector; emits normalized JSON facts about governance state consumed by the router
+- `state-inspector.md` — contract defining the inspector output schema and derivation rules
+- `routing-policy.md` — written routing policy defining hard gates, soft heuristics, confidence scoring, and command classes
+- `/at-map` command — project-level decomposition; turns a broad goal into a clarified project brief and ordered feature backlog before feature specs are created
+- `tests/test_inspect_state.py`, `tests/test_route_at.py`, `tests/test_at_facade_contract.py` — test suites covering inspector behavior, router routing scenarios, and facade contract conformance
+
+### Changed
+- `at.md` updated to consume router output from `scripts/route_at.py` instead of deriving routing from prose-only reasoning
+- `at-init` now creates `.specify/map/` as part of the governed directory structure
+- README simplified from 859 to 237 lines; `/at` facade promoted as the primary front door
+
 ## [1.4.5] - 2026-05-17
 
 ### Added
