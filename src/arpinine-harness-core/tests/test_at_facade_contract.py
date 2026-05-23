@@ -19,7 +19,7 @@ class AtFacadeContractTests(unittest.TestCase):
         self.assertIn(needle, haystack, f"Expected to find {needle!r}")
 
     def test_at_uses_inspector_and_policy_as_dependencies(self) -> None:
-        self.assertContains(self.at_command, "python3 scripts/route_at.py")
+        self.assertContains(self.at_command, 'python3 "${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py"')
         self.assertContains(self.at_command, "inspector contract and implementation")
         self.assertContains(self.at_command, "routing-policy.md")
         self.assertContains(self.at_command, "state-inspector.md")

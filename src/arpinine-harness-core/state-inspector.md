@@ -9,8 +9,10 @@ The inspector computes **facts only**. It does not produce recommendations. All 
 ## Invocation
 
 ```bash
-python3 scripts/inspect_state.py [--repo <path>] [--indent <n>]
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/inspect_state.py" [--repo <path>] [--indent <n>]
 ```
+
+Under Codex, the assemble step rewrites this to `python3 "scripts/inspect_state.py" ...` so it resolves from the installed plugin root.
 
 - `--repo`: absolute or relative path to the project root; auto-detected from CWD if omitted
 - `--indent`: JSON indent width (default: 2; use 0 for compact output)

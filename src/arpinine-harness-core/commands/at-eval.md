@@ -101,7 +101,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - optional `.specify/evals/<spec-slug>/baseline.json` when regression comparison is required
 4. Validate that the benchmark command exists in the current environment.
 5. Run the approved benchmark command across the required scenarios.
-   The shared-core runner path is `python3 src/arpinine-harness-core/scripts/run_benchmark.py --slug <spec-slug>`.
+   The shared-core runner path is `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/run_benchmark.py" --slug <spec-slug>`.
    It exports per-scenario context to the benchmark command through:
    - `ARPININE_HARNESS_SCENARIO_ID`
    - `ARPININE_HARNESS_SCENARIO_JSON`

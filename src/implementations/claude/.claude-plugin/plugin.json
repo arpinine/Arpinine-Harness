@@ -1,6 +1,6 @@
 {
   "name": "arpinine-harness",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Shared product-engineering workflow with ADRs, drift detection, evaluation, and compounding rule learning",
   "author": {
     "name": "Arpinine"

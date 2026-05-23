@@ -47,6 +47,12 @@ assemble: clean
 		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
 		cat .claude-plugin/marketplace.json | sed 's#\./dist/plugins/#./plugins/#g' > $(CLAUDE_MARKETPLACE_FILE); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		echo "Rewriting CLAUDE_PLUGIN_ROOT references for Codex plugin layout..."; \
+		find $(BUILD_DIR) -type f \( -name "*.md" -o -name "*.json" -o -name "*.sh" -o -name "*.py" \) -print0 \
+			| xargs -0 sed -i.bak -e 's#"\$${CLAUDE_PLUGIN_ROOT}/scripts/#"scripts/#g' \
+				-e 's#`\$${CLAUDE_PLUGIN_ROOT}/scripts/#`scripts/#g' \
+				-e 's#\$${CLAUDE_PLUGIN_ROOT}/scripts/#scripts/#g'; \
+		find $(BUILD_DIR) -type f -name "*.bak" -delete; \
 		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.agents/plugins $(CODEX_PLUGIN_HOME)/plugins; \
 		rm -rf $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME) $(CODEX_SYSTEM_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME); \

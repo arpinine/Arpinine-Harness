@@ -139,8 +139,10 @@ Typical routed outcomes:
 Invocation:
 
 ```bash
-python3 scripts/route_at.py [--repo <path>] --intent "<intent>" [--indent <n>]
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py" [--repo <path>] --intent "<intent>" [--indent <n>]
 ```
+
+Under Codex, the assemble step rewrites that invocation to `python3 "scripts/route_at.py" ...` so it resolves from the installed plugin root.
 
 It emits one JSON object to stdout with these high-signal fields:
 
@@ -265,10 +267,12 @@ When an archetype is selected, the shared core also records `.specify/archetype.
 The scaffold entrypoint is `scripts/scaffold_archetype.py`:
 
 ```bash
-python3 scripts/scaffold_archetype.py --list
-python3 scripts/scaffold_archetype.py agent-app --target-dir . --skip-if-nonempty
-python3 scripts/scaffold_archetype.py ml-pipeline --target-dir . --force
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" --list
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" agent-app --target-dir . --skip-if-nonempty
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" ml-pipeline --target-dir . --force
 ```
+
+Under Codex, the assemble step rewrites these to `python3 "scripts/scaffold_archetype.py" ...` so they resolve from the installed plugin root.
 
 ## Team Contract
 
@@ -410,8 +414,8 @@ For AI, LLM, or agent-runtime features, `/arpinine-harness:at-plan` writes `## O
 Implementation path:
 
 - `/arpinine-harness:at-plan` decides whether observation and evaluation are required
-- `python3 scripts/scaffold_observability_setup.py --spec <slug>` creates missing provider abstractions, the default OpenTelemetry observation implementation, optional Langfuse observation implementation when the plan selects it, default DeepEval evaluation implementations when the plan selects them, `noop` providers, and `.env.example` entries
-- `scripts/check-observability-setup.sh --spec <slug>` verifies that provider files exist and SDK imports stay inside the designated provider modules before implementation continues
+- `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_observability_setup.py" --spec <slug>` creates missing provider abstractions, the default OpenTelemetry observation implementation, optional Langfuse observation implementation when the plan selects it, default DeepEval evaluation implementations when the plan selects them, `noop` providers, and `.env.example` entries
+- `"${CLAUDE_PLUGIN_ROOT}/scripts/check-observability-setup.sh" --spec <slug>` verifies that provider files exist and SDK imports stay inside the designated provider modules before implementation continues
 
 The scaffolder is idempotent. Existing files are preserved and reported as skipped rather than overwritten.
 
@@ -420,11 +424,11 @@ The scaffolder is idempotent. Existing files are preserved and reported as skipp
 Commands are stronger when they start from executable checks rather than prompt text alone.
 
 Available helpers:
-- `scripts/check-dependencies.sh --json` — machine-readable environment readiness
-- `scripts/bootstrap_from_code.py --json --write-artifacts [--git-log]` — existing-codebase assessment with docs, tests, monorepo, and optional git-history intent signals
-- `scripts/check_vocabulary_drift.py --spec <slug> [--json|--all]` — enforce declared domain vocabulary against plan module names and code identifiers
-- `scripts/scaffold_observability_setup.py --spec <slug>` — scaffold observation/evaluation provider layers from `## Observability Strategy`
-- `scripts/spec_status.py [--spec <slug>] [--onboard]` — project governance report
+- `"${CLAUDE_PLUGIN_ROOT}/scripts/check-dependencies.sh" --json` — machine-readable environment readiness
+- `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap_from_code.py" --json --write-artifacts [--git-log]` — existing-codebase assessment with docs, tests, monorepo, and optional git-history intent signals
+- `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/check_vocabulary_drift.py" --spec <slug> [--json|--all]` — enforce declared domain vocabulary against plan module names and code identifiers
+- `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_observability_setup.py" --spec <slug>` — scaffold observation/evaluation provider layers from `## Observability Strategy`
+- `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/spec_status.py" [--spec <slug>] [--onboard]` — project governance report
 - `scripts/quick_drift_check.py --spec .specify/specs/<slug>/spec.md` — lightweight drift and static conformance hints
 - `scripts/run_benchmark.py --slug <slug>` — execute required benchmark scenarios from `dataset-manifest.json` and emit the governed aggregate result
 

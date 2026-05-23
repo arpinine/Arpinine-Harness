@@ -17,19 +17,22 @@ All `.specify/` file content (map artifacts, specs, plans, ADRs, rules, observat
 
 ### Step 0 — Archetype scaffold (optional)
 
+All shared scripts live in the installed plugin, not the user's repository. Always invoke them with the plugin-root prefix shown below. Under Claude Code that prefix expands to `${CLAUDE_PLUGIN_ROOT}/`. Codex builds strip this prefix at assemble-time so the same invocation resolves from the plugin root. `<project-root>` is always the user's repository, which is separate from the plugin path.
+
 If the user passed an explicit archetype choice, run:
 ```
-python3 scripts/scaffold_archetype.py <archetype-name> --target-dir <project-root> --force
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" <archetype-name> --target-dir <project-root> --force
 ```
-from the assembled plugin root. Report the created directories and files before continuing. This also records the selected archetype at `.specify/archetype.json`.
+
+Report the created directories and files before continuing. This also records the selected archetype at `.specify/archetype.json`.
 
 Otherwise, probe whether the target looks like an existing project by running:
 ```
-python3 scripts/scaffold_archetype.py --list
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" --list
 ```
 to show available archetypes, and:
 ```
-python3 scripts/scaffold_archetype.py <archetype-name> --target-dir <project-root> --skip-if-nonempty
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" <archetype-name> --target-dir <project-root> --skip-if-nonempty
 ```
 after the user picks one.
 
@@ -37,7 +40,7 @@ If the script reports `Skipping scaffold: target already looks non-empty ...`, c
 If the user declines archetype scaffolding, continue silently with the normal init flow.
 If the target is non-empty and the user still wants the archetype, re-run with `--force`.
 
-1. Run `check-dependencies.sh` from the plugin scripts directory, or perform equivalent environment validation and share the output.
+1. Run `"${CLAUDE_PLUGIN_ROOT}/scripts/check-dependencies.sh"`, or perform equivalent environment validation and share the output.
 2. Ensure `.specify/specification-provider.json` exists. If it does not, create it from `templates/specification-provider-template.json`.
 3. Resolve the configured specification provider from `.specify/specification-provider.json`. By default this is `spec-kit`.
 4. Validate that the provider declares a supported `constitution` action with a non-empty command. If not, stop with: `Provider <name> has no action 'constitution' configured`.
@@ -55,9 +58,10 @@ If the target is non-empty and the user still wants the archetype, re-run with `
    - `.specify/coordination/`
 7a. If `.specify/archetype.json` exists, run:
 ```
-python3 scripts/apply_archetype_governance.py --repo <project-root>
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/apply_archetype_governance.py" --repo <project-root>
 ```
-from the assembled plugin root. This must:
+
+This must:
    - append or refresh an archetype-specific addendum in the generated constitution
    - create or refresh starter rule files under `.specify/rules/archetype/`
    - keep the operation idempotent across repeated `/at-init` runs

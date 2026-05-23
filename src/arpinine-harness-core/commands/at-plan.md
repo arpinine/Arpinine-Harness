@@ -52,7 +52,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 10. Invoke the `product-owner` agent to confirm the plan preserves the spec business case, scope, and acceptance criteria.
 11. Invoke the `architecture-governor` skill to enforce modular boundaries, dependency direction, and clean separation of concerns.
 12. Invoke the `harness-governor` skill for any product feature that depends on an agent harness.
-13. If `## Harness Strategy` names a runtime, run `scripts/check-harness-readiness.sh --spec <slug>` to verify the adapter boundary, tool registry isolation, session reset, and absence of harness imports outside `adapters/`. Block planning if any check fails.
+13. If `## Harness Strategy` names a runtime, run `"${CLAUDE_PLUGIN_ROOT}/scripts/check-harness-readiness.sh" --spec <slug>` to verify the adapter boundary, tool registry isolation, session reset, and absence of harness imports outside `adapters/`. Block planning if any check fails.
 14. **Observability strategy gate:** For any feature that makes LLM calls, uses an agent harness, or produces AI-driven output:
 
    | Question | Signal |
@@ -63,7 +63,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 
    - If **yes to any**: `## Observability Strategy` must be fully documented with all controls: observation required, `ObservationProvider` interface path, default implementation (OpenTelemetry unless justified otherwise), optional specialized implementation (Langfuse when LLM-native trace inspection is needed), env var configuration, evaluation required, `EvaluationProvider` interface path, default implementation (DeepEval), observation-evaluation bridge, and swap strategy. Write this determination into `plan.md` before invoking `observability-governor`.
    - If `## Harness Strategy` names a runtime, treat the workflow as agent-heavy by default: require OpenTelemetry as the runtime telemetry backend, require DeepEval as the evaluation default, and require Langfuse as the LLM-observability overlay unless an ADR explicitly governs an alternative.
-   - If **yes to any**: include an implementation handoff note in the plan outcome telling the team to run `python3 scripts/scaffold_observability_setup.py --spec <slug>` before `/arpinine-harness:at-implement` or at the start of `/arpinine-harness:at-implement`.
+   - If **yes to any**: include an implementation handoff note in the plan outcome telling the team to run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_observability_setup.py" --spec <slug>` before `/arpinine-harness:at-implement` or at the start of `/arpinine-harness:at-implement`.
    - If **no to all**: Set `## Observability Strategy` body to `N/A — feature makes no LLM calls and produces no AI-driven output. Standard logging is sufficient.`
    - If **unclear**: ask the user the minimum question needed to resolve ambiguity before proceeding.
 
@@ -118,4 +118,4 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 30. If no ADR is needed for a decision, state why.
 31. Confirm that planning preserved the spec intent rather than redefining it.
 32. Confirm: "Plan created at `.specify/specs/<slug>/plan.md`"
-33. If `## Observability Strategy` is required, also confirm: "Next: run `python3 scripts/scaffold_observability_setup.py --spec <slug>` to scaffold observation/evaluation providers before implementation."
+33. If `## Observability Strategy` is required, also confirm: "Next: run `python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_observability_setup.py\" --spec <slug>` to scaffold observation/evaluation providers before implementation."

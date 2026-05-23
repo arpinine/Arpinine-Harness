@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [1.4.7] - 2026-05-21
+
+### Fixed
+- `/at` facade router invocation under Claude Code — command markdown now resolves `scripts/route_at.py` via `${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py` instead of a bare relative path. Previously the LLM resolved the bare path against the user's target repo CWD, causing `Router unavailable` errors when running `/at` in any repo outside the plugin install dir
+- Same plugin-root prefix applied to all shared-script invocations across `at-init.md`, `at-bootstrap-from-code.md`, `at-plan.md`, `at-implement.md`, `at-eval.md`, `templates/plan-template.md`, `state-inspector.md`, and the core README so the bug cannot recur through copy-paste of those references
+- `test_at_facade_contract.py` updated to assert the new `${CLAUDE_PLUGIN_ROOT}`-prefixed invocation
+
+### Changed
+- Codex assemble step in `Makefile` now strips `${CLAUDE_PLUGIN_ROOT}/` from `*.md`, `*.json`, `*.sh`, and `*.py` files during build, since Codex resolves relative `scripts/...` paths from the plugin root and does not set `${CLAUDE_PLUGIN_ROOT}`. Single source of truth in core; per-impl rewrite happens at build time
+- Source prose in commands and docs updated to explain the plugin-root convention and document the Codex assemble-time rewrite so the same content reads correctly in both installations
+
 ## [1.4.6] - 2026-05-21
 
 ### Added

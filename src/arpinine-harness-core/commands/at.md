@@ -77,17 +77,20 @@ Rules:
 
 ### 2. Inspect state and compute a route
 
-Run the shared router implementation from the assembled plugin root:
+Run the shared router implementation from the assembled plugin root. The router script lives inside the installed plugin, not the user's repository, so always invoke it with the absolute plugin path:
 
 ```bash
-python3 scripts/route_at.py --repo <project-root> --intent "<intent>" --indent 0
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py" --repo <project-root> --intent "<intent>" --indent 0
 ```
 
 Where:
 
-- `<project-root>` means the known repository root when the facade already has one from the current working context
+- `${CLAUDE_PLUGIN_ROOT}` is the absolute path to the installed plugin under Claude Code. Codex builds strip this prefix at assemble-time so the invocation becomes `python3 "scripts/route_at.py" ...` resolved from the plugin root.
+- `<project-root>` means the known repository root when the facade already has one from the current working context (this is the user's repo, not the plugin path)
 - if no repository root is already established, omit `--repo` and let the router auto-detect from the current working directory
 - `<intent>` is the raw user wording from step 1, after only the no-args normalization rule
+
+The router script always lives inside the installed plugin, never inside the user's target repository. Resolve it via the plugin-root prefix shown above, not from the current working directory of the user's repo.
 
 The router is the executable decision layer for `/at`. It must:
 
@@ -113,10 +116,12 @@ Rules:
 - if the router says to clarify, present the clarification turn instead of delegating
 - if the router says to confirm, wait for user confirmation before invoking a mutating or handoff command
 
-If `scripts/route_at.py` is missing, fails to execute, or emits invalid JSON:
-  - report that routing is unavailable
-  - do not silently improvise full routing
-  - fall back to a low-confidence response that explains the missing router dependency
+If `${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py` is missing, fails to execute, or emits invalid JSON:
+
+- report that routing is unavailable
+- do not silently improvise full routing
+- fall back to a low-confidence response that explains the missing router dependency
+- never reinterpret the absence as routing the user to a raw `/at-*` command without surfacing the dependency problem first
 
 ### 3. Present the routing decision
 
@@ -185,7 +190,7 @@ When the policy returns low confidence:
 
 #### 6a. Router unavailable
 
-If `scripts/route_at.py`:
+If `${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py`:
 
 - does not exist
 - cannot run
@@ -198,8 +203,10 @@ respond with a low-confidence facade error:
 AT: facade
 STATE: unavailable
 INTERPRETATION: blocked
-QUESTION: Routed facade execution is unavailable because the shared router could not be read. Restore `scripts/route_at.py` or run a raw `/at-*` command explicitly.
+QUESTION: Routed facade execution is unavailable because the shared router could not be read at `${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py`. Reinstall the plugin or run a raw `/at-*` command explicitly.
 ```
+
+Before reporting this error, verify that the failure is not caused by resolving the router from the wrong working directory. Under Claude Code the router must be invoked via `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py"`. Under Codex the assemble step rewrites this to `python3 "scripts/route_at.py"` so the path resolves from the plugin root, not from the user's target repository.
 
 Do not silently route from guesswork.
 

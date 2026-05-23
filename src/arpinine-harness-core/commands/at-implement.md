@@ -33,10 +33,10 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 8. Preserve the module boundaries and dependency direction defined in `plan.md`.
 9. If the feature uses a harness in the product application, preserve the harness abstraction boundary, tool model, memory model, and permission model defined in `## Harness Strategy`.
    **Observability pre-implementation gate:** If `plan.md` contains `## Observability Strategy` and it is not N/A:
-   a. Run `python3 scripts/scaffold_observability_setup.py --spec <slug>` to create any missing provider files (`ObservationProvider` interface, default impl, optional Langfuse specialized impl when required, noop provider, `EvaluationProvider` interface, default impl, noop provider) and update `.env.example`. The script is idempotent — it skips files that already exist.
-   b. Run `scripts/check-observability-setup.sh --spec <slug>`. Block implementation if any HIGH finding is reported. A HIGH finding after the scaffold ran means a provider file is absent or an SDK boundary is violated — do not proceed until resolved.
+   a. Run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_observability_setup.py" --spec <slug>` to create any missing provider files (`ObservationProvider` interface, default impl, optional Langfuse specialized impl when required, noop provider, `EvaluationProvider` interface, default impl, noop provider) and update `.env.example`. The script is idempotent — it skips files that already exist.
+   b. Run `"${CLAUDE_PLUGIN_ROOT}/scripts/check-observability-setup.sh" --spec <slug>`. Block implementation if any HIGH finding is reported. A HIGH finding after the scaffold ran means a provider file is absent or an SDK boundary is violated — do not proceed until resolved.
 10. For each task in `plan.md`:
-   a. Before starting work on the task, claim the next eligible task through `scripts/claim_task.py --slug <slug>`. Override `--team-id` or `--instance-id` only when the host runtime cannot infer them correctly.
+   a. Before starting work on the task, claim the next eligible task through `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/claim_task.py" --slug <slug>`. Override `--team-id` or `--instance-id` only when the host runtime cannot infer them correctly.
    b. Treat `.specify/coordination/<slug>.json` as the source of task ownership and lease state. `plan.md` remains the human-readable source of task intent and progress.
    c. Resolve runtime identity from the host plugin environment when possible. The shared PreToolUse claim gate blocks implementation-path edits until that identity owns an active lease.
    d. A task is eligible only when:
@@ -48,7 +48,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
       - failing test first
       - minimal implementation
       - refactor with tests still green
-   g. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`, then release it with `scripts/release_task.py --slug <slug> --task-id <task> --state completed`.
+   g. When the task is complete (tests green, acceptance criteria met): change its checkbox from `[~]` to `[x]` in `plan.md`, then release it with `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/release_task.py" --slug <slug> --task-id <task> --state completed`.
    h. If work on a claimed task is abandoned or re-planned, release it with `--state available`.
    i. Perform those `plan.md` status edits directly as part of the command flow; do not ask the user to update task checkboxes manually.
    The task-status edit refreshes `.specify/delivery.md` automatically through the shared `PostToolUse` delivery hook, and the shared `PostToolUse` drift hook also runs after the write.
@@ -73,9 +73,9 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
 19. If AI design decisions (model, prompting, context management) are implemented differently from `## AI Design Decisions` in `plan.md`, send the work back into planning or ADR refinement before completion.
 20. If observability decisions (provider choice, instrumentation scope, flush strategy) deviate from `## Observability Strategy` in `plan.md`, send the work back into planning or ADR refinement before completion.
 21. Verify that observability SDK imports do not appear outside the designated observation provider module (the path declared in `## Observability Strategy`, defaulting to `<root>/observability/opentelemetry.py` or `<root>/observability/langfuse.py`) and DeepEval SDK imports do not appear outside the designated evaluation provider module (the path declared in `## Observability Strategy`, defaulting to `<root>/evaluation/deepeval.py`). Report any boundary violations as HIGH findings and require remediation before completion.
-22. Re-run `scripts/check-observability-setup.sh --spec <slug>` after implementation tasks complete and before concluding the task. Block completion on any HIGH finding so SDK-boundary leaks or missing providers introduced during implementation are caught automatically.
+22. Re-run `"${CLAUDE_PLUGIN_ROOT}/scripts/check-observability-setup.sh" --spec <slug>` after implementation tasks complete and before concluding the task. Block completion on any HIGH finding so SDK-boundary leaks or missing providers introduced during implementation are caught automatically.
 23. If implementation changes the original intent or weakens the business case, send the work back into refinement by updating the spec or ADRs.
-24. Run `python3 scripts/check_vocabulary_drift.py --spec <slug>` to verify generated code reflects the spec's declared domain vocabulary:
+24. Run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/check_vocabulary_drift.py" --spec <slug>` to verify generated code reflects the spec's declared domain vocabulary:
     - Block completion on any HIGH finding (forbidden synonym used as class name, generic name overriding a declared domain term).
     - MEDIUM findings must be addressed or explicitly acknowledged with a disambiguation note in spec `## Domain Vocabulary` before completion.
     - If new domain terms were introduced during implementation, update spec `## Domain Vocabulary` and plan `## Vocabulary Decisions` before marking the feature complete.
