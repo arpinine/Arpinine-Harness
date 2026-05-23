@@ -57,8 +57,8 @@ assemble: clean
 		rm -rf $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME) $(CODEX_SYSTEM_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME); \
 		cp -r $(BUILD_DIR) $(CODEX_SYSTEM_PLUGIN_DIR); \
-		cat $(CODEX_MARKETPLACE_TEMPLATE) | sed 's#\./dist/plugins/#./plugins/#g' > $(CODEX_MARKETPLACE_FILE); \
-		echo "Codex plugin installed to $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME) and $(CODEX_SYSTEM_PLUGIN_DIR)"; \
+		sed "s#__CODEX_PLUGIN_INSTALL_PATH__#$(CODEX_SYSTEM_PLUGIN_DIR)#g" $(CODEX_MARKETPLACE_TEMPLATE) > $(CODEX_MARKETPLACE_FILE); \
+		echo "Codex plugin installed to $(CODEX_SYSTEM_PLUGIN_DIR) (marketplace points here absolutely)"; \
 	fi; \
 	trap - EXIT
 
@@ -118,7 +118,10 @@ validate-structure: assemble
 		done; \
 		test -d $(CODEX_SYSTEM_PLUGIN_DIR) || (echo "Missing Codex system plugin dir: $(CODEX_SYSTEM_PLUGIN_DIR)" && exit 1); \
 		test -f "$(CODEX_SYSTEM_PLUGIN_DIR)/hooks/hooks.json" || (echo "Missing hooks in system plugin dir" && exit 1); \
-		echo "Codex plugin structure looks valid. Installed at $(CODEX_SYSTEM_PLUGIN_DIR)."; \
+		test -f $(CODEX_MARKETPLACE_FILE) || (echo "Missing generated Codex marketplace manifest: $(CODEX_MARKETPLACE_FILE)" && exit 1); \
+		grep -q "\"path\": \"$(CODEX_SYSTEM_PLUGIN_DIR)\"" $(CODEX_MARKETPLACE_FILE) || (echo "Codex marketplace manifest does not point at $(CODEX_SYSTEM_PLUGIN_DIR). Source.path field must match the durable system install dir, not repo-local dist/." && exit 1); \
+		grep -q "__CODEX_PLUGIN_INSTALL_PATH__" $(CODEX_MARKETPLACE_FILE) && (echo "Codex marketplace manifest still contains unresolved __CODEX_PLUGIN_INSTALL_PATH__ placeholder" && exit 1) || true; \
+		echo "Codex plugin structure looks valid. Installed at $(CODEX_SYSTEM_PLUGIN_DIR). Marketplace resolves to that path."; \
 	else \
 		echo "validate-structure target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
