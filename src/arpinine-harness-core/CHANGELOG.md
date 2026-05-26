@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.4.8] - 2026-05-21
+
+### Fixed
+- Codex marketplace registration now points at the durable system install dir. `src/implementations/codex/marketplace.json` uses a `__CODEX_PLUGIN_INSTALL_PATH__` placeholder that the `Makefile` assemble step rewrites to the absolute `$(CODEX_SYSTEM_PLUGIN_DIR)`. Previously the manifest used a repo-local `./dist/plugins/...` path, so any `make clean` or update cycle orphaned the installed reference and produced `Plugin arpinine-harness not found in marketplace arpinine-harness-local`
+
+### Changed
+- `make validate-structure IMPLEMENTATION=codex` now verifies the generated marketplace manifest exists, its `source.path` matches `$(CODEX_SYSTEM_PLUGIN_DIR)`, and no unresolved `__CODEX_PLUGIN_INSTALL_PATH__` placeholder remains — closing the validation gap that let the marketplace-orphan regression pass
+
 ## [1.4.7] - 2026-05-21
 
 ### Fixed

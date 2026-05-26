@@ -53,6 +53,10 @@ assemble: clean
 				-e 's#`\$${CLAUDE_PLUGIN_ROOT}/scripts/#`scripts/#g' \
 				-e 's#\$${CLAUDE_PLUGIN_ROOT}/scripts/#scripts/#g'; \
 		find $(BUILD_DIR) -type f -name "*.bak" -delete; \
+		echo "Rewriting facade skill-invocation names for Codex (strip arpinine-harness: namespace)..."; \
+		find $(BUILD_DIR)/commands -type f -name "*.md" -print0 \
+			| xargs -0 sed -i.bak -e 's#`arpinine-harness:at-#`at-#g'; \
+		find $(BUILD_DIR) -type f -name "*.bak" -delete; \
 		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.agents/plugins $(CODEX_PLUGIN_HOME)/plugins; \
 		rm -rf $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME) $(CODEX_SYSTEM_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME); \

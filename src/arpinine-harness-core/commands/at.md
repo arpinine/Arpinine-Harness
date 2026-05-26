@@ -139,12 +139,24 @@ Requirements:
 
 Command-class behavior is defined by `routing-policy.md`.
 
+#### 4.0 Resolving the route to an invokable target
+
+The router's `route` field uses the policy shorthand form `/at-<name>` (for example `/at-implement`). That shorthand is **not** a directly invokable command string. Never emit a bare `/at-<name>` token as if it were executable — the host parses it as `Unknown command: /at-<name>` and misreads any trailing target as stray skill args (e.g. `Args from unknown skill: 008-llm-wiki`).
+
+To delegate, invoke the matching skill through the Skill tool, not by typing a slash command:
+
+- map the router `route` `/at-<name>` to the skill named `arpinine-harness:at-<name>`
+- invoke that skill via the Skill tool, passing any target (spec slug, path, intent remainder) as the skill arguments
+- example: route `/at-implement` with target `008-llm-wiki` → invoke skill `arpinine-harness:at-implement` with args `008-llm-wiki`
+
+The user-facing routing explanation (`DECISION:` / `ACTION:` block) may still display the readable `/at-<name>` form. Only the underlying invocation must use the `arpinine-harness:at-<name>` skill — never a bare slash string typed into the conversation.
+
 #### 4a. Handoff commands
 
 For handoff commands:
 
 - emit the routing explanation
-- invoke the selected command
+- invoke the selected command by calling its `arpinine-harness:at-<name>` skill (see 4.0), never by typing a bare `/at-<name>` string
 - stop speaking as the facade for that session
 - do not append your own post-command summary
 - do not append your own next-step guidance after delegation
@@ -162,7 +174,7 @@ Examples of handoff behavior:
 For return commands:
 
 - emit the routing explanation
-- invoke the selected command
+- invoke the selected command by calling its `arpinine-harness:at-<name>` skill (see 4.0), never by typing a bare `/at-<name>` string
 - after the command returns, you may summarize the outcome briefly
 - after the command returns, recommend the next step unless the return command already produced its own recommendation
 - keep the summary additive; do not overwrite the command's own output
