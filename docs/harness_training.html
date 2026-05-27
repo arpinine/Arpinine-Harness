@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1280"/>
+<title>Building Agents — A Quick Guide for Interns · Arpinine</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --W: 1280; --H: 720;
+  --hdr-h: 100px;
+  --white:  #FFFFFF;
+  --bg-sl:  #E5E7EB;
+  --hdr:    #0F172A;
+  --txt:    #1E293B;
+  --txt-m:  #64748B;
+  --txt-l:  #94A3B8;
+  --border: #E1E8F0;
+  --border2:#CBD5E1;
+  --ob-bg:  #F1F5F9;
+  --ob-bd:  #E2E8F0;
+  --logo-c: #9E9E9E;
+  --green:  #10B981;
+  --gd:     #065F46;
+  --gbg:    #F0FDF4;
+  --gbd:    #A7F3D0;
+  --coral:  #F26B43;
+  --cbg:    #FFF7ED;
+  --cbd:    #FED7AA;
+  --purple: #7F6BCA;
+  --pbg:    #F5F3FF;
+  --pbd:    #DDD6FE;
+  --teal:   #0EA5E9;
+  --tbg:    #F0F9FF;
+  --tbd:    #BAE6FD;
+  --red:    #EF4444;
+  --rbg:    #FEF2F2;
+  --rbd:    #FECACA;
+  --amber:  #F59E0B;
+  --abg:    #FFFBEB;
+  --abd:    #FDE68A;
+  --font:   'Inter', system-ui, sans-serif;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg-sl);
+  font-family: var(--font);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+
+#vp { width: 1280px; height: 720px; position: relative; transform-origin: top left; flex-shrink: 0; }
+
+.slide { position: absolute; inset: 0; background: var(--white); display: none; overflow: hidden; }
+.slide.active { display: block; }
+
+/* Header */
+.hdr {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: var(--hdr-h);
+  background: var(--hdr);
+  display: flex; align-items: center;
+  padding: 0 48px; gap: 16px;
+}
+.hdr-title { font-size: 26px; font-weight: 700; color: #fff; line-height: 1.2; flex: 1; letter-spacing: -.015em; }
+.hdr-tag   { flex-shrink: 0; font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.38); }
+
+.logo { position: absolute; bottom: 28px; right: 40px; font-size: 22px; font-weight: 400; letter-spacing: .04em; color: var(--logo-c); z-index: 10; }
+
+#gpb { position: fixed; top: 0; left: 0; height: 3px; background: var(--green); transition: width .38s ease; z-index: 500; }
+
+#nav { position: fixed; bottom: 0; left: 0; right: 0; height: 24px; background: var(--hdr); display: flex; align-items: center; justify-content: center; gap: 10px; z-index: 400; }
+#nav button { background: none; border: 1px solid rgba(255,255,255,.18); color: rgba(255,255,255,.55); font-family: var(--font); font-size: 10px; cursor: pointer; border-radius: 3px; padding: 1px 9px; transition: color .12s, border-color .12s; }
+#nav button:hover:not(:disabled) { color: #fff; border-color: rgba(255,255,255,.45); }
+#nav button:disabled { opacity: .22; cursor: default; }
+.ndots { display: flex; gap: 5px; }
+.ndot  { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.22); cursor: pointer; transition: background .2s; }
+.ndot.on { background: var(--green); }
+#sc { font-size: 10px; color: rgba(255,255,255,.35); min-width: 40px; text-align: center; font-variant-numeric: tabular-nums; }
+#kbhint { position: fixed; top: 10px; right: 14px; font-size: 10px; color: rgba(100,116,139,.7); pointer-events: none; }
+
+/* Reveal */
+.r { opacity: 0; transform: translateY(8px); transition: opacity .45s ease, transform .45s ease; pointer-events: none; }
+.r.on { opacity: 1; transform: none; pointer-events: auto; }
+.r.fl { transform: translateX(-20px); } .r.fl.on { transform: none; }
+.r.fr { transform: translateX(20px); }  .r.fr.on { transform: none; }
+.r.fu { transform: translateY(20px); }  .r.fu.on { transform: none; }
+.r.zm { transform: scale(.92); }        .r.zm.on { transform: scale(1); }
+
+.sdots { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
+.sdot  { width: 5px; height: 5px; border-radius: 50%; background: var(--border2); transition: background .2s, transform .2s; }
+.sdot.on { background: var(--green); transform: scale(1.3); }
+.clix { position: absolute; bottom: 18px; right: 90px; font-size: 10px; color: var(--txt-l); display: flex; align-items: center; gap: 5px; animation: blk 2.5s ease-in-out infinite; }
+.clix::before { content: '●'; color: var(--green); font-size: 7px; }
+@keyframes blk { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+h2 { font-size: 20px; font-weight: 700; color: var(--txt); line-height: 1.25; }
+h3 { font-size: 13px; font-weight: 700; color: var(--txt); line-height: 1.3; }
+p  { font-size: 12.5px; color: var(--txt-m); line-height: 1.6; }
+p strong { color: var(--txt); font-weight: 600; }
+
+@keyframes flow-dash { to { stroke-dashoffset: -16; } }
+.flow-line { stroke-dasharray: 4 4; animation: flow-dash 1.4s linear infinite; }
+
+@keyframes ping { 0% { transform: scale(.85); opacity: 1; } 100% { transform: scale(1.8); opacity: 0; } }
+.ping-dot { animation: ping 1.8s ease-out infinite; }
+
+/* Slide 1 — calm light hero with subtle green wash */
+.hero-light {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 60%);
+  overflow: hidden;
+}
+.hero-light::before {
+  content: '';
+  position: absolute;
+  top: -180px; right: -180px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16,185,129,.10) 0%, rgba(16,185,129,0) 65%);
+}
+.hero-light::after {
+  content: '';
+  position: absolute;
+  bottom: -260px; left: -120px;
+  width: 580px; height: 580px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14,165,233,.07) 0%, rgba(14,165,233,0) 65%);
+}
+
+.tag-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 5px 10px; border-radius: 4px;
+}
+.tag-pill.lt { background: var(--gbg); color: var(--gd); border: 1px solid var(--gbd); }
+
+</style>
+</head>
+<body>
+<div id="gpb"></div>
+<div id="kbhint">← → Space · click anywhere</div>
+
+<div id="vp">
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SLIDE 1 — Calm hero, collaboration framing           -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide active" id="s1" data-steps="3">
+  <div class="hero-light"></div>
+
+  <!-- Top bar -->
+  <div style="position:absolute;top:48px;left:48px;right:48px;display:flex;justify-content:space-between;align-items:center;">
+    <span class="tag-pill lt">Product &amp; Engineering · Arpinine Harness · 2026</span>
+  </div>
+
+  <!-- Title -->
+  <div class="r on" style="position:absolute;top:122px;left:48px;right:48px;">
+    <div style="font-size:38px;font-weight:800;color:var(--txt);line-height:1.1;letter-spacing:-.02em;">Building Reliable Agents.<br><span style="color:var(--gd);">Why Guardrails Matter — and How the Harness Helps.</span></div>
+    <div style="margin-top:14px;font-size:14px;font-weight:400;color:var(--txt-m);line-height:1.6;max-width:920px;">When your agent can take real actions in production — querying databases, drafting reports, calling dispatch systems — <strong style="color:var(--txt);">the prompt is no longer the hardest part</strong>. The hardest part is everything that has to be true around the prompt for the action to be safe, repeatable, and auditable.</div>
+  </div>
+
+  <!-- Collaboration diagram (3 panels: Agent / Harness / Operation) -->
+  <div style="position:absolute;top:320px;left:48px;right:48px;height:240px;display:grid;grid-template-columns:1fr 56px 1fr 56px 1fr;gap:0;align-items:stretch;">
+
+    <!-- Your Agent -->
+    <div class="r fl" data-step="1" style="background:var(--tbg);border:1.5px solid var(--tbd);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24"/></svg>
+        </div>
+        <div>
+          <div style="font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);">What you build</div>
+          <div style="font-size:15px;font-weight:700;color:var(--txt);">Your Agent</div>
+        </div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--teal);">●</span> reasons about the task</li>
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--teal);">●</span> proposes the next step</li>
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--teal);">●</span> drafts the response</li>
+      </ul>
+      <div style="margin-top:auto;font-size:11px;color:var(--txt-l);font-style:italic;line-height:1.45;">domain logic · prompt · behaviour</div>
+    </div>
+
+    <!-- Arrow 1 -->
+    <div class="r" data-step="1" style="display:flex;align-items:center;justify-content:center;">
+      <svg width="44" height="20" viewBox="0 0 44 20">
+        <line x1="2" y1="10" x2="32" y2="10" stroke="#10B981" stroke-width="1.8" class="flow-line"/>
+        <polygon points="32,4 42,10 32,16" fill="#10B981"/>
+      </svg>
+    </div>
+
+    <!-- Guardrails (generic) -->
+    <div class="r zm" data-step="2" style="background:var(--gbg);border:2px solid var(--gbd);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:10px;position:relative;">
+      <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 10px;border-radius:3px;">What to design for</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gd);">The guardrails</div>
+          <div style="font-size:15px;font-weight:700;color:var(--txt);">Boundaries &amp; Checks</div>
+        </div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--green);">●</span> what's in scope</li>
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--green);">●</span> what's allowed to run</li>
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--green);">●</span> what gets logged</li>
+      </ul>
+      <div style="margin-top:auto;font-size:11px;color:var(--gd);font-weight:600;font-style:italic;line-height:1.45;">design these into every agent</div>
+    </div>
+
+    <!-- Arrow 2 -->
+    <div class="r" data-step="2" style="display:flex;align-items:center;justify-content:center;">
+      <svg width="44" height="20" viewBox="0 0 44 20">
+        <line x1="2" y1="10" x2="32" y2="10" stroke="#7F6BCA" stroke-width="1.8" class="flow-line"/>
+        <polygon points="32,4 42,10 32,16" fill="#7F6BCA"/>
+      </svg>
+    </div>
+
+    <!-- Operation -->
+    <div class="r fr" data-step="2" style="background:var(--pbg);border:1.5px solid var(--pbd);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21v-7l9-5 9 5v7"/><path d="M3 14h18"/><path d="M9 21V10"/><path d="M15 21V10"/></svg>
+        </div>
+        <div>
+          <div style="font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);">The world</div>
+          <div style="font-size:15px;font-weight:700;color:var(--txt);">The Operation</div>
+        </div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--purple);">●</span> shift reports &amp; alarms</li>
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--purple);">●</span> equipment telemetry</li>
+        <li style="display:flex;gap:8px;font-size:12px;color:var(--txt-m);"><span style="color:var(--purple);">●</span> dispatch &amp; geology data</li>
+      </ul>
+      <div style="margin-top:auto;font-size:11px;color:var(--txt-l);font-style:italic;line-height:1.45;">mining ops · databases · sensors</div>
+    </div>
+
+  </div>
+
+  <!-- Bottom encouraging strip -->
+  <div class="r fu" data-step="3" style="position:absolute;bottom:60px;left:48px;right:48px;padding:16px 22px;background:var(--gbg);border:1.5px solid var(--gbd);border-radius:8px;display:flex;align-items:center;gap:18px;">
+    <div style="width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div style="font-size:13.5px;color:var(--txt);line-height:1.5;">
+      Same model. Same engineers. <strong>Different stakes.</strong> <span style="color:var(--txt-m);">Today: the design topics that decide whether your agent is a tool or a liability — and how the Harness turns guardrails into infrastructure.</span>
+    </div>
+  </div>
+
+  <div class="logo">arpinine</div>
+  <div class="sdots" id="s1-dots"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SLIDE 2 — Four guidelines, mining examples           -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" id="s2" data-steps="4">
+  <div class="hdr"><div class="hdr-title">Four Critical Topics — The Hardest Parts to Get Right</div><div class="hdr-tag">Core</div></div>
+
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:60px;display:flex;flex-direction:column;gap:14px;">
+
+    <div class="r on" style="background:var(--ob-bg);border:1px solid var(--ob-bd);border-radius:6px;padding:11px 18px;font-size:13px;color:var(--txt);">
+      Every agent that fails in production fails on one of these. <strong>Get them wrong and you ship a liability;</strong> get them right and the model becomes useful.
+    </div>
+
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-height:0;">
+
+      <!-- Topic 1 — Goal & Task Boundaries (teal) -->
+      <div class="r zm" data-step="1" style="background:var(--tbg);border:1.5px solid var(--tbd);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);">Topic #1</div>
+            <div style="font-size:14px;font-weight:700;color:var(--txt);">Goal &amp; Task Boundaries</div>
+          </div>
+        </div>
+
+        <div style="font-size:11.5px;color:var(--txt-m);line-height:1.5;"><strong style="color:var(--txt);">Guideline:</strong> Write the contract before the prompt — what's in scope, what's not, what success looks like.</div>
+
+        <!-- Mining example -->
+        <div style="margin-top:auto;background:var(--white);border:1px solid var(--tbd);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:8.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Example · Shift-handover agent</div>
+          <div style="display:flex;gap:8px;">
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span style="font-size:9px;font-weight:700;color:var(--gd);text-transform:uppercase;letter-spacing:.08em;">In scope</span>
+              </div>
+              <div style="font-size:10.5px;color:var(--txt-m);line-height:1.45;">summarise shift events · flag unresolved alarms · draft handover note</div>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span style="font-size:9px;font-weight:700;color:var(--txt-l);text-transform:uppercase;letter-spacing:.08em;">Out of scope</span>
+              </div>
+              <div style="font-size:10.5px;color:var(--txt-m);line-height:1.45;">dispatch crews · log safety incidents · change production targets</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Topic 2 — Tool Use (coral) -->
+      <div class="r zm" data-step="2" style="background:var(--cbg);border:1.5px solid var(--cbd);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--coral);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral);">Topic #2</div>
+            <div style="font-size:14px;font-weight:700;color:var(--txt);">Tool Use</div>
+          </div>
+        </div>
+
+        <div style="font-size:11.5px;color:var(--txt-m);line-height:1.5;"><strong style="color:var(--txt);">Guideline:</strong> Every tool is a small permission. Define inputs, outputs, and whether it reads or writes.</div>
+
+        <!-- Mining example: canonical pattern flow with a real tool -->
+        <div style="margin-top:auto;background:var(--white);border:1px solid var(--cbd);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:8.5px;font-weight:700;color:var(--coral);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;">Example · <code style="background:#FFF7ED;border:1px solid var(--cbd);border-radius:3px;padding:0 4px;font-family:Courier New,monospace;font-size:9.5px;color:var(--txt);">update_dispatch_priority(truck_id, priority)</code></div>
+          <svg viewBox="0 0 460 36" preserveAspectRatio="xMidYMid meet" width="100%" style="width:100%;height:36px;display:block;">
+            <rect x="2" y="6" width="78" height="24" rx="4" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+            <text x="41" y="22" text-anchor="middle" font-family="Inter" font-size="9" font-weight="600" fill="#64748B">proposes</text>
+            <text x="91" y="22" text-anchor="middle" font-family="Inter" font-size="11" fill="#94A3B8">→</text>
+            <rect x="102" y="6" width="78" height="24" rx="4" fill="#FFF7ED" stroke="#F26B43" stroke-width="1"/>
+            <text x="141" y="22" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="#F26B43">validates</text>
+            <text x="191" y="22" text-anchor="middle" font-family="Inter" font-size="11" fill="#94A3B8">→</text>
+            <rect x="202" y="6" width="78" height="24" rx="4" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+            <text x="241" y="22" text-anchor="middle" font-family="Inter" font-size="9" font-weight="600" fill="#64748B">executes</text>
+            <text x="291" y="22" text-anchor="middle" font-family="Inter" font-size="11" fill="#94A3B8">→</text>
+            <rect x="302" y="6" width="78" height="24" rx="4" fill="#FFF7ED" stroke="#F26B43" stroke-width="1"/>
+            <text x="341" y="22" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="#F26B43">checks</text>
+            <text x="391" y="22" text-anchor="middle" font-family="Inter" font-size="11" fill="#94A3B8">→</text>
+            <rect x="402" y="6" width="58" height="24" rx="4" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+            <text x="431" y="22" text-anchor="middle" font-family="Inter" font-size="9" font-weight="600" fill="#64748B">continues</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Topic 3 — Data Access & Privacy (purple) -->
+      <div class="r zm" data-step="3" style="background:var(--pbg);border:1.5px solid var(--pbd);border-radius:8px;padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);">Topic #3</div>
+            <div style="font-size:14px;font-weight:700;color:var(--txt);">Data Access &amp; Privacy</div>
+          </div>
+        </div>
+
+        <div style="font-size:11.5px;color:var(--txt-m);line-height:1.5;"><strong style="color:var(--txt);">Guideline:</strong> Least privilege. Keep sites isolated. Keep sensitive info out of logs.</div>
+
+        <!-- Mining example: Site A / Site B isolation -->
+        <div style="margin-top:auto;background:var(--white);border:1px solid var(--pbd);border-radius:5px;padding:6px 8px;">
+          <div style="font-size:8.5px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Example · Two-site geology assistant</div>
+          <svg viewBox="0 0 380 56" preserveAspectRatio="xMidYMid meet" width="100%" style="width:100%;height:48px;display:block;">
+            <!-- Site A -->
+            <rect x="10" y="10" width="92" height="36" rx="5" fill="#fff" stroke="#7F6BCA" stroke-width="1.5"/>
+            <text x="56" y="25" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#7F6BCA">SITE A</text>
+            <text x="56" y="38" text-anchor="middle" font-family="Inter" font-size="8" fill="#94A3B8">scoped creds</text>
+
+            <line x1="102" y1="28" x2="166" y2="28" stroke="#7F6BCA" stroke-width="1.2"/>
+
+            <!-- Agent -->
+            <circle cx="190" cy="28" r="22" fill="#7F6BCA"/>
+            <text x="190" y="26" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="#fff">AGENT</text>
+            <text x="190" y="36" text-anchor="middle" font-family="Inter" font-size="6.5" fill="rgba(255,255,255,.75)">harnessed</text>
+
+            <line x1="214" y1="28" x2="278" y2="28" stroke="#7F6BCA" stroke-width="1.2"/>
+
+            <!-- Site B -->
+            <rect x="278" y="10" width="92" height="36" rx="5" fill="#fff" stroke="#7F6BCA" stroke-width="1.5"/>
+            <text x="324" y="25" text-anchor="middle" font-family="Inter" font-size="11" font-weight="700" fill="#7F6BCA">SITE B</text>
+            <text x="324" y="38" text-anchor="middle" font-family="Inter" font-size="8" fill="#94A3B8">scoped creds</text>
+
+            <!-- caption -->
+            <text x="190" y="54" text-anchor="middle" font-family="Inter" font-size="7" font-weight="600" fill="#94A3B8" letter-spacing=".08em">SITE ISOLATION · OPERATOR &amp; CONTRACTOR IDS REDACTED IN LOGS</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Topic 4 — Untrusted Content (amber, calm) -->
+      <div class="r zm" data-step="4" style="background:var(--abg);border:1.5px solid var(--abd);border-radius:8px;padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:8px;background:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);">Topic #4</div>
+            <div style="font-size:14px;font-weight:700;color:var(--txt);">Untrusted Content</div>
+          </div>
+        </div>
+
+        <div style="font-size:11.5px;color:var(--txt-m);line-height:1.5;"><strong style="color:var(--txt);">Guideline:</strong> External content — datasheets, shift logs, bulletins — is <strong style="color:var(--txt);">data, not instruction.</strong></div>
+
+        <!-- Mining example: trusted vs retrieved -->
+        <div style="margin-top:auto;background:var(--white);border:1px solid var(--abd);border-radius:5px;padding:6px 8px;">
+          <div style="font-size:8.5px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Example · Daily geology summary</div>
+          <svg viewBox="0 0 460 60" preserveAspectRatio="xMidYMid meet" width="100%" style="width:100%;height:52px;display:block;">
+            <!-- Trusted -->
+            <rect x="2" y="2" width="200" height="56" rx="5" fill="#F0FDF4" stroke="#A7F3D0" stroke-width="1.5"/>
+            <text x="102" y="15" text-anchor="middle" font-family="Inter" font-size="8.5" font-weight="700" fill="#065F46" letter-spacing=".06em">TRUSTED · INSTRUCTION</text>
+            <text x="102" y="29" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">your system prompt</text>
+            <text x="102" y="41" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">operating-procedure config</text>
+            <text x="102" y="53" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">user's direct request</text>
+
+            <!-- Separator -->
+            <line x1="216" y1="6" x2="216" y2="54" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <text x="232" y="26" text-anchor="middle" font-family="Inter" font-size="7.5" font-weight="700" fill="#F59E0B" letter-spacing=".06em">KEPT</text>
+            <text x="232" y="36" text-anchor="middle" font-family="Inter" font-size="7.5" font-weight="700" fill="#F59E0B" letter-spacing=".06em">SEPARATE</text>
+
+            <!-- Retrieved (data only) -->
+            <rect x="248" y="2" width="210" height="56" rx="5" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.5"/>
+            <text x="353" y="15" text-anchor="middle" font-family="Inter" font-size="8.5" font-weight="700" fill="#F59E0B" letter-spacing=".06em">RETRIEVED · DATA ONLY</text>
+            <text x="353" y="29" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">supplier safety datasheets</text>
+            <text x="353" y="41" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">shift logs · sensor reports</text>
+            <text x="353" y="53" text-anchor="middle" font-family="Inter" font-size="9" fill="#64748B">industry bulletins · PDFs</text>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="logo">arpinine</div>
+  <div class="sdots" id="s2-dots"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SLIDE 3 — Memory & Context Rot                       -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" id="s3" data-steps="3">
+  <div class="hdr"><div class="hdr-title">Memory &amp; Context Rot — The Silent Killer of Long-Running Agents</div><div class="hdr-tag">Failure Mode</div></div>
+
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:88px;display:flex;flex-direction:column;gap:11px;">
+
+    <!-- Lead -->
+    <div class="r on" style="background:var(--ob-bg);border:1px solid var(--ob-bd);border-radius:6px;padding:10px 18px;font-size:12.5px;color:var(--txt);line-height:1.55;">
+      Left unchecked, an agent slowly <strong>forgets what it was supposed to do</strong>. Context windows fill up. Instructions drift. Costs grow. Quality degrades — and you don't see it coming because every individual turn looks fine.
+    </div>
+
+    <!-- Top: degradation timeline (left) + comparison table (right) -->
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1.25fr;gap:12px;min-height:0;">
+
+      <!-- LEFT — How agents degrade over time -->
+      <div class="r fl" data-step="1" style="background:var(--white);border:1.5px solid var(--rbd);border-radius:8px;padding:13px 16px;display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--rbd);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v9h-9"/></svg>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);">How agents degrade over a session</div>
+        </div>
+
+        <!-- Timeline visual -->
+        <div style="background:var(--ob-bg);border:1px solid var(--border);border-radius:6px;padding:10px 12px;">
+          <svg viewBox="0 0 360 80" preserveAspectRatio="xMidYMid meet" width="100%" style="width:100%;height:80px;display:block;">
+            <!-- Baseline arrow -->
+            <line x1="20" y1="55" x2="340" y2="55" stroke="#CBD5E1" stroke-width="1.5"/>
+            <polygon points="340,51 348,55 340,59" fill="#CBD5E1"/>
+
+            <!-- Turn 1 point — green -->
+            <circle cx="50" cy="55" r="6" fill="#10B981"/>
+            <text x="50" y="40" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="#065F46">Turn 1</text>
+            <text x="50" y="74" text-anchor="middle" font-family="Inter" font-size="8" fill="#64748B">clean context</text>
+
+            <!-- Turn 10 point — amber -->
+            <circle cx="170" cy="55" r="7" fill="#F59E0B"/>
+            <text x="170" y="40" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="#F59E0B">Turn 10</text>
+            <text x="170" y="74" text-anchor="middle" font-family="Inter" font-size="8" fill="#64748B">noise piles up</text>
+
+            <!-- Turn 50 point — red, larger -->
+            <circle cx="290" cy="55" r="9" fill="#EF4444"/>
+            <text x="290" y="38" text-anchor="middle" font-family="Inter" font-size="9" font-weight="700" fill="#EF4444">Turn 50</text>
+            <text x="290" y="74" text-anchor="middle" font-family="Inter" font-size="8" fill="#64748B">goal buried · cost explodes</text>
+
+            <!-- Time label -->
+            <text x="360" y="58" text-anchor="end" font-family="Inter" font-size="7.5" fill="#94A3B8" font-style="italic">time →</text>
+          </svg>
+        </div>
+
+        <!-- Living docs callout -->
+        <div style="background:var(--gbg);border:1px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:7px 10px;display:flex;align-items:center;gap:8px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+          <div style="font-size:10.5px;color:var(--txt);line-height:1.4;"><strong style="color:var(--gd);">This is why we use living documents</strong> — not long chat history.</div>
+        </div>
+
+        <!-- Failure modes list -->
+        <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:2px;">Failure modes</div>
+          <div style="display:flex;gap:7px;font-size:10.5px;color:var(--txt-m);line-height:1.4;"><span style="color:var(--red);flex-shrink:0;">●</span><span>Context fills with old turns &amp; debug traces</span></div>
+          <div style="display:flex;gap:7px;font-size:10.5px;color:var(--txt-m);line-height:1.4;"><span style="color:var(--red);flex-shrink:0;">●</span><span>Original goal &amp; success criteria drift</span></div>
+          <div style="display:flex;gap:7px;font-size:10.5px;color:var(--txt-m);line-height:1.4;"><span style="color:var(--red);flex-shrink:0;">●</span><span>Instructions evolve chaotically across turns</span></div>
+          <div style="display:flex;gap:7px;font-size:10.5px;color:var(--txt-m);line-height:1.4;"><span style="color:var(--red);flex-shrink:0;">●</span><span>Token costs balloon — history re-sent every turn</span></div>
+          <div style="display:flex;gap:7px;font-size:10.5px;color:var(--txt-m);line-height:1.4;"><span style="color:var(--red);flex-shrink:0;">●</span><span>Hallucinations &amp; off-track behaviour increase</span></div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--rbg);border:1px solid var(--rbd);border-radius:5px;padding:7px 10px;font-size:10.5px;color:var(--txt);line-height:1.45;">
+          <strong>Every frontier model degrades as input grows.</strong> Lost-in-the-middle: accuracy drops <strong>15–20 pp</strong> when relevant info sits in mid-context.<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">1,2</sup>
+        </div>
+      </div>
+
+      <!-- RIGHT — Comparison table -->
+      <div class="r fr" data-step="2" style="background:var(--white);border:1.5px solid var(--gbd);border-radius:8px;padding:13px 16px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--gbd);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);">Naive agent <span style="color:var(--txt-l);">vs</span> Agent built with the Harness</div>
+        </div>
+
+        <!-- Table -->
+        <div style="display:flex;flex-direction:column;gap:5px;flex:1;">
+
+          <!-- Row 1: Context bloat -->
+          <div style="display:grid;grid-template-columns:1fr 1.1fr 1.1fr;gap:6px;align-items:stretch;">
+            <div style="background:var(--ob-bg);border-left:3px solid var(--txt-m);border-radius:4px;padding:6px 9px;display:flex;align-items:center;">
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.3;">Context bloat</div>
+            </div>
+            <div style="background:var(--rbg);border:1px solid var(--rbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt-m);line-height:1.35;">Everything in chat history</div>
+            </div>
+            <div style="background:var(--gbg);border:1px solid var(--gbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt);line-height:1.35;">Living docs (spec, plan, ADRs) are the source of truth</div>
+            </div>
+          </div>
+
+          <!-- Row 2: Goal forgetting -->
+          <div style="display:grid;grid-template-columns:1fr 1.1fr 1.1fr;gap:6px;align-items:stretch;">
+            <div style="background:var(--ob-bg);border-left:3px solid var(--txt-m);border-radius:4px;padding:6px 9px;display:flex;align-items:center;">
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.3;">Goal forgetting</div>
+            </div>
+            <div style="background:var(--rbg);border:1px solid var(--rbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt-m);line-height:1.35;">Relies on model memory</div>
+            </div>
+            <div style="background:var(--gbg);border:1px solid var(--gbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt);line-height:1.35;">deployed agent self-checks plan vs baked-in <code style="background:var(--white);border:1px solid var(--gbd);border-radius:2px;padding:0 3px;font-family:Courier New,monospace;font-size:9.5px;">spec.md</code></div>
+            </div>
+          </div>
+
+          <!-- Row 3: Instruction drift -->
+          <div style="display:grid;grid-template-columns:1fr 1.1fr 1.1fr;gap:6px;align-items:stretch;">
+            <div style="background:var(--ob-bg);border-left:3px solid var(--txt-m);border-radius:4px;padding:6px 9px;display:flex;align-items:center;">
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.3;">Instruction drift</div>
+            </div>
+            <div style="background:var(--rbg);border:1px solid var(--rbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt-m);line-height:1.35;">Prompt evolves chaotically</div>
+            </div>
+            <div style="background:var(--gbg);border:1px solid var(--gbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt);line-height:1.35;">Constitution gates + versioned rules — stable</div>
+            </div>
+          </div>
+
+          <!-- Row 4: Cost -->
+          <div style="display:grid;grid-template-columns:1fr 1.1fr 1.1fr;gap:6px;align-items:stretch;">
+            <div style="background:var(--ob-bg);border-left:3px solid var(--txt-m);border-radius:4px;padding:6px 9px;display:flex;align-items:center;">
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.3;">Cost explosion</div>
+            </div>
+            <div style="background:var(--rbg);border:1px solid var(--rbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt-m);line-height:1.35;">History re-sent every turn</div>
+            </div>
+            <div style="background:var(--gbg);border:1px solid var(--gbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt);line-height:1.35;">Re-read only relevant docs when needed</div>
+            </div>
+          </div>
+
+          <!-- Row 5: Long-term memory -->
+          <div style="display:grid;grid-template-columns:1fr 1.1fr 1.1fr;gap:6px;align-items:stretch;">
+            <div style="background:var(--ob-bg);border-left:3px solid var(--txt-m);border-radius:4px;padding:6px 9px;display:flex;align-items:center;">
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.3;">Long-term memory</div>
+            </div>
+            <div style="background:var(--rbg);border:1px solid var(--rbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt-m);line-height:1.35;">No reliable external memory</div>
+            </div>
+            <div style="background:var(--gbg);border:1px solid var(--gbd);border-radius:4px;padding:6px 9px;display:flex;align-items:center;gap:6px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+              <div style="font-size:10px;color:var(--txt);line-height:1.35;">Structured artifacts + eval contracts + telemetry</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom strip: 4 mechanisms the Harness builds into the agent -->
+    <div class="r fu" data-step="3" style="background:var(--hdr);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="flex-shrink:0;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);">What the Harness builds in</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;line-height:1.2;">Documents as memory.<br>Specialists as the guardians.</div>
+      </div>
+
+      <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:7px 9px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:2px;">Living docs as memory</div>
+          <div style="font-size:9.5px;color:rgba(255,255,255,.7);line-height:1.35;">deployed agent reads <code style="font-family:Courier New,monospace;font-size:9px;color:#fff;background:rgba(255,255,255,.1);border-radius:2px;padding:0 2px;">spec.md</code> instead of carrying history</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:7px 9px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);margin-bottom:2px;">Self spec-check</div>
+          <div style="font-size:9.5px;color:rgba(255,255,255,.7);line-height:1.35;">agent validates plans vs baked-in <code style="font-family:Courier New,monospace;font-size:9px;color:#fff;background:rgba(255,255,255,.1);border-radius:2px;padding:0 2px;">spec.md</code></div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:7px 9px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:2px;">Constitution &amp; rules</div>
+          <div style="font-size:9.5px;color:rgba(255,255,255,.7);line-height:1.35;">persistent goals encoded into the agent at build time</div>
+        </div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:7px 9px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:2px;">Summarise &amp; prune</div>
+          <div style="font-size:9.5px;color:rgba(255,255,255,.7);line-height:1.35;">clean-context patterns wired in by default</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Source footnotes -->
+  <div style="position:absolute;bottom:60px;left:48px;right:48px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;pointer-events:none;">
+    <div style="font-size:8.5px;font-weight:400;color:var(--txt-l);line-height:1.3;display:flex;align-items:baseline;gap:3px;">
+      <span style="font-size:7.5px;font-weight:700;color:var(--txt-l);background:var(--ob-bg);border-radius:2px;padding:0 3px;line-height:1.6;">1</span>
+      <span>Chroma "Context Rot" study, 18 frontier models tested (2025)</span>
+    </div>
+    <div style="font-size:8.5px;font-weight:400;color:var(--txt-l);line-height:1.3;display:flex;align-items:baseline;gap:3px;">
+      <span style="font-size:7.5px;font-weight:700;color:var(--txt-l);background:var(--ob-bg);border-radius:2px;padding:0 3px;line-height:1.6;">2</span>
+      <span>Liu et al., "Lost in the Middle", TACL 2024 — accuracy drops 15–20pp for mid-context info</span>
+    </div>
+  </div>
+
+  <div class="logo">arpinine</div>
+  <div class="sdots" id="s3-dots"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SLIDE 4 — Five Types of Drift                        -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" id="s4" data-steps="3">
+  <div class="hdr"><div class="hdr-title">Five Types of Drift — How Agents Lose Their Way</div><div class="hdr-tag">Drift Taxonomy</div></div>
+
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:60px;display:flex;flex-direction:column;gap:11px;">
+
+    <!-- Lead -->
+    <div class="r on" style="background:var(--ob-bg);border:1px solid var(--ob-bd);border-radius:6px;padding:10px 18px;font-size:12.5px;color:var(--txt);line-height:1.55;">
+      Drift is a <strong>runtime</strong> problem — five shapes your deployed agent will face. The Harness is a dev-time plugin; it doesn't watch production. What it does is <strong>enforce that the detection &amp; guards get built into the agent</strong> before it ships. One drift type — <strong>spec/goal drift</strong> — is also caught at dev time by the <code style="background:var(--white);border:1px solid var(--ob-bd);border-radius:2px;padding:0 4px;font-family:Courier New,monospace;font-size:11px;">drift-detector</code> squad agent watching the code being written.
+    </div>
+
+    <!-- Top: 5 drift cards (left) + drift-detector panel (right) -->
+    <div style="flex:1;display:grid;grid-template-columns:1.35fr 1fr;gap:12px;min-height:0;">
+
+      <!-- LEFT — five drift types -->
+      <div class="r fl" data-step="1" style="background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);">Five runtime drift types</div>
+          <div style="margin-left:auto;display:flex;gap:14px;font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-l);">
+            <div style="min-width:135px;text-align:left;">Cause</div>
+            <div style="min-width:160px;text-align:left;">Detection signal</div>
+          </div>
+        </div>
+
+        <!-- Drift type 1: Spec / goal drift (highlighted - this is what drift-detector targets) -->
+        <div style="background:var(--gbg);border:1.5px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:7px 10px;display:flex;align-items:center;gap:10px;">
+          <div style="flex:0 0 130px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.25;">Spec / goal drift</div>
+            <div style="font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gd);margin-top:1px;">caught at dev-time + runtime self-check</div>
+          </div>
+          <div style="flex:0 0 135px;font-size:9.5px;color:var(--txt-m);line-height:1.4;">long context, evolving prompts</div>
+          <div style="flex:1;font-size:9.5px;color:var(--txt);line-height:1.4;">output diverges from <code style="background:var(--white);border:1px solid var(--gbd);border-radius:2px;padding:0 3px;font-family:Courier New,monospace;font-size:9px;">spec.md</code> / <code style="background:var(--white);border:1px solid var(--gbd);border-radius:2px;padding:0 3px;font-family:Courier New,monospace;font-size:9px;">plan.md</code></div>
+        </div>
+
+        <!-- Drift type 2: Context drift -->
+        <div style="background:var(--tbg);border:1px solid var(--tbd);border-left:3px solid var(--teal);border-radius:5px;padding:7px 10px;display:flex;align-items:center;gap:10px;">
+          <div style="flex:0 0 130px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.25;">Context drift</div>
+          </div>
+          <div style="flex:0 0 135px;font-size:9.5px;color:var(--txt-m);line-height:1.4;">accumulated noise, debug traces</div>
+          <div style="flex:1;font-size:9.5px;color:var(--txt);line-height:1.4;">relevance score drops, hallucinations rise</div>
+        </div>
+
+        <!-- Drift type 3: Instruction drift -->
+        <div style="background:var(--cbg);border:1px solid var(--cbd);border-left:3px solid var(--coral);border-radius:5px;padding:7px 10px;display:flex;align-items:center;gap:10px;">
+          <div style="flex:0 0 130px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.25;">Instruction drift</div>
+          </div>
+          <div style="flex:0 0 135px;font-size:9.5px;color:var(--txt-m);line-height:1.4;">prompt evolves unversioned</div>
+          <div style="flex:1;font-size:9.5px;color:var(--txt);line-height:1.4;">constitution rules fire violations</div>
+        </div>
+
+        <!-- Drift type 4: Behavioural drift -->
+        <div style="background:var(--pbg);border:1px solid var(--pbd);border-left:3px solid var(--purple);border-radius:5px;padding:7px 10px;display:flex;align-items:center;gap:10px;">
+          <div style="flex:0 0 130px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.25;">Behavioural drift</div>
+          </div>
+          <div style="flex:0 0 135px;font-size:9.5px;color:var(--txt-m);line-height:1.4;">tool misuse, untrusted content</div>
+          <div style="flex:1;font-size:9.5px;color:var(--txt);line-height:1.4;">runtime output guards fire</div>
+        </div>
+
+        <!-- Drift type 5: Data / retrieval drift -->
+        <div style="background:var(--abg);border:1px solid var(--abd);border-left:3px solid var(--amber);border-radius:5px;padding:7px 10px;display:flex;align-items:center;gap:10px;">
+          <div style="flex:0 0 130px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--txt);line-height:1.25;">Data / retrieval drift</div>
+          </div>
+          <div style="flex:0 0 135px;font-size:9.5px;color:var(--txt-m);line-height:1.4;">stale or mismatched sources</div>
+          <div style="flex:1;font-size:9.5px;color:var(--txt);line-height:1.4;">freshness &amp; similarity checks fail</div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT — drift-detector panel -->
+      <div class="r fr" data-step="2" style="background:var(--hdr);border-radius:8px;padding:13px 16px;display:flex;flex-direction:column;gap:8px;color:#fff;">
+        <div style="display:flex;align-items:center;gap:8px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.15);">
+          <div style="width:22px;height:22px;border-radius:5px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
+          </div>
+          <div>
+            <div style="font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);">Harness mechanism</div>
+            <div style="font-size:13px;font-weight:700;color:#fff;line-height:1.15;"><code style="font-family:Courier New,monospace;font-size:12px;background:rgba(16,185,129,.15);color:var(--green);border-radius:3px;padding:1px 5px;">drift-detector</code></div>
+          </div>
+        </div>
+
+        <div style="font-size:10px;color:rgba(255,255,255,.75);line-height:1.45;font-style:italic;margin-bottom:2px;">Dev-time squad agent — catches spec/goal drift while the agent is being written.</div>
+
+        <!-- 4 mechanism bullets -->
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-left:2px solid var(--green);border-radius:4px;padding:6px 9px;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:2px;">1 · Watches the dev session</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.78);line-height:1.4;">code being written compared to <code style="font-family:Courier New,monospace;font-size:9px;color:#fff;background:rgba(255,255,255,.1);border-radius:2px;padding:0 3px;">spec.md</code>, <code style="font-family:Courier New,monospace;font-size:9px;color:#fff;background:rgba(255,255,255,.1);border-radius:2px;padding:0 3px;">plan.md</code>, ADRs</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-left:2px solid var(--teal);border-radius:4px;padding:6px 9px;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:2px;">2 · Semantic + structural checks</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.78);line-height:1.4;">implementation stays within agreed boundaries &amp; acceptance criteria</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-left:2px solid var(--coral);border-radius:4px;padding:6px 9px;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);margin-bottom:2px;">3 · Blocks drifted code at write-time</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.78);line-height:1.4;">violations gate the PR before the agent ships</div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-left:2px solid var(--purple);border-radius:4px;padding:6px 9px;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:2px;">4 · Enforces runtime self-check exists</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.78);line-height:1.4;">deployed agent inherits the spec-validation it was built against</div>
+          </div>
+        </div>
+
+        <div style="font-size:9.5px;color:rgba(255,255,255,.6);line-height:1.4;font-style:italic;text-align:center;padding-top:4px;border-top:1px solid rgba(255,255,255,.1);">Prevention by construction — not runtime monitoring.</div>
+      </div>
+
+    </div>
+
+    <!-- Bottom: other detection techniques -->
+    <div class="r fu" data-step="3" style="background:var(--ob-bg);border:1px solid var(--ob-bd);border-radius:6px;padding:9px 16px;display:flex;align-items:center;gap:14px;">
+      <div style="flex-shrink:0;">
+        <div style="font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-l);">Other detection techniques</div>
+        <div style="font-size:11px;font-weight:700;color:var(--txt);line-height:1.2;">the squad can plug in</div>
+      </div>
+
+      <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;">
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:5px 8px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);">Embedding similarity</div>
+          <div style="font-size:9px;color:var(--txt-m);line-height:1.3;">cosine drop vs original goal</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:5px 8px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);">Behavioural baselines</div>
+          <div style="font-size:9px;color:var(--txt-m);line-height:1.3;">tool-call &amp; output anomalies</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:5px 8px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple);">LLM-as-judge</div>
+          <div style="font-size:9px;color:var(--txt-m);line-height:1.3;">second model scores vs spec</div>
+        </div>
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:5px 8px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);">Schema validation</div>
+          <div style="font-size:9px;color:var(--txt-m);line-height:1.3;">Pydantic, JSON Schema</div>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0;padding-left:14px;border-left:1px solid var(--border);">
+        <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;font-style:italic;max-width:140px;text-align:right;">Squad wires the right detector into the agent at build time.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="logo">arpinine</div>
+  <div class="sdots" id="s4-dots"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SLIDE 5 — Real-World Risks (failure scenarios)       -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" id="s5" data-steps="4">
+  <div class="hdr"><div class="hdr-title">Real-World Risks — What Goes Wrong Without Guardrails</div><div class="hdr-tag">Risk</div></div>
+
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:88px;display:flex;flex-direction:column;gap:11px;">
+
+    <!-- Lead -->
+    <div class="r on" style="background:var(--ob-bg);border:1px solid var(--ob-bd);border-radius:6px;padding:10px 18px;font-size:12.5px;color:var(--txt);line-height:1.55;">
+      <strong>72% of organisations have already had a production incident caused by AI-generated code<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">1</sup>.</strong> <span style="color:var(--txt-m);">The Harness can't intercept these at runtime — it's a dev-time plugin. What it does is <strong style="color:var(--txt);">make sure the right guards get built into the agent</strong> before it ships.</span>
+    </div>
+
+    <!-- Four failure scenario cards in 2x2 grid -->
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-height:0;">
+
+      <!-- Scenario 1: Scope creep -->
+      <div class="r zm" data-step="1" style="background:var(--white);border:1.5px solid var(--cbd);border-radius:8px;padding:11px 14px;display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--coral);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral);">Scenario #1</div>
+            <div style="font-size:13.5px;font-weight:700;color:var(--txt);line-height:1.2;">Silent scope creep</div>
+          </div>
+        </div>
+
+        <div style="background:var(--cbg);border:1px solid var(--cbd);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);margin-bottom:3px;">What happens</div>
+          <div style="font-size:11.5px;color:var(--txt);line-height:1.5;">A <strong>shift-handover agent</strong> drafts the note — then tries to <strong>reschedule maintenance</strong> because "it seemed helpful."</div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--gbg);border:1px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:8px 10px;">
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+            <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-m);">Maps to</div>
+            <div style="font-size:10px;color:var(--txt);font-weight:600;">Topic #1 — Goal &amp; task boundaries</div>
+          </div>
+          <div style="font-size:10.5px;color:var(--txt);line-height:1.45;"><strong style="color:var(--gd);">Harness at dev-time:</strong> the squad <strong>enforces an explicit tool-permission contract in the agent's spec</strong> — <code style="background:var(--white);border:1px solid var(--gbd);border-radius:2px;padding:0 3px;font-family:Courier New,monospace;font-size:9.5px;">update_maintenance_schedule</code> is never wired into this agent's permitted tools.</div>
+        </div>
+      </div>
+
+      <!-- Scenario 2: Privacy leak -->
+      <div class="r zm" data-step="2" style="background:var(--white);border:1.5px solid var(--pbd);border-radius:8px;padding:11px 14px;display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);">Scenario #2</div>
+            <div style="font-size:13.5px;font-weight:700;color:var(--txt);line-height:1.2;">Privacy leak</div>
+          </div>
+        </div>
+
+        <div style="background:var(--pbg);border:1px solid var(--pbd);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:3px;">What happens</div>
+          <div style="font-size:11.5px;color:var(--txt);line-height:1.5;">A geology-summary agent <strong>includes contractor IDs in its output</strong>, which lands in a Slack channel visible to two other sites.</div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--gbg);border:1px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:8px 10px;">
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+            <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-m);">Maps to</div>
+            <div style="font-size:10px;color:var(--txt);font-weight:600;">Topic #3 — Data access &amp; privacy</div>
+          </div>
+          <div style="font-size:10.5px;color:var(--txt);line-height:1.45;"><strong style="color:var(--gd);">Harness at dev-time:</strong> the <code style="background:var(--white);border:1px solid var(--gbd);border-radius:2px;padding:0 3px;font-family:Courier New,monospace;font-size:9.5px;">security-reviewer</code> agent <strong>requires PII redaction and site-scoped credentials</strong> before the data-access layer ships.</div>
+        </div>
+      </div>
+
+      <!-- Scenario 3: Hallucinated authority -->
+      <div class="r zm" data-step="3" style="background:var(--white);border:1.5px solid var(--abd);border-radius:8px;padding:11px 14px;display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);">Scenario #3</div>
+            <div style="font-size:13.5px;font-weight:700;color:var(--txt);line-height:1.2;">Hallucinated authority</div>
+          </div>
+        </div>
+
+        <div style="background:var(--abg);border:1px solid var(--abd);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:3px;">What happens</div>
+          <div style="font-size:11.5px;color:var(--txt);line-height:1.5;">A malformed shift log says "<em>raise target to 12 kt</em>". The agent treats it as a directive and <strong>regenerates the production plan around it.</strong></div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--gbg);border:1px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:8px 10px;">
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+            <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-m);">Maps to</div>
+            <div style="font-size:10px;color:var(--txt);font-weight:600;">Topic #4 — Untrusted content</div>
+          </div>
+          <div style="font-size:10.5px;color:var(--txt);line-height:1.45;"><strong style="color:var(--gd);">Harness at dev-time:</strong> the squad <strong>enforces source-tagged context in the agent's architecture</strong> — retrieved data is tagged as data by construction, can't be promoted to instruction at runtime.</div>
+        </div>
+      </div>
+
+      <!-- Scenario 4: Context drift in long session -->
+      <div class="r zm" data-step="4" style="background:var(--white);border:1.5px solid var(--rbd);border-radius:8px;padding:11px 14px;display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v9h-9"/></svg>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);">Scenario #4</div>
+            <div style="font-size:13.5px;font-weight:700;color:var(--txt);line-height:1.2;">Goal buried in a long session</div>
+          </div>
+        </div>
+
+        <div style="background:var(--rbg);border:1px solid var(--rbd);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:3px;">What happens</div>
+          <div style="font-size:11.5px;color:var(--txt);line-height:1.5;">A planning agent runs 4 hours. By turn 30 it has <strong>forgotten the minimum night-shift staffing constraint</strong> and quietly produces a plan that violates it.</div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--gbg);border:1px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:8px 10px;">
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">
+            <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-m);">Maps to</div>
+            <div style="font-size:10px;color:var(--txt);font-weight:600;">Memory &amp; context rot</div>
+          </div>
+          <div style="font-size:10.5px;color:var(--txt);line-height:1.45;"><strong style="color:var(--gd);">Harness at dev-time:</strong> the squad <strong>wires runtime spec-check &amp; eval contracts into the agent</strong> — minimum-staffing constraint encoded in <code style="background:var(--white);border:1px solid var(--gbd);border-radius:2px;padding:0 3px;font-family:Courier New,monospace;font-size:9.5px;">spec.md</code>, deployed agent self-validates plans against it.</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Source footnotes -->
+  <div style="position:absolute;bottom:60px;left:48px;right:48px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;pointer-events:none;">
+    <div style="font-size:8.5px;font-weight:400;color:var(--txt-l);line-height:1.3;display:flex;align-items:baseline;gap:3px;">
+      <span style="font-size:7.5px;font-weight:700;color:var(--txt-l);background:var(--ob-bg);border-radius:2px;padding:0 3px;line-height:1.6;">1</span>
+      <span>Harness "State of AI in Software Engineering 2025", n=900, Coleman Parkes (Aug 2025)</span>
+    </div>
+    <div style="font-size:8.5px;font-weight:400;color:var(--txt-l);line-height:1.3;display:flex;align-items:baseline;gap:3px;">
+      <span style="font-size:7.5px;font-weight:700;color:var(--txt-l);background:var(--ob-bg);border-radius:2px;padding:0 3px;line-height:1.6;">2</span>
+      <span>IBM Cost of a Data Breach Report 2025, n=600 orgs (Mar 2024–Feb 2025)</span>
+    </div>
+  </div>
+
+  <div class="logo">arpinine</div>
+  <div class="sdots" id="s5-dots"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SLIDE 6 — Meet the Arpinine Harness                  -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" id="s6" data-steps="3">
+  <div class="hdr"><div class="hdr-title">Meet the Arpinine Harness — Guardrails + a Specialist Squad</div><div class="hdr-tag">The Plugin</div></div>
+
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:60px;display:flex;flex-direction:column;gap:11px;">
+
+    <!-- Lead -->
+    <div class="r on" style="background:var(--ob-bg);border:1px solid var(--ob-bd);border-radius:6px;padding:10px 18px;font-size:12.5px;color:var(--txt);line-height:1.55;">
+      The Arpinine Harness is a plugin that extends your <strong>AI code assistant</strong> (Claude Code, Codex) with a <strong>squad of specialist agents</strong>. On top of regular coding &amp; standards best practices, the squad puts in place the guardrails for the four topics — turning each scenario you just saw into infrastructure, not vigilance.
+    </div>
+
+    <!-- Top: squad + artifacts -->
+    <div class="r on" style="flex:1;display:grid;grid-template-columns:1.45fr 1fr;gap:12px;min-height:0;">
+
+      <!-- LEFT — The Squad -->
+      <div class="r fl" data-step="1" style="background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:13px 16px;display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--border);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);">The Squad</div>
+          <div style="margin-left:auto;font-size:10px;color:var(--txt-l);font-style:italic;">activated by one command</div>
+        </div>
+
+        <!-- Product discipline -->
+        <div style="background:var(--tbg);border:1.5px solid var(--tbd);border-radius:6px;padding:8px 11px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:6px;">Product</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--tbd);border-radius:4px;padding:4px 8px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;"></div>
+              <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);">product-owner</div><div style="font-size:9px;color:var(--txt-m);">spec · acceptance criteria</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--tbd);border-radius:4px;padding:4px 8px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--coral);flex-shrink:0;"></div>
+              <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);">domain-linguist</div><div style="font-size:9px;color:var(--txt-m);">ore-grade · stope · pit lingo</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engineering — always on -->
+        <div style="background:var(--gbg);border:1.5px solid var(--gbd);border-radius:6px;padding:8px 11px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gd);margin-bottom:6px;">Engineering <span style="font-weight:400;color:var(--txt-l);">· always on</span></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--gbd);border-radius:4px;padding:4px 8px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--purple);flex-shrink:0;"></div>
+              <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);">tech-architect</div><div style="font-size:9px;color:var(--txt-m);">ADRs · arch boundaries</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--gbd);border-radius:4px;padding:4px 8px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+              <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);">security-reviewer</div><div style="font-size:9px;color:var(--txt-m);">risk gates</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--gbd);border-radius:4px;padding:4px 8px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+              <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);">tdd-guide + drift-detector</div><div style="font-size:9px;color:var(--txt-m);">test-first · spec ↔ code alignment</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scoped on demand -->
+        <div style="background:var(--ob-bg);border:1.5px solid var(--border);border-radius:6px;padding:6px 11px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt-l);margin-bottom:5px;">Scoped on demand</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <span style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:3px;padding:3px 7px;font-size:9.5px;color:var(--txt-m);"><span style="width:6px;height:6px;border-radius:50%;background:var(--amber);"></span>eval-governor</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:3px;padding:3px 7px;font-size:9.5px;color:var(--txt-m);"><span style="width:6px;height:6px;border-radius:50%;background:var(--teal);"></span>ai-engineer</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:3px;padding:3px 7px;font-size:9.5px;color:var(--txt-m);"><span style="width:6px;height:6px;border-radius:50%;background:var(--purple);"></span>devops</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:3px;padding:3px 7px;font-size:9.5px;color:var(--txt-m);"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);"></span>data-engineer</span>
+          </div>
+        </div>
+
+        <div style="margin-top:auto;font-size:10.5px;color:var(--txt-l);line-height:1.45;font-style:italic;text-align:center;padding-top:4px;">Each agent enables best practices for its role.</div>
+      </div>
+
+      <!-- RIGHT — Governed Artifacts -->
+      <div class="r fr" data-step="2" style="background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:13px 16px;display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--border);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);">Governed Artifacts</div>
+        </div>
+
+        <!-- spec -->
+        <div style="display:flex;align-items:flex-start;gap:9px;background:var(--tbg);border:1px solid var(--tbd);border-radius:5px;padding:7px 10px;">
+          <div style="width:22px;height:22px;background:var(--white);border:1.5px solid var(--tbd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:800;color:var(--teal);">S</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--txt);">spec.md</div>
+            <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;">Living product spec — intent, acceptance criteria. Never implementation language.</div>
+          </div>
+        </div>
+
+        <!-- plan -->
+        <div style="display:flex;align-items:flex-start;gap:9px;background:var(--gbg);border:1px solid var(--gbd);border-radius:5px;padding:7px 10px;">
+          <div style="width:22px;height:22px;background:var(--white);border:1.5px solid var(--gbd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:800;color:var(--gd);">P</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--txt);">plan.md</div>
+            <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;">Module boundaries, dependency rules. Gates implementation start.</div>
+          </div>
+        </div>
+
+        <!-- ADR -->
+        <div style="display:flex;align-items:flex-start;gap:9px;background:var(--pbg);border:1px solid var(--pbd);border-radius:5px;padding:7px 10px;">
+          <div style="width:22px;height:22px;background:var(--white);border:1.5px solid var(--pbd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:800;color:var(--purple);">A</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--txt);">ADRs</div>
+            <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;">Decision records — why it was built this way. Read by every agent before touching anything.</div>
+          </div>
+        </div>
+
+        <!-- code structure -->
+        <div style="display:flex;align-items:flex-start;gap:9px;background:var(--abg);border:1px solid var(--abd);border-radius:5px;padding:7px 10px;">
+          <div style="width:22px;height:22px;background:var(--white);border:1.5px solid var(--abd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:800;color:var(--amber);">C</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--txt);">code structure</div>
+            <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;">Module layout enforced by the plan. Generated &amp; kept consistent — not invented per project.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--ob-bg);border-radius:4px;padding:6px 9px;font-size:9.5px;color:var(--txt-m);line-height:1.45;text-align:center;">Version-controlled · the squad's source of truth.</div>
+      </div>
+
+    </div>
+
+    <!-- Bottom: Q&A interaction strip -->
+    <div class="r fu" data-step="3" style="background:var(--hdr);border-radius:8px;padding:12px 18px;display:flex;align-items:stretch;gap:18px;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:5px;font-family:'Courier New',monospace;font-size:10.5px;">
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="color:var(--green);font-weight:700;min-width:56px;">SQUAD ›</span>
+          <span style="color:rgba(255,255,255,.78);">spec.md needs an acceptance criterion for shift-end alarms. Should unresolved P2 alarms block the handover note? <span style="color:#fff;font-weight:700;">[Y/N]</span></span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="color:var(--teal);font-weight:700;min-width:56px;">YOU   ›</span>
+          <span style="color:rgba(255,255,255,.78);">Y — block on P2 unresolved.</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="color:var(--green);font-weight:700;min-width:56px;">SQUAD ›</span>
+          <span style="color:rgba(255,255,255,.78);"><span style="color:var(--green);">✓</span> Recorded · spec updated · plan regenerated · ready to implement</span>
+        </div>
+      </div>
+      <div style="flex-shrink:0;background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(16,185,129,.06));border:1.5px solid rgba(16,185,129,.5);border-radius:8px;padding:12px 18px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;min-width:170px;">
+        <div style="display:flex;align-items:baseline;gap:2px;">
+          <div style="font-size:36px;font-weight:800;color:var(--green);line-height:1;letter-spacing:-.02em;">~90%</div>
+        </div>
+        <div style="font-size:9.5px;color:#fff;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-top:1px;">automatic</div>
+        <div style="font-size:9.5px;color:rgba(255,255,255,.85);margin-top:5px;font-style:italic;text-align:center;line-height:1.35;">humans confirm,<br>don't comply</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.55);margin-top:5px;text-align:center;line-height:1.4;border-top:1px solid rgba(255,255,255,.15);padding-top:5px;width:100%;">focus on the agent's <strong style="color:#fff;font-style:normal;">behaviour</strong> — squad handles the bookkeeping</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="logo">arpinine</div>
+  <div class="sdots" id="s6-dots"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SLIDE 7 — Architecture: concerns x layers x defaults -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" id="s7" data-steps="3">
+  <div class="hdr"><div class="hdr-title">Under the Hood — What the Harness Actually Standardises</div><div class="hdr-tag">Architecture</div></div>
+
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:60px;display:flex;flex-direction:column;gap:11px;">
+
+    <!-- Lead -->
+    <div class="r on" style="background:var(--ob-bg);border:1px solid var(--ob-bd);border-radius:6px;padding:10px 18px;font-size:12.5px;color:var(--txt);line-height:1.55;">
+      The Harness isn't tied to any specific tool. It's a <strong>layered set of defaults</strong> — opinions about how a good codebase should look, behave, and be observed — that the squad applies for you. <span style="color:var(--txt-m);">Swap any default; most teams don't.</span>
+    </div>
+
+    <!-- Top: concerns (left) + skill cards (right) -->
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1.4fr;gap:12px;min-height:0;">
+
+      <!-- LEFT — The seven concerns -->
+      <div class="r fl" data-step="1" style="background:transparent;border:none;border-radius:8px;padding:4px 4px;display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);">What the squad standardises</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1;">
+
+          <!-- Spec, plan & ADRs (full-width to lead) -->
+          <div style="grid-column:1 / span 2;background:var(--gbg);border:1.5px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:7px 9px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);">Spec, plan &amp; ADRs <span style="color:var(--gd);font-weight:500;">· the product baseline</span></div>
+            </div>
+            <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;">Living specs, plans, architecture decisions — the squad's source of truth.</div>
+          </div>
+
+          <!-- Code structure -->
+          <div style="background:var(--tbg);border:1px solid var(--tbd);border-left:3px solid var(--teal);border-radius:5px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">Code structure</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">Module boundaries, folder layout.</div>
+          </div>
+
+          <!-- Code style -->
+          <div style="background:var(--cbg);border:1px solid var(--cbd);border-left:3px solid var(--coral);border-radius:5px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#F26B43" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">Code style</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">Linters, formatters, naming.</div>
+          </div>
+
+          <!-- Domain language -->
+          <div style="background:var(--pbg);border:1px solid var(--pbd);border-left:3px solid var(--purple);border-radius:5px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7F6BCA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">Domain language</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">Mining vocabulary in code.</div>
+          </div>
+
+          <!-- Telemetry -->
+          <div style="background:var(--ob-bg);border:1px solid var(--border);border-left:3px solid var(--txt-m);border-radius:5px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">Telemetry</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">Structured logs, traces.</div>
+          </div>
+
+          <!-- Observation / monitoring -->
+          <div style="background:var(--abg);border:1px solid var(--abd);border-left:3px solid var(--amber);border-radius:5px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">Obs &amp; monitoring</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">Dashboards, alerts.</div>
+          </div>
+
+          <!-- Evaluation -->
+          <div style="background:var(--rbg);border:1px solid var(--rbd);border-left:3px solid var(--red);border-radius:5px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">Evaluation <span style="color:var(--txt-l);font-weight:500;">(ML/AI)</span></div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">Eval contracts, regressions.</div>
+          </div>
+
+          <!-- Build & deployment (full-width closer) -->
+          <div style="grid-column:1 / span 2;background:var(--gbg);border:1.5px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:7px 9px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 2v5M8 2v5M2 11h20"/></svg>
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);">Build &amp; deployment <span style="color:var(--gd);font-weight:500;">· how the squad ships</span></div>
+            </div>
+            <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;">Containers, CI/CD pipelines, infrastructure-as-code, release strategy.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT — Seven skill cards (3x3 grid; product spans top-row leading) -->
+      <div class="r fr" data-step="2" style="background:transparent;border:none;border-radius:8px;padding:4px 4px;display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt);">Skills &amp; best practices the squad carries</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;flex:1;">
+
+          <!-- Product ownership — spans full top row width-wise visually -->
+          <div style="grid-column:1 / span 3;background:var(--gbg);border:1.5px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:6px 9px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+              <div style="width:14px;height:14px;border-radius:3px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:800;color:#fff;">PO</div>
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);">Product ownership</div>
+              <div style="margin-left:auto;font-size:9px;color:var(--gd);font-weight:600;font-style:italic;">defines the baseline</div>
+            </div>
+            <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;">spec.md · plan.md · ADRs · acceptance criteria · domain language</div>
+          </div>
+
+          <!-- FE engineering -->
+          <div style="background:var(--tbg);border:1px solid var(--tbd);border-left:3px solid var(--teal);border-radius:5px;padding:6px 9px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div style="width:13px;height:13px;border-radius:3px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:7px;font-weight:800;color:#fff;">FE</div>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">FE engineering</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">code structure · code style · UX telemetry</div>
+          </div>
+
+          <!-- BE engineering -->
+          <div style="background:var(--pbg);border:1px solid var(--pbd);border-left:3px solid var(--purple);border-radius:5px;padding:6px 9px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div style="width:13px;height:13px;border-radius:3px;background:var(--purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:7px;font-weight:800;color:#fff;">BE</div>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">BE engineering</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">code structure · API contracts · telemetry · observation</div>
+          </div>
+
+          <!-- Data engineering -->
+          <div style="background:var(--tbg);border:1px solid var(--tbd);border-left:3px solid var(--teal);border-radius:5px;padding:6px 9px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div style="width:13px;height:13px;border-radius:3px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:7px;font-weight:800;color:#fff;">DE</div>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">Data engineering</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">schemas · lineage · telemetry · observation</div>
+          </div>
+
+          <!-- ML engineering -->
+          <div style="background:var(--abg);border:1px solid var(--abd);border-left:3px solid var(--amber);border-radius:5px;padding:6px 9px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div style="width:13px;height:13px;border-radius:3px;background:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:7px;font-weight:800;color:#fff;">ML</div>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">ML engineering</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">model registry · feature contracts · evaluation</div>
+          </div>
+
+          <!-- AI engineering -->
+          <div style="background:var(--cbg);border:1px solid var(--cbd);border-left:3px solid var(--coral);border-radius:5px;padding:6px 9px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div style="width:13px;height:13px;border-radius:3px;background:var(--coral);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:7px;font-weight:800;color:#fff;">AI</div>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">AI engineering</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">prompt design · trace capture · evaluation</div>
+          </div>
+
+          <!-- Cyber security -->
+          <div style="background:var(--rbg);border:1px solid var(--rbd);border-left:3px solid var(--red);border-radius:5px;padding:6px 9px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div style="width:13px;height:13px;border-radius:3px;background:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:7px;font-weight:800;color:#fff;">SEC</div>
+              <div style="font-size:10px;font-weight:700;color:var(--txt);">Cyber security</div>
+            </div>
+            <div style="font-size:9px;color:var(--txt-m);line-height:1.35;">threat models · secrets · red-team eval</div>
+          </div>
+
+          <!-- DevOps engineering (full-width closer) -->
+          <div style="grid-column:1 / span 3;background:var(--gbg);border:1.5px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:6px 9px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+              <div style="width:14px;height:14px;border-radius:3px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:800;color:#fff;">DO</div>
+              <div style="font-size:10.5px;font-weight:700;color:var(--txt);">DevOps engineering</div>
+              <div style="margin-left:auto;font-size:9px;color:var(--gd);font-weight:600;font-style:italic;">ships the baseline</div>
+            </div>
+            <div style="font-size:9.5px;color:var(--txt-m);line-height:1.4;">containers · CI/CD pipelines · infrastructure-as-code · release strategy · environment management</div>
+          </div>
+
+        </div>
+
+        <div style="font-size:10px;color:var(--txt-l);line-height:1.45;font-style:italic;text-align:center;padding-top:2px;">Every concern has an owner. The squad coordinates them — you don't.</div>
+      </div>
+
+    </div>
+
+    <!-- Bottom: pluggable defaults strip -->
+    <div class="r fu" data-step="3" style="background:var(--hdr);border-radius:8px;padding:13px 18px;display:flex;align-items:center;gap:14px;">
+      <div style="flex-shrink:0;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);">Real implementations</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;line-height:1.25;">Abstracted &mdash;<br>sensible defaults<br>out of the box</div>
+      </div>
+
+      <div style="flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:6px;">
+
+        <!-- Speckit -->
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);">Spec</div>
+          <div style="font-size:12px;font-weight:700;color:#fff;line-height:1.1;">Speckit</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);line-height:1.3;">spec-driven specs &amp; plans</div>
+        </div>
+
+        <!-- OpenTelemetry -->
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);">Telemetry</div>
+          <div style="font-size:12px;font-weight:700;color:#fff;line-height:1.1;">OpenTelemetry</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);line-height:1.3;">logs · traces · metrics</div>
+        </div>
+
+        <!-- Langfuse -->
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);">Obs / mon</div>
+          <div style="font-size:12px;font-weight:700;color:#fff;line-height:1.1;">Langfuse</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);line-height:1.3;">LLM tracing &amp; dashboards</div>
+        </div>
+
+        <!-- DeepEval -->
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);">Eval</div>
+          <div style="font-size:12px;font-weight:700;color:#fff;line-height:1.1;">DeepEval</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);line-height:1.3;">ML/AI quality gates</div>
+        </div>
+
+        <!-- Lint/style -->
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);">Style</div>
+          <div style="font-size:12px;font-weight:700;color:#fff;line-height:1.1;">ruff · eslint</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);line-height:1.3;">language-native lint</div>
+        </div>
+
+        <!-- Build & deploy -->
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);">Build &amp; deploy</div>
+          <div style="font-size:11.5px;font-weight:700;color:#fff;line-height:1.1;">Docker · GH Actions</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);line-height:1.3;">containers · CI/CD · IaC</div>
+        </div>
+
+      </div>
+
+      <div style="flex-shrink:0;padding-left:14px;border-left:1px solid rgba(255,255,255,.15);">
+        <div style="font-size:9.5px;color:rgba(255,255,255,.7);line-height:1.4;font-style:italic;max-width:130px;text-align:right;">Swap any default for what your team already uses.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="logo">arpinine</div>
+  <div class="sdots" id="s7-dots"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SLIDE 8 — Outcomes & ROI (sourced numbers)            -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" id="s8" data-steps="3">
+  <div class="hdr"><div class="hdr-title">Outcomes — Time Saved · Risk Reduced · Consistency</div><div class="hdr-tag">ROI</div></div>
+
+  <div style="position:absolute;top:114px;left:48px;right:48px;bottom:88px;display:flex;flex-direction:column;gap:11px;">
+
+    <!-- Lead -->
+    <div class="r on" style="background:var(--ob-bg);border:1px solid var(--ob-bd);border-radius:6px;padding:10px 18px;font-size:12.5px;color:var(--txt);line-height:1.55;">
+      The Harness doesn't invent the productivity gains — <strong>AI coding tools already deliver those</strong>. The Harness protects them, by keeping cross-cutting concerns (spec, telemetry, observation, eval) from becoming the bottleneck the industry is already hitting.
+    </div>
+
+    <!-- Three outcome columns -->
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;min-height:0;">
+
+      <!-- TIME SAVED -->
+      <div class="r zm" data-step="1" style="background:var(--white);border:1.5px solid var(--tbd);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:9px;padding-bottom:8px;border-bottom:1px solid var(--tbd);">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);">Outcome #1</div>
+            <div style="font-size:14px;font-weight:700;color:var(--txt);line-height:1.2;">Time saved</div>
+          </div>
+        </div>
+
+        <!-- Big stat -->
+        <div style="background:var(--tbg);border:1px solid var(--tbd);border-radius:5px;padding:10px 12px;">
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <div style="font-size:32px;font-weight:800;color:var(--teal);line-height:1;">3.6 hrs</div>
+            <div style="font-size:11px;color:var(--txt-m);font-weight:500;">/week per developer<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">1</sup></div>
+          </div>
+          <div style="font-size:10.5px;color:var(--txt-m);margin-top:5px;line-height:1.4;">average time saved with AI coding tools · daily users save 4.1 hrs/wk</div>
+        </div>
+
+        <!-- Secondary stat -->
+        <div style="display:flex;align-items:baseline;gap:6px;padding:0 2px;">
+          <div style="font-size:20px;font-weight:800;color:var(--teal);line-height:1;">+60%</div>
+          <div style="font-size:10.5px;color:var(--txt-m);line-height:1.4;">PR throughput · daily AI users<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">1</sup></div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--gbg);border:1px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gd);margin-bottom:3px;">Harness keeps it</div>
+          <div style="font-size:10.5px;color:var(--txt);line-height:1.45;">Consistency lets gains <strong>compound across projects</strong> — no team rebuilds spec, plan, telemetry, eval plumbing from scratch.</div>
+        </div>
+      </div>
+
+      <!-- RISK REDUCED -->
+      <div class="r zm" data-step="2" style="background:var(--white);border:1.5px solid var(--rbd);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:9px;padding-bottom:8px;border-bottom:1px solid var(--rbd);">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);">Outcome #2</div>
+            <div style="font-size:14px;font-weight:700;color:var(--txt);line-height:1.2;">Risk reduced</div>
+          </div>
+        </div>
+
+        <!-- Big stat -->
+        <div style="background:var(--rbg);border:1px solid var(--rbd);border-radius:5px;padding:10px 12px;">
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <div style="font-size:32px;font-weight:800;color:var(--red);line-height:1;">72%</div>
+            <div style="font-size:11px;color:var(--txt-m);font-weight:500;">of orgs hit a production incident<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">2</sup></div>
+          </div>
+          <div style="font-size:10.5px;color:var(--txt-m);margin-top:5px;line-height:1.4;">caused by AI-generated code · only 41% trust their governance<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">2</sup></div>
+        </div>
+
+        <!-- Secondary stat -->
+        <div style="display:flex;align-items:baseline;gap:6px;padding:0 2px;">
+          <div style="font-size:20px;font-weight:800;color:var(--red);line-height:1;">+$670K</div>
+          <div style="font-size:10.5px;color:var(--txt-m);line-height:1.4;">extra breach cost without governance<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">3</sup></div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--gbg);border:1px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gd);margin-bottom:3px;">Harness applies</div>
+          <div style="font-size:10.5px;color:var(--txt);line-height:1.45;">Guardrails at <strong>commit time</strong>, not at incident time. Audit trail logged automatically — recovery starts with data, not forensics.</div>
+        </div>
+      </div>
+
+      <!-- CONSISTENCY -->
+      <div class="r zm" data-step="3" style="background:var(--white);border:1.5px solid var(--gbd);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:9px;padding-bottom:8px;border-bottom:1px solid var(--gbd);">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gd);">Outcome #3</div>
+            <div style="font-size:14px;font-weight:700;color:var(--txt);line-height:1.2;">Consistency</div>
+          </div>
+        </div>
+
+        <!-- Big stat -->
+        <div style="background:var(--gbg);border:1px solid var(--gbd);border-radius:5px;padding:10px 12px;">
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <div style="font-size:32px;font-weight:800;color:var(--gd);line-height:1;">45%</div>
+            <div style="font-size:11px;color:var(--txt-m);font-weight:500;">of AI deployments have problems<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">2</sup></div>
+          </div>
+          <div style="font-size:10.5px;color:var(--txt-m);margin-top:5px;line-height:1.4;">without downstream automation — the velocity gain disappears in rework</div>
+        </div>
+
+        <!-- Secondary stat -->
+        <div style="display:flex;align-items:baseline;gap:6px;padding:0 2px;">
+          <div style="font-size:20px;font-weight:800;color:var(--gd);line-height:1;">63%</div>
+          <div style="font-size:10.5px;color:var(--txt-m);line-height:1.4;">of breached orgs have no AI governance policy<sup style="font-size:8px;color:var(--txt-l);font-weight:700;">3</sup></div>
+        </div>
+
+        <div style="margin-top:auto;background:var(--gbg);border:1.5px solid var(--gbd);border-left:3px solid var(--green);border-radius:5px;padding:8px 10px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gd);margin-bottom:3px;">Harness delivers</div>
+          <div style="font-size:10.5px;color:var(--txt);line-height:1.45;">Same spec / plan / ADRs / telemetry / observation / eval defaults on <strong>every project</strong> — rules compound, don't reset.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Closing line -->
+    <div class="r fu" data-step="3" style="background:var(--hdr);border-radius:8px;padding:11px 18px;display:flex;align-items:center;gap:14px;">
+      <div style="width:30px;height:30px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div style="flex:1;font-size:13px;color:#fff;line-height:1.5;">
+        <strong>Same engineers. Same model. Fewer production surprises.</strong> <span style="color:rgba(255,255,255,.6);">The Harness turns "we should be more careful next time" into infrastructure that doesn't require remembering.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Source footnotes -->
+  <div style="position:absolute;bottom:60px;left:48px;right:48px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;pointer-events:none;">
+    <div style="font-size:8.5px;font-weight:400;color:var(--txt-l);line-height:1.3;display:flex;align-items:baseline;gap:3px;">
+      <span style="font-size:7.5px;font-weight:700;color:var(--txt-l);background:var(--ob-bg);border-radius:2px;padding:0 3px;line-height:1.6;">1</span>
+      <span>DX Q4 2025 AI-Assisted Engineering Impact Report, n=135,000+ developers, 435 companies</span>
+    </div>
+    <div style="font-size:8.5px;font-weight:400;color:var(--txt-l);line-height:1.3;display:flex;align-items:baseline;gap:3px;">
+      <span style="font-size:7.5px;font-weight:700;color:var(--txt-l);background:var(--ob-bg);border-radius:2px;padding:0 3px;line-height:1.6;">2</span>
+      <span>Harness "State of AI in Software Engineering 2025", n=900 (Aug 2025)</span>
+    </div>
+    <div style="font-size:8.5px;font-weight:400;color:var(--txt-l);line-height:1.3;display:flex;align-items:baseline;gap:3px;">
+      <span style="font-size:7.5px;font-weight:700;color:var(--txt-l);background:var(--ob-bg);border-radius:2px;padding:0 3px;line-height:1.6;">3</span>
+      <span>IBM Cost of a Data Breach Report 2025, n=600 orgs</span>
+    </div>
+  </div>
+
+  <div class="logo">arpinine</div>
+  <div class="sdots" id="s8-dots"></div>
+</div>
+
+
+<div id="nav">
+  <button id="bp" disabled>← Prev</button>
+  <div class="ndots" id="nd"></div>
+  <span id="sc">1 / 8</span>
+  <button id="bn">Next →</button>
+</div>
+
+<script>
+const TOTAL = 8;
+const slides = Array.from({length:TOTAL},(_,i)=>document.getElementById('s'+(i+1)));
+let cur = 0;
+const ss = new Array(TOTAL).fill(0);
+
+const vp = document.getElementById('vp');
+function scl() {
+  const W=1280, H=720, sw=window.innerWidth, sh=window.innerHeight-24;
+  const s = Math.min(sw/W, sh/H);
+  vp.style.transform = `scale(${s})`;
+  vp.style.left = Math.round((sw-W*s)/2)+'px';
+  vp.style.top  = Math.round((sh-H*s)/2)+'px';
+  vp.style.position = 'fixed';
+}
+scl(); window.addEventListener('resize', scl);
+
+const nd = document.getElementById('nd');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='ndot'+(i===0?' on':'');
+  d.addEventListener('click',()=>goTo(i));
+  nd.appendChild(d);
+}
+
+slides.forEach(s=>{
+  const n=parseInt(s.dataset.steps||'0'); if(!n) return;
+  const c=document.getElementById(s.id+'-dots'); if(!c) return;
+  for(let i=0;i<n;i++){const d=document.createElement('div');d.className='sdot';c.appendChild(d);}
+});
+
+function syncDots(s){
+  const c=document.getElementById(s.id+'-dots'); if(!c) return;
+  const si=slides.indexOf(s), step=ss[si], max=parseInt(s.dataset.steps||'0');
+  c.querySelectorAll('.sdot').forEach((d,i)=>d.classList.toggle('on',i<step));
+  const h=document.getElementById(s.id+'-hint');
+  if(h) h.style.opacity=step>=max?'0':'1';
+}
+
+function apply(s, step){
+  s.querySelectorAll('.r').forEach(el=>{
+    const ds=parseInt(el.dataset.step||'0');
+    el.classList.toggle('on', ds===0||ds<=step);
+  });
+  syncDots(s);
+}
+function init(s){ const si=slides.indexOf(s); ss[si]=0; apply(s,0); }
+
+const bp=document.getElementById('bp'), bn=document.getElementById('bn'), sc=document.getElementById('sc'), gpb=document.getElementById('gpb');
+
+function goTo(idx){
+  if(idx===cur) return;
+  slides[cur].classList.remove('active');
+  nd.children[cur].classList.remove('on');
+  cur=idx;
+  slides[cur].classList.add('active');
+  nd.children[cur].classList.add('on');
+  init(slides[cur]);
+  const els=slides[cur].querySelectorAll('.r.on');
+  els.forEach((el,i)=>{ el.style.transitionDelay=(i*.055)+'s'; });
+  setTimeout(()=>els.forEach(el=>el.style.transitionDelay=''),700);
+  sc.textContent=(cur+1)+' / '+TOTAL;
+  bp.disabled=cur===0; bn.disabled=cur===TOTAL-1;
+  gpb.style.width=((cur+1)/TOTAL*100)+'%';
+}
+
+function adv(){
+  const s=slides[cur], max=parseInt(s.dataset.steps||'0'), si=cur;
+  if(ss[si]<max){ss[si]++;apply(s,ss[si]);}
+  else if(cur<TOTAL-1) goTo(cur+1);
+}
+function bk(){
+  const s=slides[cur], si=cur;
+  if(ss[si]>0){ss[si]--;apply(s,ss[si]);}
+  else if(cur>0) goTo(cur-1);
+}
+
+bn.addEventListener('click',adv);
+bp.addEventListener('click',bk);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();adv();}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();bk();}
+});
+document.getElementById('vp').addEventListener('click',e=>{
+  if(!e.target.closest('#nav')&&!e.target.closest('button')) adv();
+});
+
+gpb.style.width=(1/TOTAL*100)+'%';
+for(let i=1;i<TOTAL;i++) init(slides[i]);
+const e1=slides[0].querySelectorAll('.r.on');
+e1.forEach((el,i)=>{el.style.transitionDelay=(i*.08)+'s';});
+setTimeout(()=>e1.forEach(el=>el.style.transitionDelay=''),900);
+</script>
+</body>
+</html>
