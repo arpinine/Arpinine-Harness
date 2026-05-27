@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+- Semantic drift detection (Layer 2) for `/at-audit`, gated behind an opt-in `--semantic` flag and governed by `ADR-0012`. Detects behavioral contradictions a structural check cannot see (e.g. spec says "rate-limit per user", code limits per IP). Never runs in the PostToolUse hook and never hard-blocks
+- `scripts/semantic_drift_prep.py` — deterministic preparation that pairs each spec clause (`##` section) with the code **that clause** references (resolved from the clause body, so a Billing clause is not judged against Auth code), reusing `quick_drift_check.py` related-code resolution. Excerpt line numbers are absolute source lines, so judge citations point at real `file:line`. Judging is performed by the `/at-audit` agent via the new prompt template, keeping the deterministic and non-deterministic parts separated
+- `skills/drift-detector/semantic-judge-prompt.md` — versioned LLM-as-judge prompt template. Output reuses the structural severity vocabulary (`CRITICAL`/`HIGH`/`MEDIUM`) with cited spec phrase and code `file:line`, so semantic and structural findings merge into one `/at-audit` report
+
+### Changed
+- `drift-detector` skill and `at-audit` command document the two-layer model (structural always-on + semantic opt-in) and record that embedding/cosine-similarity detection is rejected per `ADR-0012`
+
 ## [1.4.8] - 2026-05-21
 
 ### Fixed
@@ -9,6 +17,8 @@
 
 ### Changed
 - `make validate-structure IMPLEMENTATION=codex` now verifies the generated marketplace manifest exists, its `source.path` matches `$(CODEX_SYSTEM_PLUGIN_DIR)`, and no unresolved `__CODEX_PLUGIN_INSTALL_PATH__` placeholder remains — closing the validation gap that let the marketplace-orphan regression pass
+- Build output is now isolated per implementation under `dist/<impl>` (`DIST_DIR := dist/$(IMPLEMENTATION)`). Previously both implementations shared a single `dist/` and `assemble` ran a full `clean`, so assembling one implementation wiped the other's installed marketplace target and produced `Marketplace arpinine-harness-local failed to load: cache-miss` (and the earlier `not found in marketplace`). Each implementation now cleans and registers only its own `dist/<impl>` subtree
+- `/at` facade delegation now resolves the router's `/at-<name>` policy shorthand to the wrapping skill and invokes it through the skill mechanism instead of emitting a bare `/at-<name>` slash string, which the host rejected as `Unknown command`. Claude builds use the `arpinine-harness:at-<name>` skill id; Codex builds strip the namespace at assemble-time to the bare `at-<name>` skill name. Direct `/arpinine-harness:at-<name>` command invocation is unchanged
 
 ## [1.4.7] - 2026-05-21
 

@@ -13,3 +13,4 @@
 | ADR-0009 | Plain-text version-controlled artifact store under .specify/ | Accepted | specs/002-arpinine-harness-core-workflow | decision:002-arpinine-harness-core-workflow:plain-text-artifact-store |
 | ADR-0010 | Machine-readable AIN fields in spec.md as the gating source of truth | Accepted | specs/004-ain-readiness-gates | decision:004-ain-readiness-gates:machine-readable-ain-source-of-truth |
 | ADR-0011 | Shared JSON violation contract as the output format for rule execution | Accepted | specs/005-deterministic-rule-engine | decision:005-deterministic-rule-engine:shared-json-violation-contract |
+| ADR-0012 | Semantic drift detection as opt-in LLM-judge at audit time | Accepted | specs/002-arpinine-harness-core-workflow | decision:002-arpinine-harness-core-workflow:semantic-drift-detection-mechanism |

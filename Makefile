@@ -3,7 +3,7 @@ IMPLEMENTATION ?= claude
 VERSION      := $(shell python3 -c 'import json; print(json.load(open("src/implementations/$(IMPLEMENTATION)/.$(IMPLEMENTATION)-plugin/plugin.json"))["version"])')
 CORE_DIR     := src/arpinine-harness-core
 IMPLEMENTATION_DIR := src/implementations/$(IMPLEMENTATION)
-DIST_DIR     := dist
+DIST_DIR     := dist/$(IMPLEMENTATION)
 PLUGIN_DIST_DIR := $(DIST_DIR)/plugins
 BUILD_NAME   := $(PLUGIN_NAME)-$(IMPLEMENTATION)-v$(VERSION)
 BUILD_DIR    := $(DIST_DIR)/$(BUILD_NAME)
@@ -86,9 +86,9 @@ register:
 	@set -e; \
 	$(MAKE) assemble IMPLEMENTATION=$(IMPLEMENTATION); \
 	if [ "$(IMPLEMENTATION)" = "claude" ]; then \
-		claude plugin marketplace add ./dist; \
+		claude plugin marketplace add ./$(DIST_DIR); \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
-		codex plugin marketplace add ./dist; \
+		codex plugin marketplace add ./$(DIST_DIR); \
 		echo "Codex marketplace registered from $(CODEX_MARKETPLACE_FILE)."; \
 		echo "Enable $(PLUGIN_NAME) from the Codex marketplace UI if your Codex client requires a separate confirmation step."; \
 	else \
