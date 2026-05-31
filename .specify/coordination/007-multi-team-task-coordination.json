@@ -1,0 +1,46 @@
+{
+  "slug": "007-multi-team-task-coordination",
+  "tasks": {
+    "TASK-001": {
+      "assigned_team": null,
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-002": {
+      "assigned_team": null,
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-003": {
+      "assigned_team": null,
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-004": {
+      "assigned_team": null,
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-005": {
+      "assigned_team": null,
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-006": {
+      "assigned_team": null,
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-007": {
+      "assigned_team": null,
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-008": {
+      "assigned_team": null,
+      "lease_until": null,
+      "state": "completed"
+    }
+  },
+  "updated_at": "2026-05-31T06:47:45Z"
+}

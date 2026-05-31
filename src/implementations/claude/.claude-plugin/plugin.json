@@ -7,5 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["speckit", "adr", "drift-detection", "spec-management", "evaluation", "agent-quality"],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
 }

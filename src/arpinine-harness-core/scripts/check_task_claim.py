@@ -96,7 +96,7 @@ def main() -> int:
     team_id, instance_id = resolve_runtime_identity()
     if not team_id:
         print("VIOLATION: implementation edit attempted without a resolved team identity")
-        print("Set `ARPININE_HARNESS_TEAM_ID` to `claude` or `codex` only if the host runtime does not expose its plugin identity.")
+        print("Set `ARPININE_HARNESS_TEAM_ID` to `claude`, `codex`, or `copilot` only if the host runtime does not expose its plugin identity.")
         return 1
 
     specs = candidate_specs(spec_root, file_path)

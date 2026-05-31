@@ -119,7 +119,7 @@ Each command routes to the specialists that matter for that stage.
 
 ## Multi-Team Coordination
 
-Claude and Codex can share the same governed workflow.
+Claude, Codex, and GitHub Copilot CLI can share the same governed workflow.
 
 - both use the same `spec.md`, `plan.md`, ADRs, and eval artifacts
 - task ownership is coordinated through lease-based claims so they don't collide
@@ -180,11 +180,27 @@ make install IMPLEMENTATION=codex
 
 Restart Codex after install.
 
+### Copilot
+
+```bash
+make install IMPLEMENTATION=copilot
+```
+
+To update:
+
+```bash
+make uninstall IMPLEMENTATION=copilot
+make install IMPLEMENTATION=copilot
+```
+
+Restart GitHub Copilot CLI after install.
+
 ### Validate before installing
 
 ```bash
 make validate-structure IMPLEMENTATION=claude
 make validate-structure IMPLEMENTATION=codex
+make validate-structure IMPLEMENTATION=copilot
 ```
 
 ---
@@ -197,6 +213,7 @@ src/
   implementations/
     claude/                  # Claude implementation
     codex/                   # Codex plugin implementation
+    copilot/                 # GitHub Copilot CLI implementation
 tools/
   style/                     # canonical cross-team style configs
 ```

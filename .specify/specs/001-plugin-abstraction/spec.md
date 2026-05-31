@@ -14,7 +14,7 @@ Arpinine Harness governance workflows should be available to any team regardless
 ## Requirements
 
 - FR-001: The system SHALL maintain a shared core containing all governance behavior — commands, runtime hooks, agent definitions, and reusable templates — independent of any assistant platform.
-- FR-002: The system SHALL support at least two assistant implementations: Claude Code and Codex.
+- FR-002: The system SHALL support at least three assistant implementations: Claude Code, Codex, and GitHub Copilot CLI. Additional implementations SHALL be addable without modifying the shared core.
 - FR-003: Each assistant implementation SHALL contribute only the artifacts required by that platform. Governance behavior SHALL NOT be duplicated in implementation layers.
 - FR-004: The build process SHALL compose core and implementation into a single deployable artifact per assistant.
 - FR-005: The deployed plugin SHALL be installable from a stable local path that persists across builds.

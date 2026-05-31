@@ -2,7 +2,7 @@
 
 This package contains the shared workflow assets that power Arpinine Harness across all assistant implementations.
 
-Commands, agents, hooks, scripts, skills, and templates all live here. Assistant-specific metadata (manifests, registration files, implementation-specific skill wrappers) lives under `src/implementations/<assistant>/` and gets overlaid during the build step. Nothing in this package assumes Claude, Codex, or any specific assistant — the workflow is the abstraction.
+Commands, agents, hooks, scripts, skills, and templates all live here. Assistant-specific metadata (manifests, registration files, implementation-specific skill wrappers) lives under `src/implementations/<assistant>/` and gets overlaid during the build step. Nothing in this package assumes Claude, Codex, GitHub Copilot CLI, or any specific assistant — the workflow is the abstraction.
 
 Specification generation and planning also go through an adapter layer. Arpinine Harness keeps `.specify/` as the canonical artifact contract, while `.specify/specification-provider.json` selects the backend that generates or updates `spec.md` and `plan.md`.
 
@@ -142,7 +142,7 @@ Invocation:
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py" [--repo <path>] --intent "<intent>" [--indent <n>]
 ```
 
-Under Codex, the assemble step rewrites that invocation to `python3 "scripts/route_at.py" ...` so it resolves from the installed plugin root.
+Under Codex and Copilot, the assemble step rewrites that invocation to `python3 "scripts/route_at.py" ...` so it resolves from the installed plugin root.
 
 It emits one JSON object to stdout with these high-signal fields:
 
@@ -241,7 +241,7 @@ Use `/arpinine-harness:at-discover` when the user has an idea but not yet a spec
 
 ## Multi-Team Note
 
-The shared core is the source of truth for multi-team behavior. Claude, Codex, and any future implementation must all:
+The shared core is the source of truth for multi-team behavior. Claude, Codex, Copilot, and any future implementation must all:
 
 - honor shared task claims and leases
 - follow shared style-governance rules
@@ -262,7 +262,7 @@ The archetype contract is intentionally narrow:
 - generated `PROJECT_CONVENTIONS.md` documents starter boundaries without binding the repo to a specific assistant
 - dependency installation, framework selection, and runtime-specific policy remain governed decisions for later `spec.md` and `plan.md` artifacts
 
-When an archetype is selected, the shared core also records `.specify/archetype.json`, appends an archetype addendum to the generated constitution, writes starter rules under `.specify/rules/archetype/`, and enables shared pre-edit enforcement through the common hook layer used by both Claude and Codex.
+When an archetype is selected, the shared core also records `.specify/archetype.json`, appends an archetype addendum to the generated constitution, writes starter rules under `.specify/rules/archetype/`, and enables shared pre-edit enforcement through the common hook layer used by Claude, Codex, and Copilot.
 
 The scaffold entrypoint is `scripts/scaffold_archetype.py`:
 
@@ -272,7 +272,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" agent-app --target
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" ml-pipeline --target-dir . --force
 ```
 
-Under Codex, the assemble step rewrites these to `python3 "scripts/scaffold_archetype.py" ...` so they resolve from the installed plugin root.
+Under Codex and Copilot, the assemble step rewrites these to `python3 "scripts/scaffold_archetype.py" ...` so they resolve from the installed plugin root.
 
 ## Team Contract
 

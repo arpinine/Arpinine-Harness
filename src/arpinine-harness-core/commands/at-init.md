@@ -17,7 +17,7 @@ All `.specify/` file content (map artifacts, specs, plans, ADRs, rules, observat
 
 ### Step 0 — Archetype scaffold (optional)
 
-All shared scripts live in the installed plugin, not the user's repository. Always invoke them with the plugin-root prefix shown below. Under Claude Code that prefix expands to `${CLAUDE_PLUGIN_ROOT}/`. Codex builds strip this prefix at assemble-time so the same invocation resolves from the plugin root. `<project-root>` is always the user's repository, which is separate from the plugin path.
+All shared scripts live in the installed plugin, not the user's repository. Always invoke them with the plugin-root prefix shown below. Under Claude Code that prefix expands to `${CLAUDE_PLUGIN_ROOT}/`. Codex and Copilot builds strip this prefix at assemble-time so the same invocation resolves from the plugin root. `<project-root>` is always the user's repository, which is separate from the plugin path.
 
 If the user passed an explicit archetype choice, run:
 ```

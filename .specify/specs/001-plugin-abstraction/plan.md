@@ -31,14 +31,19 @@ src/
       .claude-plugin/     ← Claude manifest (plugin.json)
     codex/                ← Codex platform adapter
       .codex-plugin/      ← Codex manifest (plugin.json)
-      skills/             ← Codex skill wrappers for 4/11 workflows
+      skills/             ← Codex skill wrappers
+    copilot/              ← GitHub Copilot CLI platform adapter
+      plugin.json         ← Copilot manifest
+      hooks/              ← Copilot hook manifest (PreToolUse/PostToolUse)
+      scripts/            ← Copilot hook wrappers that normalize payloads to the shared shape
+      skills/             ← Copilot skill wrappers
 
 Makefile                  ← build orchestrator (assemble, build, install, validate)
 
-dist/                     ← all generated artifacts (cleaned on every assemble)
-  plugins/                ← stable registration targets (generated, ignored)
-    arpinine-harness-claude/   ← assembled Claude plugin; used for marketplace registration
-    arpinine-harness-codex/    ← assembled Codex plugin (future install path)
+dist/                     ← all generated artifacts, isolated per implementation under dist/<impl>
+  <impl>/
+    plugins/              ← stable registration targets (generated, ignored)
+      arpinine-harness/   ← assembled plugin for that implementation
   <name>-<impl>-v<ver>.zip
 ```
 

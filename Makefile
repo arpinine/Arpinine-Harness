@@ -1,6 +1,7 @@
 PLUGIN_NAME  := arpinine-harness
 IMPLEMENTATION ?= claude
-VERSION      := $(shell python3 -c 'import json; print(json.load(open("src/implementations/$(IMPLEMENTATION)/.$(IMPLEMENTATION)-plugin/plugin.json"))["version"])')
+PLUGIN_MANIFEST_REL := $(if $(filter $(IMPLEMENTATION),claude),.claude-plugin/plugin.json,$(if $(filter $(IMPLEMENTATION),codex),.codex-plugin/plugin.json,$(if $(filter $(IMPLEMENTATION),copilot),plugin.json,.plugin/plugin.json)))
+VERSION      := $(shell python3 -c 'import json; print(json.load(open("src/implementations/$(IMPLEMENTATION)/$(PLUGIN_MANIFEST_REL)"))["version"])')
 CORE_DIR     := src/arpinine-harness-core
 IMPLEMENTATION_DIR := src/implementations/$(IMPLEMENTATION)
 DIST_DIR     := dist/$(IMPLEMENTATION)
@@ -18,6 +19,10 @@ CODEX_CACHE_DIR := $(HOME)/.codex/plugins/cache/$(MARKETPLACE)/$(PLUGIN_NAME)
 CODEX_CACHE_VERSION_DIR := $(CODEX_CACHE_DIR)/$(VERSION)
 CODEX_MARKETPLACE_TEMPLATE := $(IMPLEMENTATION_DIR)/marketplace.json
 CODEX_MARKETPLACE_FILE := $(DIST_DIR)/.agents/plugins/marketplace.json
+COPILOT_MARKETPLACE_TEMPLATE := $(IMPLEMENTATION_DIR)/marketplace.json
+COPILOT_MARKETPLACE_FILE := $(DIST_DIR)/.github/plugin/marketplace.json
+COPILOT_PLUGIN_HOME ?= $(HOME)/.copilot
+COPILOT_INSTALLED_PLUGIN_DIR := $(COPILOT_PLUGIN_HOME)/installed-plugins/$(MARKETPLACE)/$(PLUGIN_NAME)
 
 .DEFAULT_GOAL := build
 
@@ -63,6 +68,25 @@ assemble: clean
 		cp -r $(BUILD_DIR) $(CODEX_SYSTEM_PLUGIN_DIR); \
 		sed "s#__CODEX_PLUGIN_INSTALL_PATH__#$(CODEX_SYSTEM_PLUGIN_DIR)#g" $(CODEX_MARKETPLACE_TEMPLATE) > $(CODEX_MARKETPLACE_FILE); \
 		echo "Codex plugin installed to $(CODEX_SYSTEM_PLUGIN_DIR) (marketplace points here absolutely)"; \
+	elif [ "$(IMPLEMENTATION)" = "copilot" ]; then \
+		echo "Rewriting CLAUDE_PLUGIN_ROOT references for Copilot plugin layout..."; \
+		find $(BUILD_DIR) -type f \( -name "*.md" -o -name "*.json" -o -name "*.sh" -o -name "*.py" \) -print0 \
+			| xargs -0 sed -i.bak -e 's#"\$${CLAUDE_PLUGIN_ROOT}/scripts/#"scripts/#g' \
+				-e 's#`\$${CLAUDE_PLUGIN_ROOT}/scripts/#`scripts/#g' \
+				-e 's#\$${CLAUDE_PLUGIN_ROOT}/scripts/#scripts/#g'; \
+		find $(BUILD_DIR) -type f -name "*.bak" -delete; \
+		echo "Rewriting facade skill-invocation names for Copilot (strip arpinine-harness: namespace)..."; \
+		find $(BUILD_DIR)/commands -type f -name "*.md" -print0 \
+			| xargs -0 sed -i.bak -e 's#`arpinine-harness:at-#`at-#g'; \
+		find $(BUILD_DIR) -type f -name "*.bak" -delete; \
+		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.github/plugin; \
+		rm -rf $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME); \
+		cp -r $(BUILD_DIR) $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME); \
+		echo "Resolving __COPILOT_PLUGIN_INSTALL_PATH__ in Copilot hooks to the durable installed-plugin dir $(COPILOT_INSTALLED_PLUGIN_DIR) (Copilot copies marketplace plugins there on install; no plugin-root env var, hooks run from repo-root cwd)..."; \
+		sed -i.bak "s#__COPILOT_PLUGIN_INSTALL_PATH__#$(COPILOT_INSTALLED_PLUGIN_DIR)#g" $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)/hooks/hooks.json; \
+		rm -f $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)/hooks/hooks.json.bak; \
+		cp $(COPILOT_MARKETPLACE_TEMPLATE) $(COPILOT_MARKETPLACE_FILE); \
+		echo "Copilot plugin assembled at $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)"; \
 	fi; \
 	trap - EXIT
 
@@ -91,6 +115,9 @@ register:
 		codex plugin marketplace add ./$(DIST_DIR); \
 		echo "Codex marketplace registered from $(CODEX_MARKETPLACE_FILE)."; \
 		echo "Enable $(PLUGIN_NAME) from the Codex marketplace UI if your Codex client requires a separate confirmation step."; \
+	elif [ "$(IMPLEMENTATION)" = "copilot" ]; then \
+		copilot plugin marketplace add ./$(DIST_DIR); \
+		echo "Copilot marketplace registered from $(COPILOT_MARKETPLACE_FILE)."; \
 	else \
 		echo "register target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
@@ -126,6 +153,35 @@ validate-structure: assemble
 		grep -q "\"path\": \"$(CODEX_SYSTEM_PLUGIN_DIR)\"" $(CODEX_MARKETPLACE_FILE) || (echo "Codex marketplace manifest does not point at $(CODEX_SYSTEM_PLUGIN_DIR). Source.path field must match the durable system install dir, not repo-local dist/." && exit 1); \
 		grep -q "__CODEX_PLUGIN_INSTALL_PATH__" $(CODEX_MARKETPLACE_FILE) && (echo "Codex marketplace manifest still contains unresolved __CODEX_PLUGIN_INSTALL_PATH__ placeholder" && exit 1) || true; \
 		echo "Codex plugin structure looks valid. Installed at $(CODEX_SYSTEM_PLUGIN_DIR). Marketplace resolves to that path."; \
+	elif [ "$(IMPLEMENTATION)" = "copilot" ]; then \
+		test -f $(BUILD_DIR)/plugin.json || (echo "Missing plugin.json" && exit 1); \
+		grep -q '"skills"[[:space:]]*:[[:space:]]*"./skills/"' $(BUILD_DIR)/plugin.json || (echo "Copilot plugin manifest must declare skills at ./skills/" && exit 1); \
+		grep -q '"hooks"[[:space:]]*:[[:space:]]*"./hooks/hooks.json"' $(BUILD_DIR)/plugin.json || (echo "Copilot plugin manifest must declare hooks at ./hooks/hooks.json" && exit 1); \
+		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json" && exit 1); \
+		for agent in product-owner tech-architect security-reviewer ai-engineer devops data-engineer tdd-guide domain-linguist; do \
+			test -f "$(BUILD_DIR)/skills/$$agent/SKILL.md" || (echo "Missing Copilot specialist wrapper: $$agent" && exit 1); \
+		done; \
+		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
+		for skill in $$(ls $(CORE_DIR)/commands/ | sed 's/\.md$$//'); do \
+			test -f "$(BUILD_DIR)/skills/$$skill/SKILL.md" || (echo "Missing Copilot workflow wrapper: $$skill" && exit 1); \
+		done; \
+		test -f $(COPILOT_MARKETPLACE_FILE) || (echo "Missing generated Copilot marketplace manifest: $(COPILOT_MARKETPLACE_FILE)" && exit 1); \
+		grep -q '"source"[[:space:]]*:[[:space:]]*"\./plugins/$(PLUGIN_NAME)"' $(COPILOT_MARKETPLACE_FILE) || (echo "Copilot marketplace manifest must point at ./plugins/$(PLUGIN_NAME)" && exit 1); \
+		test -f $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)/hooks/hooks.json || (echo "Missing assembled Copilot hooks manifest" && exit 1); \
+		! grep -q "__COPILOT_PLUGIN_INSTALL_PATH__" $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)/hooks/hooks.json || (echo "Copilot hooks.json still contains unresolved __COPILOT_PLUGIN_INSTALL_PATH__ placeholder; assemble did not rewrite it" && exit 1); \
+		ARTIFACT_DIR="$(abspath $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME))" INSTALL_DIR="$(COPILOT_INSTALLED_PLUGIN_DIR)" python3 -c 'import json,os,sys; \
+artifact=os.environ["ARTIFACT_DIR"]; install=os.environ["INSTALL_DIR"]; \
+m=json.load(open(os.path.join(artifact,"hooks","hooks.json"))); \
+cmds=[h["bash"] for ph in m["hooks"].values() for h in ph if "bash" in h]; \
+prefix=install+"/scripts/"; \
+bad=[c for c in cmds if not os.path.isabs(c)]; \
+offtree=[c for c in cmds if os.path.isabs(c) and not c.startswith(prefix)]; \
+shipped=[c for c in cmds if c.startswith(prefix) and not (lambda p: os.path.isfile(p) and os.access(p, os.X_OK))(os.path.join(artifact,"scripts",c[len(prefix):]))]; \
+sys.exit("Copilot hook commands must be absolute (Copilot resolves cwd against repo root, exposes no plugin-root env var): "+str(bad)) if bad else None; \
+sys.exit("Copilot hook commands must point at the durable installed-plugin dir "+install+": "+str(offtree)) if offtree else None; \
+sys.exit("Copilot hook scripts missing/not-executable in the shipped artifact (will be absent after install): "+str(shipped)) if shipped else None; \
+print("Copilot hooks: %d command(s) point at %s and ship as executable scripts" % (len(cmds), install))' || exit 1; \
+		echo "Copilot plugin structure looks valid. Marketplace resolves via $(COPILOT_MARKETPLACE_FILE). Hooks resolve to the durable installed-plugin dir $(COPILOT_INSTALLED_PLUGIN_DIR)."; \
 	else \
 		echo "validate-structure target is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
@@ -143,6 +199,9 @@ install:
 		mkdir -p $(CODEX_CACHE_VERSION_DIR); \
 		cp -r $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)/. $(CODEX_CACHE_VERSION_DIR)/; \
 		echo "Cache hydrated at $(CODEX_CACHE_VERSION_DIR)"; \
+	elif [ "$(IMPLEMENTATION)" = "copilot" ]; then \
+		$(MAKE) register IMPLEMENTATION=copilot; \
+		copilot plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
 	else \
 		echo "install is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
@@ -160,6 +219,9 @@ uninstall:
 		rm -rf $(CODEX_CACHE_DIR); \
 		echo "Cleared cache $(CODEX_CACHE_DIR)"; \
 		codex plugin marketplace remove $(MARKETPLACE) 2>/dev/null && echo "Marketplace entry removed" || echo "No marketplace entry found (may need manual removal)"; \
+	elif [ "$(IMPLEMENTATION)" = "copilot" ]; then \
+		copilot plugin uninstall $(PLUGIN_NAME) 2>/dev/null || echo "Plugin was not installed"; \
+		copilot plugin marketplace remove $(MARKETPLACE) 2>/dev/null && echo "Marketplace entry removed" || echo "No marketplace entry found"; \
 	else \
 		echo "uninstall is not implemented for IMPLEMENTATION=$(IMPLEMENTATION)"; \
 		exit 1; \
@@ -182,7 +244,7 @@ help:
 	@grep -E '^##' Makefile | sed 's/## //'
 	@echo ""
 	@echo "Targets: build (default), clean, delivery, register, validate-structure, install, uninstall, validate"
-	@echo "Variables: IMPLEMENTATION=claude|codex (default: claude)"
+	@echo "Variables: IMPLEMENTATION=claude|codex|copilot (default: claude)"
 	@echo "           CODEX_PLUGIN_HOME=<path> (default: $(HOME)/.agents)"
 	@echo "Claude-only: validate (uses claude plugin validate)"
 

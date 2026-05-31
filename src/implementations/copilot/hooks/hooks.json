@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-check-constitution.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 5
+      },
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-check-architecture-readiness.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 5
+      },
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-check-style-governance.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 5
+      },
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-check-task-claim.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 5
+      },
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/check-security-setup.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 5
+      },
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-check-archetype-governance.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 5
+      }
+    ],
+    "postToolUse": [
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-quick-drift-check.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 10
+      },
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-update-backlog.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

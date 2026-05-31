@@ -18,15 +18,15 @@ Plan: [specs/001-plugin-abstraction/plan.md](specs/001-plugin-abstraction/plan.m
 
 | Task | Status | Assigned Team | Claimed By | Lease Until |
 |------|--------|---------------|------------|-------------|
-| [TASK-001](specs/001-plugin-abstraction/plan.md#L84) | none | - | - | - |
-| [TASK-002](specs/001-plugin-abstraction/plan.md#L85) | none | - | - | - |
-| [TASK-003](specs/001-plugin-abstraction/plan.md#L86) | none | - | - | - |
-| [TASK-004](specs/001-plugin-abstraction/plan.md#L87) | none | - | - | - |
-| [TASK-005](specs/001-plugin-abstraction/plan.md#L88) | none | - | - | - |
-| [TASK-006](specs/001-plugin-abstraction/plan.md#L89) | none | - | - | - |
-| [TASK-007](specs/001-plugin-abstraction/plan.md#L90) | none | - | - | - |
-| [TASK-008](specs/001-plugin-abstraction/plan.md#L93) | none | - | - | - |
-| [TASK-009](specs/001-plugin-abstraction/plan.md#L94) | none | - | - | - |
+| [TASK-001](specs/001-plugin-abstraction/plan.md#L89) | none | - | - | - |
+| [TASK-002](specs/001-plugin-abstraction/plan.md#L90) | none | - | - | - |
+| [TASK-003](specs/001-plugin-abstraction/plan.md#L91) | none | - | - | - |
+| [TASK-004](specs/001-plugin-abstraction/plan.md#L92) | none | - | - | - |
+| [TASK-005](specs/001-plugin-abstraction/plan.md#L93) | none | - | - | - |
+| [TASK-006](specs/001-plugin-abstraction/plan.md#L94) | none | - | - | - |
+| [TASK-007](specs/001-plugin-abstraction/plan.md#L95) | none | - | - | - |
+| [TASK-008](specs/001-plugin-abstraction/plan.md#L98) | none | - | - | - |
+| [TASK-009](specs/001-plugin-abstraction/plan.md#L99) | none | - | - | - |
 
 ## [002-arpinine-harness-core-workflow](specs/002-arpinine-harness-core-workflow/spec.md)
 Plan: [specs/002-arpinine-harness-core-workflow/plan.md](specs/002-arpinine-harness-core-workflow/plan.md) &nbsp;|&nbsp; Progress: 3/13 full, 0 partial
@@ -149,6 +149,6 @@ Plan: [specs/009-operational-measurement-and-benchmark-governance/plan.md](specs
 | [TASK-009](specs/009-operational-measurement-and-benchmark-governance/plan.md#L84) | full | - | - | - |
 
 ---
-_Last updated: 2026-05-04 10:22_
+_Last updated: 2026-05-31 14:47_
 
 **Total tasks:** 81 &nbsp;|&nbsp; **Full:** 29 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 52

@@ -1,0 +1,15 @@
+{
+  "name": "arpinine-harness",
+  "version": "1.4.8",
+  "description": "Governed product-engineering workflow for GitHub Copilot CLI using shared Arpinine Harness artifacts",
+  "author": {
+    "name": "Arpinine",
+    "url": "https://github.com/Arpinine"
+  },
+  "homepage": "https://github.com/Arpinine/specops",
+  "repository": "https://github.com/Arpinine/specops",
+  "license": "MIT",
+  "keywords": ["copilot", "governance", "workflow", "spec-kit", "adr", "evaluation"],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}

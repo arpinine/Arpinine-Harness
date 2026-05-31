@@ -85,7 +85,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py" --repo <project-root> --inte
 
 Where:
 
-- `${CLAUDE_PLUGIN_ROOT}` is the absolute path to the installed plugin under Claude Code. Codex builds strip this prefix at assemble-time so the invocation becomes `python3 "scripts/route_at.py" ...` resolved from the plugin root.
+- `${CLAUDE_PLUGIN_ROOT}` is the absolute path to the installed plugin under Claude Code. Codex and Copilot builds strip this prefix at assemble-time so the invocation becomes `python3 "scripts/route_at.py" ...` resolved from the plugin root.
 - `<project-root>` means the known repository root when the facade already has one from the current working context (this is the user's repo, not the plugin path)
 - if no repository root is already established, omit `--repo` and let the router auto-detect from the current working directory
 - `<intent>` is the raw user wording from step 1, after only the no-args normalization rule
@@ -218,7 +218,7 @@ INTERPRETATION: blocked
 QUESTION: Routed facade execution is unavailable because the shared router could not be read at `${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py`. Reinstall the plugin or run a raw `/at-*` command explicitly.
 ```
 
-Before reporting this error, verify that the failure is not caused by resolving the router from the wrong working directory. Under Claude Code the router must be invoked via `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py"`. Under Codex the assemble step rewrites this to `python3 "scripts/route_at.py"` so the path resolves from the plugin root, not from the user's target repository.
+Before reporting this error, verify that the failure is not caused by resolving the router from the wrong working directory. Under Claude Code the router must be invoked via `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/route_at.py"`. Under Codex and Copilot the assemble step rewrites this to `python3 "scripts/route_at.py"` so the path resolves from the plugin root, not from the user's target repository.
 
 Do not silently route from guesswork.
 

@@ -156,6 +156,23 @@ class TaskCoordinationTests(unittest.TestCase):
         allowed = self.run_script(HOOK, env=env, input_text=payload)
         self.assertEqual(allowed.returncode, 0, allowed.stdout + allowed.stderr)
 
+    def test_runtime_identity_auto_resolves_from_copilot_host_env(self) -> None:
+        self.write_plan(["- [ ] TASK-001: Shared work"])
+        payload = json.dumps({"tool_input": {"file_path": "src/demo.py"}})
+        env = {"COPILOT_PLUGIN_ROOT": "/tmp/fake-copilot-plugin"}
+
+        blocked = self.run_script(HOOK, env=env, input_text=payload)
+        self.assertEqual(blocked.returncode, 1, blocked.stdout + blocked.stderr)
+        self.assertIn("Resolved identity: copilot:", blocked.stdout)
+
+        claim = self.run_script(CLAIM, "--slug", "001-demo", env=env)
+        self.assertEqual(claim.returncode, 0, claim.stdout + claim.stderr)
+        claimed = json.loads(claim.stdout)
+        self.assertTrue(claimed["claimed_by"].startswith("copilot:copilot-"))
+
+        allowed = self.run_script(HOOK, env=env, input_text=payload)
+        self.assertEqual(allowed.returncode, 0, allowed.stdout + allowed.stderr)
+
     def test_completed_task_preserves_claimer_history(self) -> None:
         self.write_plan(["- [ ] TASK-001: Shared work"])
 

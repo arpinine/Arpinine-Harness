@@ -5,7 +5,7 @@
 
 ## Scope
 - Validate shared-core artifact contracts, benchmark runner behavior, and assembled plugin structure for the operational measurement feature.
-- Applies to `src/arpinine-harness-core/**` plus assembled Claude and Codex plugin outputs.
+- Applies to `src/arpinine-harness-core/**` plus assembled Claude, Codex, and Copilot plugin outputs.
 
 ## Evaluation Objective
 - Prove that the shared core preserves the lightweight path, supports benchmarked evaluation, and fails closed on invalid baseline comparisons.
@@ -28,6 +28,7 @@
 | shared-core unit suite | validate schema, history, benchmark, and fail-closed logic | local tests | Yes |
 | Claude structure assembly | validate assembled Claude plugin content | `make validate-structure IMPLEMENTATION=claude` | Yes |
 | Codex structure assembly | validate assembled Codex plugin content | `make validate-structure IMPLEMENTATION=codex` | Yes |
+| Copilot structure assembly | validate assembled Copilot plugin content | `make validate-structure IMPLEMENTATION=copilot` | Yes |
 
 ## Metrics And Thresholds
 | Dimension | Metric | Threshold | Failure Action |
@@ -35,6 +36,7 @@
 | Shared-core regression | unittest pass rate | >= 1.00 | block completion |
 | Claude packaging | validate-structure exit status | >= 1.00 | block completion |
 | Codex packaging | validate-structure exit status | >= 1.00 | block completion |
+| Copilot packaging | validate-structure exit status | >= 1.00 | block completion |
 
 ## Regression Policy
 - Rerun evaluation after changes to shared scripts, commands, templates, or tests under `src/arpinine-harness-core/`.
@@ -53,4 +55,4 @@
 - Observation history source: not applicable
 
 ## Approval Rule
-- Work is not complete until the shared-core test suite passes and both assembled plugin structures validate.
+- Work is not complete until the shared-core test suite passes and all assembled plugin structures (Claude, Codex, Copilot) validate.

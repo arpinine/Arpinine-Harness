@@ -78,12 +78,12 @@ N/A — feature makes no LLM calls and produces no AI-driven output. Standard lo
 | Observation-evaluation bridge | Attach eval metric scores to traces via `ObservationProvider.score()` |
 | Swap strategy | [what changes when provider is replaced — must be adapter file only; no agent, tool, or domain code changes] |
 
-Implementation handoff: run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_observability_setup.py" --spec <slug>` before `/arpinine-harness:at-implement` to scaffold provider files from this section. Codex builds rewrite this to `python3 "scripts/scaffold_observability_setup.py" --spec <slug>` so it resolves from the installed plugin root.
+Implementation handoff: run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_observability_setup.py" --spec <slug>` before `/arpinine-harness:at-implement` to scaffold provider files from this section. Codex and Copilot builds rewrite this to `python3 "scripts/scaffold_observability_setup.py" --spec <slug>` so it resolves from the installed plugin root.
 Provider templates: `templates/observation-provider-template.py`, `templates/opentelemetry-observation-provider-template.py`, `templates/langfuse-observation-provider-template.py`, `templates/evaluation-provider-template.py`, `templates/deepeval-evaluation-provider-template.py`
 
 ## Tasks
 - [ ] TASK-001: Write failing tests for [module] [team: codex]
-- [ ] TASK-002: Implement [module] [team: claude]
+- [ ] TASK-002: Implement [module] [team: copilot]
 - [ ] TASK-003: Integration test for [flow]
 
 Team tags are optional. When present, only that team may claim the task during `/arpinine-harness:at-implement`.

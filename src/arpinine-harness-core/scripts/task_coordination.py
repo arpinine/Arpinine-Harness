@@ -221,4 +221,7 @@ def resolve_runtime_identity() -> tuple[str | None, str | None]:
     if os.environ.get("CODEX_PLUGIN_ROOT"):
         return "codex", default_instance_id("codex")
 
+    if os.environ.get("COPILOT_PLUGIN_ROOT"):
+        return "copilot", default_instance_id("copilot")
+
     return None, os.environ.get("ARPININE_HARNESS_INSTANCE_ID")

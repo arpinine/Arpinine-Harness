@@ -43,6 +43,7 @@ Typical example:
 
 - one delivery lane runs in Claude
 - one delivery lane runs in Codex
+- one delivery lane runs in GitHub Copilot CLI
 - both operate on the same spec, plan, ADR, evaluation, and delivery artifacts
 - implementation work is coordinated through task claims and optional team tags in `plan.md`
 
@@ -110,6 +111,7 @@ Make the plugin available in the current assistant and confirm the repo can use 
 - Register the plugin for the current implementation:
   - `make register IMPLEMENTATION=claude`
   - `make register IMPLEMENTATION=codex`
+  - `make register IMPLEMENTATION=copilot`
 - If using Claude, native install is available:
   - `make install IMPLEMENTATION=claude`
 - Confirm `spec-kit` exists:
@@ -250,7 +252,7 @@ Convert the approved spec into an executable engineering plan.
 - evaluation strategy if relevant
 - optional cross-assistant task ownership
 
-When multiple assistant instances will run concurrently, assign tasks in `plan.md` with optional tags such as `[team: claude]` and `[team: codex]`. Execution then claims tasks through `.specify/coordination/<slug>.json` so each runtime takes only eligible work that is not already leased by another team.
+When multiple assistant instances will run concurrently, assign tasks in `plan.md` with optional tags such as `[team: claude]`, `[team: codex]`, and `[team: copilot]`. Execution then claims tasks through `.specify/coordination/<slug>.json` so each runtime takes only eligible work that is not already leased by another team.
 
 **Manual**
 - inspect the generated plan
