@@ -5,13 +5,13 @@
   },
   "metadata": {
     "description": "Local Arpinine Harness plugin marketplace for GitHub Copilot CLI",
-    "version": "1.4.8"
+    "version": "1.4.9"
   },
   "plugins": [
     {
       "name": "arpinine-harness",
       "description": "Governed product-engineering workflow for GitHub Copilot CLI using shared Arpinine Harness artifacts",
-      "version": "1.4.8",
+      "version": "1.4.9",
       "source": "./plugins/arpinine-harness"
     }
   ]

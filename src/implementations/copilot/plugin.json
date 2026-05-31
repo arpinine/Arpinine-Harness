@@ -1,6 +1,6 @@
 {
   "name": "arpinine-harness",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "description": "Governed product-engineering workflow for GitHub Copilot CLI using shared Arpinine Harness artifacts",
   "author": {
     "name": "Arpinine",

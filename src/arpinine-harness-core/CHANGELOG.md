@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.4.9] - 2026-05-31
+
 ### Added
 - Semantic drift detection (Layer 2) for `/at-audit`, gated behind an opt-in `--semantic` flag and governed by `ADR-0012`. Detects behavioral contradictions a structural check cannot see (e.g. spec says "rate-limit per user", code limits per IP). Never runs in the PostToolUse hook and never hard-blocks
 - `scripts/semantic_drift_prep.py` — deterministic preparation that pairs each spec clause (`##` section) with the code **that clause** references (resolved from the clause body, so a Billing clause is not judged against Auth code), reusing `quick_drift_check.py` related-code resolution. Excerpt line numbers are absolute source lines, so judge citations point at real `file:line`. Judging is performed by the `/at-audit` agent via the new prompt template, keeping the deterministic and non-deterministic parts separated

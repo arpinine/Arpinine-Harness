@@ -79,12 +79,12 @@ assemble: clean
 		find $(BUILD_DIR)/commands -type f -name "*.md" -print0 \
 			| xargs -0 sed -i.bak -e 's#`arpinine-harness:at-#`at-#g'; \
 		find $(BUILD_DIR) -type f -name "*.bak" -delete; \
+		echo "Resolving __COPILOT_PLUGIN_INSTALL_PATH__ in Copilot hooks to the durable installed-plugin dir $(COPILOT_INSTALLED_PLUGIN_DIR) (Copilot copies marketplace plugins there on install; no plugin-root env var, hooks run from repo-root cwd)..."; \
+		sed -i.bak "s#__COPILOT_PLUGIN_INSTALL_PATH__#$(COPILOT_INSTALLED_PLUGIN_DIR)#g" $(BUILD_DIR)/hooks/hooks.json; \
+		rm -f $(BUILD_DIR)/hooks/hooks.json.bak; \
 		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.github/plugin; \
 		rm -rf $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME); \
 		cp -r $(BUILD_DIR) $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME); \
-		echo "Resolving __COPILOT_PLUGIN_INSTALL_PATH__ in Copilot hooks to the durable installed-plugin dir $(COPILOT_INSTALLED_PLUGIN_DIR) (Copilot copies marketplace plugins there on install; no plugin-root env var, hooks run from repo-root cwd)..."; \
-		sed -i.bak "s#__COPILOT_PLUGIN_INSTALL_PATH__#$(COPILOT_INSTALLED_PLUGIN_DIR)#g" $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)/hooks/hooks.json; \
-		rm -f $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)/hooks/hooks.json.bak; \
 		cp $(COPILOT_MARKETPLACE_TEMPLATE) $(COPILOT_MARKETPLACE_FILE); \
 		echo "Copilot plugin assembled at $(PLUGIN_DIST_DIR)/$(PLUGIN_NAME)"; \
 	fi; \
