@@ -1,0 +1,80 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "description": "Validate constitution before file edits",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "scripts/check-constitution.sh",
+          "timeout": 5
+        }]
+      },
+      {
+        "description": "Block implementation edits until architecture requirements are defined",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "scripts/check-architecture-readiness.sh",
+          "timeout": 5
+        }]
+      },
+      {
+        "description": "Block implementation edits when the repository has no declared style standard for the language",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "scripts/check-style-governance.sh",
+          "timeout": 5
+        }]
+      },
+      {
+        "description": "Block implementation edits unless the current team has an active task claim",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "scripts/check-task-claim.sh",
+          "timeout": 5
+        }]
+      },
+      {
+        "description": "Verify pre-commit security hooks are installed and active (cached, 5-min TTL)",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "scripts/check-security-setup.sh",
+          "timeout": 5
+        }]
+      },
+      {
+        "description": "Block edits that violate active archetype governance checks",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "scripts/check-archetype-governance.sh",
+          "timeout": 5
+        }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "description": "Detect lightweight spec drift after file writes, including implementation-time plan updates",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "scripts/quick-drift-check.sh",
+          "timeout": 10
+        }]
+      },
+      {
+        "description": "Regenerate delivery matrix when task state or other plan.md content is updated",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "scripts/update-backlog.sh",
+          "timeout": 10
+        }]
+      }
+    ]
+  }
+}

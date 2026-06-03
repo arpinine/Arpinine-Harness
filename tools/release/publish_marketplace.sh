@@ -5,7 +5,9 @@
 #
 # Separate from assemble/build/install: it only assembles (read-only reuse) and
 # copies the portable assembled trees into the committed `marketplace/` directory,
-# then writes the root marketplace manifests with bundle-relative sources.
+# then writes the host-specific marketplace manifests. Claude installs directly
+# from the repo root. Codex stages a committed Codex-only local marketplace root
+# from `marketplace/codex-root/`.
 #
 # Only portable hosts are eligible: Claude (${CLAUDE_PLUGIN_ROOT}) and Codex
 # (plugin-relative hook paths). Copilot bakes machine-absolute hook paths and is
@@ -85,7 +87,14 @@ cp -r "$CODEX_SRC/." "marketplace/codex/arpinine-harness/"
 rm -f "marketplace/codex/arpinine-harness/marketplace.json"
 assert_portable "marketplace/codex/arpinine-harness"
 
-mkdir -p ".agents/plugins"
+# GitHub-root `codex plugin marketplace add owner/repo` resolves the wrong manifest
+# in this multi-host repo, so publish a committed Codex-only marketplace root that
+# the installer can sparse-checkout and stage locally.
+rm -rf "marketplace/codex-root"
+mkdir -p "marketplace/codex-root/plugins/arpinine-harness" "marketplace/codex-root/.agents/plugins"
+cp -r "$CODEX_SRC/." "marketplace/codex-root/plugins/arpinine-harness/"
+rm -f "marketplace/codex-root/plugins/arpinine-harness/marketplace.json"
+assert_portable "marketplace/codex-root/plugins/arpinine-harness"
 python3 - "$PLUGIN_NAME" "$MARKETPLACE" <<'PY'
 import json, sys
 plugin, marketplace = sys.argv[1:3]
@@ -94,15 +103,15 @@ manifest = {
     "interface": {"displayName": "Arpinine Harness"},
     "plugins": [{
         "name": plugin,
-        "source": {"source": "local", "path": "./marketplace/codex/arpinine-harness"},
+        "source": {"source": "local", "path": "./plugins/arpinine-harness"},
         "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
         "category": "Productivity",
     }],
 }
-open(".agents/plugins/marketplace.json", "w").write(json.dumps(manifest, indent=2) + "\n")
+open("marketplace/codex-root/.agents/plugins/marketplace.json", "w").write(json.dumps(manifest, indent=2) + "\n")
 PY
 
 echo "Committed marketplace refreshed:"
 echo "  Claude: .claude-plugin/marketplace.json -> ./marketplace/claude/arpinine-harness-claude"
-echo "  Codex : .agents/plugins/marketplace.json -> ./marketplace/codex/arpinine-harness"
+echo "  Codex : marketplace/codex-root/.agents/plugins/marketplace.json -> ./plugins/arpinine-harness"
 echo "Commit the marketplace/ tree and both manifests. Copilot is zip-only (use 'make release IMPLEMENTATION=copilot')."

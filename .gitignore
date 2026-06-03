@@ -1,7 +1,8 @@
 .DS_Store
 .claude/settings.local.json
 dist/
-plugins/
+/plugins/
+/.agents/
 __pycache__/
 .specify/coordination/.coordination.lock
 .specify/coordination/.security-tooling-cache.json

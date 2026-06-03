@@ -1,0 +1,12 @@
+{
+  "baseline_run_id": "YYYYMMDDTHHMMSSZ-core-suite-v1",
+  "approved_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "approved_by": "team-or-person",
+  "dataset_version": "v1.0.0",
+  "model_name": "example-model",
+  "model_version": "example-model-version",
+  "variant_id": "prompt-a_adapter-b",
+  "scenario_set": "core-suite",
+  "source_results_path": ".specify/evals/[SPEC-NUMBER]-[name]/baseline-results.json",
+  "release_note": "Known-good baseline after benchmark stabilization"
+}

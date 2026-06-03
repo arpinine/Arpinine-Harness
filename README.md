@@ -144,7 +144,7 @@ Automatic checks fire on every file write:
 
 ## Installation
 
-Install directly from GitHub — no clone, no build, no `make`. The plugin is committed in this repo and the host installs it straight from the marketplace.
+Install from GitHub with no build. Claude can install straight from the repo-root marketplace. Codex needs a Codex-only local marketplace root staged from the committed GitHub contents because this repo also carries the Claude marketplace manifest at the root.
 
 ### Claude
 
@@ -167,24 +167,30 @@ Restart Claude Code. Update later with `/plugin marketplace update arpinine-harn
 ### Codex
 
 ```bash
-codex plugin marketplace add arpinine/Arpinine-Harness
-codex plugin add arpinine-harness@arpinine-harness-local
+bash <(curl -fsSL https://raw.githubusercontent.com/arpinine/Arpinine-Harness/main/tools/release/install_codex_remote.sh)
 ```
 
 Then **fully restart Codex** (the running client does not hot-load plugins).
 
-> **Codex remote install is provisional.** `codex plugin add` populates the plugin
-> cache (`~/.codex/plugins/cache/<marketplace>/<plugin>/<version>`) but, on some
-> Codex versions, the plugin still reports "installed" without becoming available
-> in the client. If a full restart does not surface it, install from source
-> instead — that path also copies the plugin into `~/.agents/plugins/`, which the
-> client loads reliably:
-> ```bash
-> make install IMPLEMENTATION=codex
-> ```
-> Claude remote install is verified end-to-end.
+The installer does a sparse Git checkout of only the Codex marketplace files,
+stages them under `~/.codex/marketplaces/arpinine-harness-local-codex/`, then
+runs:
 
-> **Access:** the host clones the repo (SSH by default), so you need read access — the repo must be public or your SSH key / token configured.
+```bash
+codex plugin marketplace add <staged-local-root>
+codex plugin add arpinine-harness@arpinine-harness-local
+```
+
+Use `REMOTE_REF=<tag|branch|sha>` to pin a version, or `GIT_REMOTE_URL=git@github.com:owner/repo.git`
+for private-repo SSH access:
+
+```bash
+REMOTE_REF=v1.4.9 bash <(curl -fsSL https://raw.githubusercontent.com/arpinine/Arpinine-Harness/main/tools/release/install_codex_remote.sh)
+```
+
+> **Why not `codex plugin marketplace add arpinine/Arpinine-Harness`?** Codex resolves this multi-host repo against the root Claude marketplace manifest, so a direct root-level add installs the Claude payload instead of the Codex one. The installer stages a Codex-only marketplace root to avoid that conflict.
+>
+> **Access:** the installer clones the repo over HTTPS by default. For private repos, use an authenticated HTTPS URL or set `GIT_REMOTE_URL=git@github.com:owner/repo.git`.
 >
 > **Copilot** cannot install from the committed marketplace (it bakes machine-absolute hook paths at install time). Build a release bundle with `make release IMPLEMENTATION=copilot` and run the bundled `install.sh`. Maintainer build/release details: `make help`.
 
@@ -215,8 +221,7 @@ Codex:
 ```bash
 codex plugin remove arpinine-harness
 codex plugin marketplace remove arpinine-harness-local
-codex plugin marketplace add arpinine/Arpinine-Harness
-codex plugin add arpinine-harness@arpinine-harness-local
+bash <(curl -fsSL https://raw.githubusercontent.com/arpinine/Arpinine-Harness/main/tools/release/install_codex_remote.sh)
 ```
 
 Restart the host after switching.
@@ -230,7 +235,13 @@ The remote marketplace tracks `main`. Pull the newest published version anytime:
 ```
 
 ```bash
-claude plugin marketplace update arpinine-harness-local   # Codex: codex plugin marketplace upgrade arpinine-harness-local
+claude plugin marketplace update arpinine-harness-local
+```
+
+For Codex, rerun the installer so the staged local marketplace root is refreshed:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/arpinine/Arpinine-Harness/main/tools/release/install_codex_remote.sh)
 ```
 
 Restart the host to load the updated plugin.

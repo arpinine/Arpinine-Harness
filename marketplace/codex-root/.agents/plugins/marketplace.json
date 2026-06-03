@@ -1,0 +1,20 @@
+{
+  "name": "arpinine-harness-local",
+  "interface": {
+    "displayName": "Arpinine Harness"
+  },
+  "plugins": [
+    {
+      "name": "arpinine-harness",
+      "source": {
+        "source": "local",
+        "path": "./plugins/arpinine-harness"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -110,19 +110,21 @@ release-all:
 release-publish:
 	@TAG="$(TAG)" DRAFT="$(DRAFT)" tools/release/publish_release.sh $(TAG)
 
-## Refresh the committed in-repo marketplace (Claude + Codex) for direct GitHub install.
-## Commit the resulting marketplace/ tree and manifests. Copilot stays zip-only.
+## Refresh committed marketplace artifacts for no-build GitHub install.
+## Claude installs directly from repo root; Codex stages the committed Codex tree locally.
 publish-marketplace:
 	@tools/release/publish_marketplace.sh
 
-## No-build GitHub-repo install (Claude or Codex): remove any local marketplace,
-## then add the remote marketplace and install from it.
+## No-build GitHub install.
+## Claude installs from the repo-root marketplace; Codex stages a Codex-only local root first.
 ## Vars: REMOTE_REPO (default arpinine/Arpinine-Harness), REMOTE_REF (optional branch/tag/sha).
 REMOTE_REPO ?= arpinine/Arpinine-Harness
 REMOTE_SOURCE := $(REMOTE_REPO)$(if $(REMOTE_REF),@$(REMOTE_REF),)
 install-remote:
 	@if [ "$(IMPLEMENTATION)" = "claude" ]; then HOST=claude; ADD=install; RM=uninstall; \
-	elif [ "$(IMPLEMENTATION)" = "codex" ]; then HOST=codex; ADD=add; RM=remove; \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
+		REMOTE_REPO="$(REMOTE_REPO)" REMOTE_REF="$(REMOTE_REF)" bash tools/release/install_codex_remote.sh; \
+		exit $$?; \
 	else echo "install-remote supports IMPLEMENTATION=claude|codex only (Copilot is zip-only)"; exit 1; fi; \
 	command -v $$HOST >/dev/null || { echo "$$HOST CLI not found on PATH"; exit 1; }; \
 	echo "Removing any existing local install..."; \
@@ -285,8 +287,8 @@ help:
 	@echo "         release         -> one GitHub-distributable bundle (dist/<impl>/release/); separate from build"
 	@echo "         release-all     -> bundles for all implementations (no upload)"
 	@echo "         release-publish -> build all bundles + upload to a GitHub Release (needs authenticated gh; TAG=vX.Y.Z, DRAFT=1 optional)"
-	@echo "         publish-marketplace -> refresh committed in-repo marketplace (Claude+Codex) for direct 'marketplace add owner/repo' install"
-	@echo "         install-remote -> uninstall local, add remote marketplace + install from GitHub (REMOTE_REPO=, REMOTE_REF=branch optional)"
+	@echo "         publish-marketplace -> refresh committed marketplace artifacts (Claude direct; Codex staged local root)"
+	@echo "         install-remote -> no-build GitHub install (Claude direct; Codex stages a Codex-only local root)"
 	@echo "Variables: IMPLEMENTATION=claude|codex|copilot (default: claude)"
 	@echo "           CODEX_PLUGIN_HOME=<path> (default: $(HOME)/.agents)"
 	@echo "Claude-only: validate (uses claude plugin validate)"
