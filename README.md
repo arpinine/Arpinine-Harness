@@ -8,7 +8,7 @@ When you build with AI, things move fast. Specs drift. Architecture decisions ha
 
 ## Start Here
 
-Use `/arpinine-harness:at` as the front door. Describe what you want. It inspects repo state, picks the right governed command, explains the choice, and delegates.
+Use `/arpinine-harness:at` as the front door. It is the facade over the Arpinine Harness agent team: you describe the intent in plain language, the facade inspects the repository's current state, selects the right specialist-led workflow command, explains the decision, and delegates.
 
 ```text
 /arpinine-harness:at "I want to build a product for remote retrospectives"
@@ -27,6 +27,14 @@ WHY: The request spans project-level decomposition rather than one feature spec.
 ALTERNATIVE: /at-discover
 CONFIRM: proceed with /at-map?
 ```
+
+From an initial state, that means:
+
+- in an ungoverned or mostly empty repo, the facade routes to `/arpinine-harness:at-init`
+- in an existing codebase with no governance artifacts, it routes or confirms toward `/arpinine-harness:at-bootstrap-from-code`
+- in a governed repo with a broad goal, it routes to `/arpinine-harness:at-map`
+- in a governed repo with one feature idea, it routes to `/arpinine-harness:at-discover`
+- when the next step is unclear, it routes to `/arpinine-harness:at-status`
 
 Typical routed outcomes:
 
@@ -79,6 +87,8 @@ The workflow is a loop, not a checklist:
 ---
 
 ## Agent Team
+
+`/arpinine-harness:at` does not replace this team. It is the facade that decides which part of the team should lead next based on repo state and user intent.
 
 Each command routes to the specialists that matter for that stage.
 

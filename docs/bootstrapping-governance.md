@@ -8,7 +8,13 @@ If you do not want to choose the workflow command yourself, start with:
 /arpinine-harness:at "We already have code. Bootstrap governance from this repo."
 ```
 
-The facade will inspect repo state, explain the recommendation, and then hand off to the right underlying command. The rest of this guide shows the explicit raw-command path.
+`/arpinine-harness:at` is the facade over the Arpinine Harness agent team. From an initial state, it first determines what kind of repository it is looking at:
+
+- empty or ungoverned repo -> initialize governance
+- existing codebase with no governed artifacts -> bootstrap governance from code
+- already governed repo -> route to the next stage-specific command
+
+It then explains the recommendation and hands off to the right underlying command. The rest of this guide shows the explicit raw-command path.
 
 ## Prerequisites
 
