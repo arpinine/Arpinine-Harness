@@ -1,0 +1,48 @@
+{
+  "name": "ml-pipeline",
+  "description": "Machine learning pipeline with feature engineering, model training, and evaluation",
+  "directories": [
+    "src/pipelines",
+    "src/features",
+    "src/models",
+    "src/domain",
+    "data/raw",
+    "data/processed",
+    "notebooks",
+    "evals",
+    "tests"
+  ],
+  "template_files": [
+    "PROJECT_CONVENTIONS.md"
+  ],
+  "constitution_principles": [
+    "Production code must not depend on notebooks; notebooks remain exploratory and import from src, never the other way around.",
+    "Raw data is immutable after ingest, and domain modules remain free of ML and dataframe framework imports."
+  ],
+  "starter_rules": [
+    {
+      "rule_id": "archetype-ml-pipeline-notebook-boundary",
+      "severity": "HIGH",
+      "prevents": "production dependencies on exploratory notebook code",
+      "triggers": [
+        "src file imports notebooks package or notebook-relative path",
+        "pipeline implementation moves reusable logic into notebooks instead of src"
+      ],
+      "rule": "Keep notebooks exploratory only. Production code under `src/` must never import from `notebooks/`.",
+      "detection_pattern": "Review imports in `src/` for `notebooks` package references or relative imports that traverse into `notebooks/`.",
+      "correct_pattern": "Shared logic lives under `src/`; notebooks may import from `src/` for analysis, but production code does not depend on notebooks."
+    },
+    {
+      "rule_id": "archetype-ml-pipeline-raw-data-immutability",
+      "severity": "HIGH",
+      "prevents": "mutation of raw datasets and loss of data lineage",
+      "triggers": [
+        "edit targets data/raw/",
+        "pipeline design writes transformed output back into raw dataset locations"
+      ],
+      "rule": "Treat `data/raw/` as immutable after ingest. Derived artifacts belong under `data/processed/` or another explicitly versioned output location.",
+      "detection_pattern": "Block edits to files under `data/raw/` unless the team is performing a one-time ingest/bootstrap outside the governed application flow.",
+      "correct_pattern": "Ingest once into `data/raw/`, then write all derived or transformed artifacts into `data/processed/` or a managed artifact store."
+    }
+  ]
+}

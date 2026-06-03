@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# Refresh the COMMITTED, in-repo plugin marketplace so consumers can install with
+#   <host> plugin marketplace add arpinine/Arpinine-Harness
+# directly from GitHub — no zip download, no build.
+#
+# Separate from assemble/build/install: it only assembles (read-only reuse) and
+# copies the portable assembled trees into the committed `marketplace/` directory,
+# then writes the root marketplace manifests with bundle-relative sources.
+#
+# Only portable hosts are eligible: Claude (${CLAUDE_PLUGIN_ROOT}) and Codex
+# (plugin-relative hook paths). Copilot bakes machine-absolute hook paths and is
+# NOT publishable as a committed marketplace — ship it via `make release` zip.
+#
+# Usage: tools/release/publish_marketplace.sh
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$ROOT"
+
+PLUGIN_NAME="arpinine-harness"
+MARKETPLACE="arpinine-harness-local"
+
+assert_portable() { # dir
+  if grep -rqI "/Users/\|/home/" "$1" 2>/dev/null; then
+    echo "Refusing to publish: machine-absolute path found in $1 (not portable)." >&2
+    exit 1
+  fi
+}
+
+# ---- Claude ----
+make assemble IMPLEMENTATION=claude >/dev/null
+CLAUDE_SRC="dist/claude/plugins/arpinine-harness-claude"
+test -d "$CLAUDE_SRC" || { echo "Missing assembled Claude tree: $CLAUDE_SRC" >&2; exit 1; }
+assert_portable "$CLAUDE_SRC"
+rm -rf "marketplace/claude"
+mkdir -p "marketplace/claude/arpinine-harness-claude"
+cp -r "$CLAUDE_SRC/." "marketplace/claude/arpinine-harness-claude/"
+
+CLAUDE_VERSION="$(python3 -c "import json; print(json.load(open('marketplace/claude/arpinine-harness-claude/.claude-plugin/plugin.json'))['version'])")"
+python3 - "$PLUGIN_NAME" "$MARKETPLACE" "$CLAUDE_VERSION" <<'PY'
+import json, sys
+plugin, marketplace, version = sys.argv[1:4]
+manifest = {
+    "name": marketplace,
+    "owner": {"name": "Arpinine"},
+    "metadata": {
+        "description": "Arpinine Harness Claude Code marketplace (install directly from GitHub)",
+        "version": version,
+    },
+    "plugins": [{
+        "name": plugin,
+        "description": "Governed product-engineering workflow: ADRs, drift detection, evaluation, compounding rule learning",
+        "version": version,
+        "source": "./marketplace/claude/arpinine-harness-claude",
+    }],
+}
+open(".claude-plugin/marketplace.json", "w").write(json.dumps(manifest, indent=2) + "\n")
+PY
+
+# ---- Codex ----
+make assemble IMPLEMENTATION=codex >/dev/null
+CODEX_SRC="dist/codex/plugins/arpinine-harness"
+test -d "$CODEX_SRC" || { echo "Missing assembled Codex tree: $CODEX_SRC" >&2; exit 1; }
+assert_portable "$CODEX_SRC"
+rm -rf "marketplace/codex"
+mkdir -p "marketplace/codex/arpinine-harness"
+cp -r "$CODEX_SRC/." "marketplace/codex/arpinine-harness/"
+
+mkdir -p ".agents/plugins"
+python3 - "$PLUGIN_NAME" "$MARKETPLACE" <<'PY'
+import json, sys
+plugin, marketplace = sys.argv[1:3]
+manifest = {
+    "name": marketplace,
+    "interface": {"displayName": "Arpinine Harness"},
+    "plugins": [{
+        "name": plugin,
+        "source": {"source": "local", "path": "./marketplace/codex/arpinine-harness"},
+        "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+        "category": "Productivity",
+    }],
+}
+open(".agents/plugins/marketplace.json", "w").write(json.dumps(manifest, indent=2) + "\n")
+PY
+
+echo "Committed marketplace refreshed:"
+echo "  Claude: .claude-plugin/marketplace.json -> ./marketplace/claude/arpinine-harness-claude"
+echo "  Codex : .agents/plugins/marketplace.json -> ./marketplace/codex/arpinine-harness"
+echo "Commit the marketplace/ tree and both manifests. Copilot is zip-only (use 'make release IMPLEMENTATION=copilot')."
