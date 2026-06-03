@@ -168,7 +168,7 @@ Restart Claude Code. Update later with `/plugin marketplace update arpinine-harn
 
 ```bash
 codex plugin marketplace add arpinine/Arpinine-Harness
-codex plugin install arpinine-harness@arpinine-harness-local
+codex plugin add arpinine-harness@arpinine-harness-local
 ```
 
 Restart Codex.
@@ -176,6 +176,53 @@ Restart Codex.
 > **Access:** the host clones the repo (SSH by default), so you need read access — the repo must be public or your SSH key / token configured.
 >
 > **Copilot** cannot install from the committed marketplace (it bakes machine-absolute hook paths at install time). Build a release bundle with `make release IMPLEMENTATION=copilot` and run the bundled `install.sh`. Maintainer build/release details: `make help`.
+
+### Replace a pre-installed / local copy with the remote version
+
+If you previously installed from a local directory or a `make install` build, remove it first so the host uses the always-updated GitHub marketplace instead of a stale local tree.
+
+Claude — in Claude Code:
+
+```text
+/plugin uninstall arpinine-harness
+/plugin marketplace remove arpinine-harness-local
+/plugin marketplace add arpinine/Arpinine-Harness
+/plugin install arpinine-harness@arpinine-harness-local
+```
+
+Or from the terminal:
+
+```bash
+claude plugin uninstall arpinine-harness                  # ignore "not found" if absent
+claude plugin marketplace remove arpinine-harness-local   # ignore "not found" if absent
+claude plugin marketplace add arpinine/Arpinine-Harness
+claude plugin install arpinine-harness@arpinine-harness-local
+```
+
+Codex:
+
+```bash
+codex plugin remove arpinine-harness
+codex plugin marketplace remove arpinine-harness-local
+codex plugin marketplace add arpinine/Arpinine-Harness
+codex plugin add arpinine-harness@arpinine-harness-local
+```
+
+Restart the host after switching.
+
+### Stay on the latest version
+
+The remote marketplace tracks `main`. Pull the newest published version anytime:
+
+```text
+/plugin marketplace update arpinine-harness-local
+```
+
+```bash
+claude plugin marketplace update arpinine-harness-local   # Codex: codex plugin marketplace upgrade arpinine-harness-local
+```
+
+Restart the host to load the updated plugin.
 
 ---
 

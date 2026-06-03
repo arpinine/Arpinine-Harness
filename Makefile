@@ -121,18 +121,18 @@ publish-marketplace:
 REMOTE_REPO ?= arpinine/Arpinine-Harness
 REMOTE_SOURCE := $(REMOTE_REPO)$(if $(REMOTE_REF),@$(REMOTE_REF),)
 install-remote:
-	@if [ "$(IMPLEMENTATION)" = "claude" ]; then HOST=claude; \
-	elif [ "$(IMPLEMENTATION)" = "codex" ]; then HOST=codex; \
+	@if [ "$(IMPLEMENTATION)" = "claude" ]; then HOST=claude; ADD=install; RM=uninstall; \
+	elif [ "$(IMPLEMENTATION)" = "codex" ]; then HOST=codex; ADD=add; RM=remove; \
 	else echo "install-remote supports IMPLEMENTATION=claude|codex only (Copilot is zip-only)"; exit 1; fi; \
 	command -v $$HOST >/dev/null || { echo "$$HOST CLI not found on PATH"; exit 1; }; \
 	echo "Removing any existing local install..."; \
-	$$HOST plugin uninstall $(PLUGIN_NAME) 2>/dev/null || true; \
+	$$HOST plugin $$RM $(PLUGIN_NAME) 2>/dev/null || true; \
 	$$HOST plugin marketplace remove $(MARKETPLACE) 2>/dev/null || true; \
 	echo "Adding remote marketplace: $(REMOTE_SOURCE)"; \
 	$$HOST plugin marketplace add "$(REMOTE_SOURCE)"; \
 	echo "Installing $(PLUGIN_NAME)@$(MARKETPLACE) from remote..."; \
-	$$HOST plugin install $(PLUGIN_NAME)@$(MARKETPLACE); \
-	$$HOST plugin list | grep -A4 "$(PLUGIN_NAME)@$(MARKETPLACE)" || true; \
+	$$HOST plugin $$ADD $(PLUGIN_NAME)@$(MARKETPLACE); \
+	$$HOST plugin list | grep -A4 "$(PLUGIN_NAME)" || true; \
 	echo "Done. Restart $$HOST to load commands."
 
 ## Remove generated build outputs
