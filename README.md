@@ -142,9 +142,17 @@ Automatic checks fire on every file write:
 
 ---
 
+## Prerequisites
+
+- A supported host: **Claude Code**, **Codex CLI**, or **GitHub Copilot CLI**
+- **Python 3** — the governance hooks, lease scripts, and demos run on it
+- **git** — required by the Codex installer (it does a sparse checkout)
+
 ## Installation
 
 Install from GitHub with no build. Claude can install straight from the repo-root marketplace. Codex needs a Codex-only local marketplace root staged from the committed GitHub contents because this repo also carries the Claude marketplace manifest at the root.
+
+> The marketplace is named `arpinine-harness-local` on every host. The `-local` suffix is just the registered marketplace id — you still install live from GitHub and update from GitHub. It is not a local-only build.
 
 ### Claude
 
@@ -273,22 +281,48 @@ make delivery
 
 ## Archetypes
 
-For new repos, `at-init` can scaffold a starter structure before governance setup:
+For new repos, `at-init` can scaffold a starter structure before governance setup. An archetype is more than a folder template — it seeds the structure, the boundary principles in your constitution, and the starter rules the hooks enforce from the first commit. Each archetype applies:
 
-- `agent-app` — agent workflows, tool orchestration, runtime adapters
-- `ml-pipeline` — data ingestion, feature transforms, model training, evaluation
+- **Directories** — a boundary-aware source layout (e.g. `src/domain/`, `src/tools/`, `evals/`, `tests/`)
+- **`PROJECT_CONVENTIONS.md`** — written into the repo so intent is documented up front
+- **Constitution principles** — boundary rules added to your constitution
+- **Starter governance rules** — `HIGH`-severity rules the drift and architecture hooks check on every write
 
-Skip archetypes when reversing an existing codebase.
+### `agent-app`
+
+AI agent application with tools, domain, and evaluation support.
+
+- Layout: `src/agents`, `src/tools`, `src/domain`, `src/observability`, `src/evaluation`, `evals`, `tests`
+- Enforces:
+  - `src/domain/` stays free of frameworks, runtimes, transport clients, and persistence imports
+  - observability/evaluation SDKs (OpenTelemetry, Langfuse, DeepEval) stay inside `src/observability/` and `src/evaluation/`; everything else depends on the provider interfaces
+  - providers are injected at the composition root — no module resolves its own
+
+### `ml-pipeline`
+
+Machine learning pipeline with feature engineering, model training, and evaluation.
+
+- Layout: `src/pipelines`, `src/features`, `src/models`, `src/domain`, `data/raw`, `data/processed`, `notebooks`, `evals`, `tests`
+- Enforces:
+  - production code under `src/` never imports from `notebooks/` — notebooks stay exploratory
+  - `data/raw/` is immutable after ingest; derived artifacts go to `data/processed/`
+  - domain modules stay free of ML and dataframe framework imports
+
+Skip archetypes when reversing an existing codebase — use `/at-bootstrap-from-code` instead, which infers structure and governance from what already exists.
 
 ---
 
-## End-to-End Demo
+## End-to-End Demos
 
-```text
-examples/end-to-end/support-agent-demo/
-```
+Each demo covers the full loop: product request → governed spec → plan → implementation → eval → observation → ADR → drift audit. Pick the one that matches your runtime:
 
-Covers the full loop: product request → governed spec → plan → implementation → eval → observation → ADR → drift audit.
+| Demo | Agent runtime behind the app boundary |
+|------|----------------------------------------|
+| `support-agent-demo` | Fake/stub adapter — no external dependencies |
+| `support-agent-openai-demo` | Real OpenAI-backed adapter |
+| `support-agent-openharness-demo` | [OpenHarness](https://github.com/HKUDS/OpenHarness) runtime |
+
+Run any demo:
 
 ```bash
 cd examples/end-to-end/support-agent-demo
