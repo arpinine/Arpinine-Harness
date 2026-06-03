@@ -129,12 +129,42 @@ Each command routes to the specialists that matter for that stage.
 
 ## Multi-Team Coordination
 
-Claude, Codex, and GitHub Copilot CLI can share the same governed workflow.
+Claude, Codex, and GitHub Copilot CLI can run the **same** Arpinine Harness against the **same** repository at the same time. Each assistant is a distinct *team* working from one shared source of truth — and the harness keeps them from stepping on each other.
 
-- both use the same `spec.md`, `plan.md`, ADRs, and eval artifacts
-- task ownership is coordinated through lease-based claims so they don't collide
-- `scripts/claim_task.py` atomically selects the next eligible task
-- `check-task-claim.sh` blocks implementation edits unless the current team owns an active claim
+This is what lets a developer run several coding assistants in parallel and route work to whichever one is strongest for the job: planning and brainstorming on one team, implementation on another, evaluation on a third. The coordination layer is what makes that safe instead of chaotic.
+
+### One source of truth, many assistants
+
+Every team reads and writes the same governance artifacts — there is no per-assistant fork of the plan:
+
+- the same `spec.md`, `plan.md`, ADRs, and eval artifacts
+- the same constitution, rules, and hooks
+- the same drift reports and runtime observations
+
+Because intent lives in shared files rather than in any one assistant's context, Claude can plan a feature, Codex can implement it, and Copilot can evaluate it — each picking up exactly where the last left off.
+
+### Team identity
+
+Each assistant is automatically resolved to a team id (`claude`, `codex`, or `copilot`) from its host runtime — the harness detects which plugin root is set and assigns the team for you. You can override it with the `ARPININE_HARNESS_TEAM_ID` environment variable only when the host doesn't expose its own identity.
+
+### Task ownership through leases
+
+Work is divided into tasks in `plan.md`. A task can optionally be reserved for one team with a tag:
+
+```markdown
+- [ ] TASK-014: Build the ingestion pipeline [team: codex]
+- [ ] TASK-015: Wire up the eval harness   [team: claude]
+```
+
+Untagged tasks are open to any team; tagged tasks are eligible only for that team. Ownership is then coordinated through **lease-based claims** so two assistants never grab the same task:
+
+- **`scripts/claim_task.py`** atomically selects the next eligible task. It takes a file lock on a per-spec registry (`coordination/*.json`), then claims the first task that is unstarted, eligible for the calling team, and not already under a live lease held by someone else. The claim records who owns it and a `lease_until` expiry (default **30 minutes**).
+- Leases **expire**. If a team crashes or walks away, its claim lapses and the task becomes available again — no manual cleanup. Tightening a task's `[team: …]` tag also revokes a claim held by a now-ineligible team.
+- **`check-task-claim.sh`** runs as a pre-edit hook. It blocks edits to implementation paths (`src/`, `lib/`, `app/`, `packages/`, `services/`, `internal/`, `cmd/`, `tests/`) unless the current team owns an **active, unexpired** claim on a task under the governing spec. No claim, no code change.
+
+### Why it matters
+
+The result is a shared, governed work queue across heterogeneous assistants. The developer picks the best assistant per kind of work, assigns it a team, and lets the lease protocol arbitrate who edits what — coordinated, collision-free, and always anchored to one spec.
 
 ---
 
