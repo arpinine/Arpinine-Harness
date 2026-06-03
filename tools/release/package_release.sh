@@ -24,7 +24,15 @@ PLUGIN_NAME="arpinine-harness"
 MARKETPLACE="arpinine-harness-local"
 
 # Assemble first (reuses the existing, unchanged make target).
-make assemble IMPLEMENTATION="$IMPL" >/dev/null
+# For codex, redirect the system-dir copy to a throwaway home so packaging never
+# mutates the maintainer's live ~/.agents install and works in sandboxed/CI runs.
+if [ "$IMPL" = "codex" ]; then
+  CODEX_TMP_HOME="$(mktemp -d)"
+  trap 'rm -rf "$CODEX_TMP_HOME"' EXIT
+  make assemble IMPLEMENTATION=codex CODEX_PLUGIN_HOME="$CODEX_TMP_HOME" >/dev/null
+else
+  make assemble IMPLEMENTATION="$IMPL" >/dev/null
+fi
 
 case "$IMPL" in
   claude)
@@ -58,6 +66,13 @@ mkdir -p "$STAGE/plugins/$PLUGIN_DIRNAME" "$STAGE/$(dirname "$MANIFEST_REL")"
 
 # Copy the assembled plugin tree into the bundle.
 cp -r "$SRC_PLUGIN/." "$STAGE/plugins/$PLUGIN_DIRNAME/"
+
+# The codex impl ships a marketplace template that cp pulls into the plugin payload.
+# It is not a plugin file and carries the unresolved __CODEX_PLUGIN_INSTALL_PATH__
+# placeholder; the bundle's authoritative manifest is written below. Strip the stray.
+if [ "$IMPL" = "codex" ]; then
+  rm -f "$STAGE/plugins/$PLUGIN_DIRNAME/marketplace.json"
+fi
 
 # Write a bundle-relative marketplace manifest (source points inside the bundle).
 RELSOURCE="./plugins/$PLUGIN_DIRNAME"

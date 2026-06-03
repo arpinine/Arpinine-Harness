@@ -23,6 +23,16 @@ MARKETPLACE="arpinine-harness-local"
 assert_portable() { # dir
   if grep -rqI "/Users/\|/home/" "$1" 2>/dev/null; then
     echo "Refusing to publish: machine-absolute path found in $1 (not portable)." >&2
+    grep -rnI "/Users/\|/home/" "$1" 2>/dev/null | head >&2
+    exit 1
+  fi
+  # Only config/code carry resolvable placeholders; markdown docs legitimately
+  # mention them in prose, so exclude *.md from this check.
+  local hits
+  hits="$(grep -rlI "__[A-Z_]*PLUGIN_INSTALL_PATH__" "$1" 2>/dev/null | grep -v '\.md$' || true)"
+  if [ -n "$hits" ]; then
+    echo "Refusing to publish: unresolved install-path placeholder in config/code (would resolve to an invalid path):" >&2
+    echo "$hits" >&2
     exit 1
   fi
 }
@@ -58,13 +68,22 @@ open(".claude-plugin/marketplace.json", "w").write(json.dumps(manifest, indent=2
 PY
 
 # ---- Codex ----
-make assemble IMPLEMENTATION=codex >/dev/null
+# Hermetic: codex assemble copies into $(CODEX_SYSTEM_PLUGIN_DIR) = $CODEX_PLUGIN_HOME/plugins/...
+# Redirect that to a throwaway dir so packaging never mutates the maintainer's live
+# ~/.agents install and works in sandboxed/CI environments.
+CODEX_TMP_HOME="$(mktemp -d)"
+trap 'rm -rf "$CODEX_TMP_HOME"' EXIT
+make assemble IMPLEMENTATION=codex CODEX_PLUGIN_HOME="$CODEX_TMP_HOME" >/dev/null
 CODEX_SRC="dist/codex/plugins/arpinine-harness"
 test -d "$CODEX_SRC" || { echo "Missing assembled Codex tree: $CODEX_SRC" >&2; exit 1; }
-assert_portable "$CODEX_SRC"
 rm -rf "marketplace/codex"
 mkdir -p "marketplace/codex/arpinine-harness"
 cp -r "$CODEX_SRC/." "marketplace/codex/arpinine-harness/"
+# The codex impl ships a marketplace template that cp pulls into the plugin payload.
+# It is not a plugin file and carries the unresolved __CODEX_PLUGIN_INSTALL_PATH__
+# placeholder; the bundle's authoritative manifest is .agents/plugins/marketplace.json.
+rm -f "marketplace/codex/arpinine-harness/marketplace.json"
+assert_portable "marketplace/codex/arpinine-harness"
 
 mkdir -p ".agents/plugins"
 python3 - "$PLUGIN_NAME" "$MARKETPLACE" <<'PY'
