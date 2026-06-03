@@ -1,0 +1,15 @@
+{
+  "dataset_name": "core-agent-regression-suite",
+  "dataset_version": "v1.0.0",
+  "owner": "team-or-role",
+  "scenarios": [
+    {
+      "scenario_id": "scenario-001",
+      "source": "synthetic",
+      "required": true,
+      "tags": ["happy-path"],
+      "expected_output_ref": "labels/scenario-001.json",
+      "adjudication_status": "approved"
+    }
+  ]
+}

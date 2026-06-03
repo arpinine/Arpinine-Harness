@@ -1,0 +1,11 @@
+{
+  "name": "arpinine-harness",
+  "version": "1.4.9",
+  "description": "Shared product-engineering workflow with ADRs, drift detection, evaluation, and compounding rule learning",
+  "author": {
+    "name": "Arpinine"
+  },
+  "license": "MIT",
+  "keywords": ["speckit", "adr", "drift-detection", "spec-management", "evaluation", "agent-quality"],
+  "skills": "./skills/"
+}

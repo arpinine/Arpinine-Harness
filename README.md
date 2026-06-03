@@ -144,6 +144,83 @@ Automatic checks fire on every file write:
 
 ## Installation
 
+There are three paths:
+- **Install directly from GitHub (marketplace)** — Claude & Codex only. No download, no build, auto-updatable. See below.
+- **Install from a GitHub Release** — any host, including Copilot. Download a bundle zip. No `make`. See "Install from a GitHub Release".
+- **Install from source with `make`** — maintainers/contributors building locally. See "Install from source".
+
+## Install directly from GitHub (marketplace)
+
+Claude and Codex resolve hook paths portably (`${CLAUDE_PLUGIN_ROOT}` / plugin-relative), so the assembled plugin is committed in this repo and the host can install it straight from GitHub — no zip, no build.
+
+### Claude
+
+```text
+/plugin marketplace add arpinine/Arpinine-Harness
+/plugin install arpinine-harness@arpinine-harness-local
+```
+
+Update later with `/plugin marketplace update arpinine-harness-local`. Restart Claude Code.
+
+### Codex
+
+```bash
+codex plugin marketplace add arpinine/Arpinine-Harness
+codex plugin install arpinine-harness@arpinine-harness-local
+```
+
+Restart Codex. (If your Codex version cannot resolve the in-repo marketplace, use the GitHub Release zip below instead.)
+
+> **Copilot is not available this way.** Copilot bakes machine-absolute hook paths at install time, which cannot be committed portably — use the GitHub Release zip + `install.sh` below.
+
+## Install from a GitHub Release
+
+Each release attaches a self-contained bundle per host: `arpinine-harness-<impl>-v<version>.zip`. Download the one for your assistant, then add it as a local marketplace and install.
+
+### Claude (no build)
+
+```bash
+# 1. Download + extract the claude bundle from the GitHub Release
+unzip arpinine-harness-claude-v<version>.zip -d ~/arpinine-harness
+
+# 2. In Claude Code, add the extracted folder as a marketplace and install
+/plugin marketplace add ~/arpinine-harness/arpinine-harness-claude-v<version>
+/plugin install arpinine-harness@arpinine-harness-local
+```
+
+Restart Claude Code. Claude resolves hook paths via `${CLAUDE_PLUGIN_ROOT}` at runtime, so the bundle is fully portable across machines.
+
+### Codex (no build)
+
+```bash
+unzip arpinine-harness-codex-v<version>.zip -d ~/arpinine-harness
+codex plugin marketplace add ~/arpinine-harness/arpinine-harness-codex-v<version>
+codex plugin install arpinine-harness@arpinine-harness-local
+```
+
+Restart Codex. Codex hook commands are plugin-relative, so the bundle is portable.
+
+### Copilot (no build, one install command)
+
+GitHub Copilot CLI runs hooks from the repo-root working directory and exposes no plugin-root variable, so hook paths must be absolute to the install dir — which is machine-specific. The bundle ships a placeholder plus a one-shot installer that resolves it on your machine:
+
+```bash
+unzip arpinine-harness-copilot-v<version>.zip -d ~/arpinine-harness
+cd ~/arpinine-harness/arpinine-harness-copilot-v<version>
+./install.sh          # resolves hook paths to ~/.copilot/installed-plugins/..., then registers + installs
+```
+
+Restart GitHub Copilot CLI. (Override the base dir with `COPILOT_PLUGIN_HOME=/custom/.copilot ./install.sh`.)
+
+> Maintainers build these bundles with `make release IMPLEMENTATION=<impl>` (separate from `make assemble`/`build`); the zip lands in `dist/<impl>/release/`. To build all three at once and publish them to a GitHub Release in one step (requires an authenticated `gh` CLI):
+> ```bash
+> make release-all                 # build all bundles, no upload
+> make release-publish             # build all + create/update the GitHub Release
+> make release-publish TAG=v1.4.9 DRAFT=1   # explicit tag, draft release
+> ```
+
+## Install from source
+
 ### Claude
 
 ```bash

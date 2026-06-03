@@ -1,0 +1,38 @@
+{
+  "name": "arpinine-harness",
+  "version": "1.4.9",
+  "description": "Governed product-engineering workflow for Codex using shared Arpinine Harness artifacts",
+  "author": {
+    "name": "Arpinine",
+    "url": "https://github.com/Arpinine"
+  },
+  "homepage": "https://github.com/Arpinine/specops",
+  "repository": "https://github.com/Arpinine/specops",
+  "license": "MIT",
+  "keywords": ["codex", "governance", "workflow", "spec-kit", "adr", "evaluation"],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "Arpinine Harness",
+    "shortDescription": "Governed workflow for product and engineering delivery",
+    "longDescription": "Adds shared specification, planning, review, and governance workflows to Codex using the Arpinine Harness core. Specialist agents cover product intent, architecture, domain language, TDD, security, AI design, DevOps, and data engineering.",
+    "developerName": "Arpinine",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write", "Execute"],
+    "websiteURL": "https://github.com/Arpinine/specops",
+    "privacyPolicyURL": "https://github.com/Arpinine/specops/blob/main/LICENSE",
+    "termsOfServiceURL": "https://github.com/Arpinine/specops/blob/main/LICENSE",
+    "brandColor": "#4F46E5",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.svg",
+    "screenshots": [],
+    "defaultPrompt": [
+      "Use /arpinine-harness:at as the default front door. It now runs a deterministic router over repo state and user intent, explains the chosen command, and delegates.",
+      "If the repo is ungoverned, /arpinine-harness:at should route to /arpinine-harness:at-init before later workflow steps.",
+      "If the repo already has code but no governance, /arpinine-harness:at should present the init vs bootstrap-from-code choice instead of silently choosing.",
+      "If the user gives a broad product goal, /arpinine-harness:at should route to /arpinine-harness:at-map. If the user gives one feature-sized idea, it should route to /arpinine-harness:at-discover.",
+      "If the user asks what to do next, /arpinine-harness:at should normally route to /arpinine-harness:at-status unless a more specific state-driven route is required.",
+      "Use Arpinine Harness to create or refine a spec before implementation starts."
+    ]
+  }
+}
