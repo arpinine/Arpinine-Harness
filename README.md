@@ -171,7 +171,18 @@ codex plugin marketplace add arpinine/Arpinine-Harness
 codex plugin add arpinine-harness@arpinine-harness-local
 ```
 
-Restart Codex.
+Then **fully restart Codex** (the running client does not hot-load plugins).
+
+> **Codex remote install is provisional.** `codex plugin add` populates the plugin
+> cache (`~/.codex/plugins/cache/<marketplace>/<plugin>/<version>`) but, on some
+> Codex versions, the plugin still reports "installed" without becoming available
+> in the client. If a full restart does not surface it, install from source
+> instead — that path also copies the plugin into `~/.agents/plugins/`, which the
+> client loads reliably:
+> ```bash
+> make install IMPLEMENTATION=codex
+> ```
+> Claude remote install is verified end-to-end.
 
 > **Access:** the host clones the repo (SSH by default), so you need read access — the repo must be public or your SSH key / token configured.
 >
