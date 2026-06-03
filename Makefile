@@ -50,7 +50,7 @@ assemble: clean
 		mkdir -p $(PLUGIN_DIST_DIR) $(DIST_DIR)/.claude-plugin; \
 		rm -rf $(CLAUDE_PLUGIN_DIR); \
 		cp -r $(BUILD_DIR) $(CLAUDE_PLUGIN_DIR); \
-		cat .claude-plugin/marketplace.json | sed 's#\./dist/plugins/#./plugins/#g' > $(CLAUDE_MARKETPLACE_FILE); \
+		python3 -c "import json; m=json.load(open('.claude-plugin/marketplace.json')); m['plugins'][0]['source']='./plugins/arpinine-harness-claude'; open('$(CLAUDE_MARKETPLACE_FILE)','w').write(json.dumps(m, indent=2)+chr(10))"; \
 	elif [ "$(IMPLEMENTATION)" = "codex" ]; then \
 		echo "Rewriting CLAUDE_PLUGIN_ROOT references for Codex plugin layout..."; \
 		find $(BUILD_DIR) -type f \( -name "*.md" -o -name "*.json" -o -name "*.sh" -o -name "*.py" \) -print0 \
