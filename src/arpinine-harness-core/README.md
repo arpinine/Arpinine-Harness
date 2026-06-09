@@ -255,6 +255,7 @@ Current shared archetypes:
 
 - `agent-app` — starter structure for agent-oriented applications with `src/agents`, `src/tools`, `src/domain`, `evals`, and `tests`
 - `ml-pipeline` — starter structure for ML/data applications with `src/pipelines`, `src/features`, `src/models`, `data/`, `notebooks`, `evals`, and `tests`
+- `fullstack` — starter structure for full-stack web applications with `frontend/src/` (React 18 + Vite + TypeScript), `backend/` (FastAPI), and `iac/cdk/` (AWS CDK)
 
 The archetype contract is intentionally narrow:
 
@@ -270,6 +271,7 @@ The scaffold entrypoint is `scripts/scaffold_archetype.py`:
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" --list
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" agent-app --target-dir . --skip-if-nonempty
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" ml-pipeline --target-dir . --force
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold_archetype.py" fullstack --target-dir . --skip-if-nonempty
 ```
 
 Under Codex and Copilot, the assemble step rewrites these to `python3 "scripts/scaffold_archetype.py" ...` so they resolve from the installed plugin root.

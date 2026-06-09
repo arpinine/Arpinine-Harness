@@ -348,6 +348,17 @@ Machine learning pipeline with feature engineering, model training, and evaluati
   - `data/raw/` is immutable after ingest; derived artifacts go to `data/processed/`
   - domain modules stay free of ML and dataframe framework imports
 
+### `fullstack`
+
+Full-stack web application with a React 18 + Vite + TypeScript frontend and a Python 3.13+ FastAPI backend, deployed to AWS.
+
+- Layout: `frontend/src/components`, `frontend/src/pages`, `frontend/src/hooks`, `frontend/src/stores`, `frontend/src/services`, `backend/api`, `backend/core`, `backend/data`, `backend/prompts`, `backend/tests`, `iac/cdk`, `docs`
+- Stack: React 18 + Vite + TypeScript, shadcn/ui v4, Tailwind CSS v4, TanStack React Query v5, Zustand, FastAPI, Pydantic v2, Zod, pytest + Vitest, AWS ECS Fargate + CDK
+- Enforces:
+  - FastAPI route handlers in `backend/api/` are thin wrappers only — business logic belongs in `backend/core/`
+  - React Query owns all server state; Zustand owns UI-only state; no manual sync between them
+  - Pydantic models define the API contract; Zod schemas on the frontend mirror them and both change in the same commit
+
 Skip archetypes when reversing an existing codebase — use `/at-bootstrap-from-code` instead, which infers structure and governance from what already exists.
 
 ---

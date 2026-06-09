@@ -1,0 +1,68 @@
+{
+  "name": "fullstack",
+  "description": "Full-stack web app: React 18 + Vite + TypeScript frontend, Python 3.13+ FastAPI backend, AWS deployment",
+  "directories": [
+    "frontend/src/components/ui",
+    "frontend/src/components",
+    "frontend/src/pages",
+    "frontend/src/hooks",
+    "frontend/src/stores",
+    "frontend/src/services",
+    "backend/api",
+    "backend/core",
+    "backend/data",
+    "backend/prompts",
+    "backend/tests/unit",
+    "backend/tests/api",
+    "docs",
+    "iac/cdk"
+  ],
+  "template_files": [
+    "PROJECT_CONVENTIONS.md"
+  ],
+  "constitution_principles": [
+    "Frontend components never import directly from backend modules; all data crosses the API boundary via HTTP.",
+    "FastAPI route handlers in backend/api/ are thin wrappers only — validate input, call a service in backend/core/, return a response. No business logic in route handlers.",
+    "Server state lives in React Query. Local UI state lives in Zustand or useState. Never duplicate server state in the client store.",
+    "Pydantic models define the API contract. Zod schemas on the frontend mirror them. When either changes, the other changes in the same commit.",
+    "Secrets are never committed. Use .env for local development and SSM Parameter Store for production."
+  ],
+  "starter_rules": [
+    {
+      "rule_id": "archetype-full-stack-mvp-route-handler-boundary",
+      "severity": "HIGH",
+      "prevents": "business logic leaking into FastAPI route handlers",
+      "triggers": [
+        "route handler file contains database queries, non-trivial computation, or domain logic",
+        "plan or implementation adds logic directly inside a route function instead of a service"
+      ],
+      "rule": "FastAPI route handlers in `backend/api/` are thin wrappers only: validate input, call a function in `backend/core/`, return a response. Business logic belongs in `backend/core/`.",
+      "detection_pattern": "Review edits under `backend/api/` for direct DB queries, non-trivial computation, or logic that belongs in a service or core module.",
+      "correct_pattern": "Route handler delegates to `backend/core/`. The core function owns the logic and is independently testable."
+    },
+    {
+      "rule_id": "archetype-full-stack-mvp-state-management",
+      "severity": "HIGH",
+      "prevents": "server state duplicated or manually synced in client-side store",
+      "triggers": [
+        "Zustand store is created for data that originates from an API endpoint",
+        "frontend code manually copies or syncs server response data into a local store"
+      ],
+      "rule": "Use React Query for all server state (fetching, caching, mutations). Use Zustand only for UI-only state that does not come from the server (sidebar open, modal visibility, user preferences not persisted remotely).",
+      "detection_pattern": "Review Zustand store definitions for fields that mirror API response shapes or that are populated by fetch or mutation callbacks.",
+      "correct_pattern": "API data lives in a React Query query or mutation result. Components call `useQuery` or `useMutation`. Data is never copied into a Zustand store."
+    },
+    {
+      "rule_id": "archetype-full-stack-mvp-api-contract",
+      "severity": "HIGH",
+      "prevents": "frontend and backend drifting from the agreed data contract",
+      "triggers": [
+        "Pydantic response model is changed without a corresponding Zod schema update",
+        "frontend TypeScript type is defined manually without referencing or mirroring the API contract"
+      ],
+      "rule": "Pydantic models in `backend/api/` define the API contract. Zod schemas on the frontend must mirror them. Both sides must change in the same commit when the contract changes.",
+      "detection_pattern": "Review backend Pydantic model changes for a matching frontend Zod schema update in the same diff, and vice versa.",
+      "correct_pattern": "Change Pydantic model and Zod schema together. If openapi-typescript or similar generation is configured, regenerate and commit the output."
+    }
+  ]
+}
