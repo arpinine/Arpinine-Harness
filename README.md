@@ -348,6 +348,17 @@ Machine learning pipeline with feature engineering, model training, and evaluati
   - `data/raw/` is immutable after ingest; derived artifacts go to `data/processed/`
   - domain modules stay free of ML and dataframe framework imports
 
+### `fullstack-app`
+
+Technology-agnostic fullstack application with backend, frontend, domain, persistence, and infrastructure layers. The archetype fixes the *layer boundaries*, not the stack — pick languages, frameworks, datastore, and IaC tool per product and record them in an ADR.
+
+- Layout: `src/backend`, `src/frontend`, `src/domain`, `src/db`, `src/observability`, `infra`, `evals`, `tests`
+- Enforces:
+  - `src/domain/` stays free of web frameworks, transport clients, persistence, and frontend/UI imports
+  - database drivers and ORM sessions stay inside `src/db/`; backend and domain depend on repository abstractions
+  - `src/frontend/` talks to the backend only through the published API boundary — it never imports `src/backend/`, `src/domain/`, or `src/db/`
+  - infrastructure-as-code stays in `infra/`; application code never imports IaC constructs and vice versa
+
 Skip archetypes when reversing an existing codebase — use `/at-bootstrap-from-code` instead, which infers structure and governance from what already exists.
 
 ---

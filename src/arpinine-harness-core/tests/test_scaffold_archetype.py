@@ -41,6 +41,16 @@ class ScaffoldArchetypeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("agent-app", result.stdout)
         self.assertIn("ml-pipeline", result.stdout)
+        self.assertIn("fullstack-app", result.stdout)
+
+    def test_scaffold_fullstack_app_into_empty_repo(self) -> None:
+        result = self.run_script("fullstack-app")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        for layer in ("backend", "frontend", "domain", "db"):
+            self.assertTrue((self.repo / "src" / layer / ".gitkeep").exists(), layer)
+        self.assertTrue((self.repo / "infra" / ".gitkeep").exists())
+        self.assertTrue((self.repo / "PROJECT_CONVENTIONS.md").exists())
+        self.assertTrue((self.repo / ".specify" / "archetype.json").exists())
 
     def test_scaffold_agent_app_into_empty_repo(self) -> None:
         result = self.run_script("agent-app")
