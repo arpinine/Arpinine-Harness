@@ -255,6 +255,7 @@ Current shared archetypes:
 
 - `agent-app` — starter structure for agent-oriented applications with `src/agents`, `src/tools`, `src/domain`, `evals`, and `tests`
 - `ml-pipeline` — starter structure for ML/data applications with `src/pipelines`, `src/features`, `src/models`, `data/`, `notebooks`, `evals`, and `tests`
+- `fullstack-app` — technology-agnostic fullstack structure with `src/backend`, `src/frontend`, `src/domain`, `src/db`, `src/observability`, `infra`, `evals`, and `tests`; enforces layer boundaries (domain purity, frontend↔backend via API, persistence in `src/db`, IaC in `infra`) while leaving the concrete stack to a per-product ADR
 
 The archetype contract is intentionally narrow:
 

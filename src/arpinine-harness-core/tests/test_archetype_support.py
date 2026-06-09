@@ -31,6 +31,14 @@ class ArchetypeSupportTests(unittest.TestCase):
         available = archetype_support.list_archetypes(ARCHETYPES_ROOT)
         self.assertIn("agent-app", available)
         self.assertIn("ml-pipeline", available)
+        self.assertIn("fullstack-app", available)
+
+    def test_load_manifest_reads_fullstack_app_fields(self) -> None:
+        manifest = archetype_support.load_manifest(ARCHETYPES_ROOT, "fullstack-app")
+        self.assertEqual(manifest["name"], "fullstack-app")
+        self.assertIn("infra", manifest["directories"])
+        rule_ids = {rule["rule_id"] for rule in manifest["starter_rules"]}
+        self.assertIn("archetype-fullstack-app-infra-boundary", rule_ids)
 
     def test_load_manifest_reads_structured_fields(self) -> None:
         manifest = archetype_support.load_manifest(ARCHETYPES_ROOT, "agent-app")

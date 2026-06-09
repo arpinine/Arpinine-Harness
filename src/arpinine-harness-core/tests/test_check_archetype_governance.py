@@ -61,6 +61,41 @@ class CheckArchetypeGovernanceTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("raw data is immutable", result.stdout)
 
+    def test_fullstack_app_blocks_framework_import_in_domain(self) -> None:
+        self.scaffold("fullstack-app")
+        result = self.run_hook("src/domain/user.py", "from fastapi import APIRouter\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("domain layer cannot import", result.stdout)
+
+    def test_fullstack_app_blocks_orm_outside_db(self) -> None:
+        self.scaffold("fullstack-app")
+        result = self.run_hook("src/backend/handlers.py", "import sqlalchemy\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("confined to src/db/", result.stdout)
+
+    def test_fullstack_app_allows_orm_inside_db(self) -> None:
+        self.scaffold("fullstack-app")
+        result = self.run_hook("src/db/repository.py", "import sqlalchemy\n")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_fullstack_app_blocks_frontend_importing_backend(self) -> None:
+        self.scaffold("fullstack-app")
+        result = self.run_hook("src/frontend/App.tsx", "import { svc } from '../backend/service'\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("frontend cannot import", result.stdout)
+
+    def test_fullstack_app_blocks_iac_import_in_app_code(self) -> None:
+        self.scaffold("fullstack-app")
+        result = self.run_hook("src/backend/main.py", "import aws_cdk\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("infrastructure-as-code constructs", result.stdout)
+
+    def test_fullstack_app_blocks_app_logic_import_in_infra(self) -> None:
+        self.scaffold("fullstack-app")
+        result = self.run_hook("infra/app.py", "from src.domain import order\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("cannot import application business logic", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
