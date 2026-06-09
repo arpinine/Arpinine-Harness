@@ -7,6 +7,16 @@
 - `make release-all` and `make release-publish` — build bundles for all three implementations, and (publish) create/update a GitHub Release with all three zips via the `gh` CLI. Backed by `tools/release/publish_release.sh`; tag defaults to `v<version>`, overridable with `TAG=`, draft via `DRAFT=1`. Guards on `gh` auth before doing any work
 - `make publish-marketplace` — refreshes a committed, in-repo plugin marketplace so consumers can `marketplace add arpinine/Arpinine-Harness` directly from GitHub with no download or build (hybrid distribution). Backed by `tools/release/publish_marketplace.sh`: assembles the portable Claude and Codex trees into `marketplace/<impl>/` and writes the root `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json` with bundle-relative sources. Refuses to publish any tree containing machine-absolute paths. Copilot is excluded by design (absolute hook paths are not portable) and remains zip-only. README documents the per-host install matrix (GitHub marketplace vs release zip vs source)
 
+## [1.6.0] - 2026-06-09
+
+### Added
+- `fullstack-react-fastapi` archetype — stack-specific fullstack structure (React 18 + Vite + TypeScript frontend, Python 3.13+ FastAPI backend, AWS ECS Fargate + CDK) with `frontend/`, `backend/`, `iac/cdk`, and `docs` layout. Enforced by the shared pre-edit hook across claude/codex/copilot: route handlers in `backend/api/` stay thin (no DB/ORM access), the frontend never imports from `backend/` (HTTP API boundary), server state stays in React Query (Zustand stores reject `axios`/`fetch`/React Query), and AWS CDK is confined to `iac/cdk/` (no app↔infra cross-imports). The Pydantic↔Zod API-contract rule is a cross-file, same-commit invariant documented as a constitution principle and enforced at review (not the single-edit hook). Ships regression tests (listing, scaffold, one blocking case per enforced rule plus allow cases) and `README`, core `README`, and `docs/vibe-coder-process.md` entries. Complements the technology-agnostic `fullstack-app` for teams whose stack is settled
+
+## [1.5.0] - 2026-06-09
+
+### Added
+- `fullstack-app` archetype — technology-agnostic fullstack structure (`src/backend`, `src/frontend`, `src/domain`, `src/db`, `src/observability`, `infra`, `evals`, `tests`). Fixes the layer *boundaries*, not the stack: frameworks appear only as examples in detection patterns, and the concrete technology is chosen per product and recorded in an ADR via the `at-plan` tech-architect. Enforced by the shared pre-edit hook across claude/codex/copilot: domain stays framework/transport/persistence/frontend-free, the frontend reaches the backend only through the API boundary, database drivers/ORM are confined to `src/db/`, and infrastructure-as-code is isolated in `infra/` with no app↔infra cross-imports. Ships regression tests and `README`/core `README` entries
+
 ## [1.4.9] - 2026-05-31
 
 ### Added

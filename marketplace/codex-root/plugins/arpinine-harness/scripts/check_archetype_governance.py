@@ -46,7 +46,7 @@ APP_INTERNAL_IMPORT_RE = re.compile(
 )
 # Infrastructure code importing application business logic.
 APP_LOGIC_FROM_INFRA_RE = re.compile(r"\b(src[\\/.])(domain|backend)\b", re.IGNORECASE)
-# Opinionated fullstack-react-fastapi layout (frontend/ + backend/ + iac/ at repo root).
+# Stack-specific fullstack-react-fastapi layout (frontend/ + backend/ + iac/ at repo root).
 BACKEND_PATH_RE = re.compile(r"(^|/)backend(/|$)", re.IGNORECASE)
 BACKEND_API_PATH_RE = re.compile(r"(^|/)backend/api(/|$)", re.IGNORECASE)
 STORES_PATH_RE = re.compile(r"(^|/)stores(/|$)", re.IGNORECASE)
