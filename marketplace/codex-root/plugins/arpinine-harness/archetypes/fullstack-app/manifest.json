@@ -1,0 +1,76 @@
+{
+  "name": "fullstack-app",
+  "description": "Technology-agnostic fullstack application: backend, frontend, domain, persistence, and infrastructure layers with boundary governance",
+  "directories": [
+    "src/backend",
+    "src/frontend",
+    "src/domain",
+    "src/db",
+    "src/observability",
+    "infra",
+    "evals",
+    "tests"
+  ],
+  "template_files": [
+    "PROJECT_CONVENTIONS.md"
+  ],
+  "constitution_principles": [
+    "Domain modules stay free of web frameworks, transport clients, persistence-layer imports, and frontend/UI code.",
+    "The backend composes domain logic and persistence through explicit boundaries; business rules do not migrate into route handlers, the frontend, or the persistence layer.",
+    "Persistence access is confined to src/db/; backend and domain modules depend on repository or data-access abstractions, never on database drivers or ORM sessions directly.",
+    "The frontend communicates with the backend only through the published HTTP/API boundary; it never imports backend, domain, or persistence modules.",
+    "Infrastructure-as-code is confined to infra/; application code under src/ never imports infrastructure constructs, and infrastructure code never imports application business logic.",
+    "Concrete technology choices (languages, frameworks, datastore, cloud, IaC tool) are recorded per product in an ADR, not fixed by the archetype.",
+    "Product code depends on the ObservationProvider abstraction only; observability SDK imports stay inside src/observability/, and the provider is injected at the composition root."
+  ],
+  "starter_rules": [
+    {
+      "rule_id": "archetype-fullstack-app-domain-boundary",
+      "severity": "HIGH",
+      "prevents": "framework, transport, persistence, or frontend leakage into domain modules",
+      "triggers": [
+        "domain-layer file gains a web framework, transport, persistence, ORM, or frontend/UI import",
+        "fullstack plan or implementation collapses domain and backend/persistence boundaries"
+      ],
+      "rule": "Keep `src/domain/` framework-independent regardless of the chosen stack. Web frameworks, database clients, ORM sessions, HTTP clients, and frontend/UI libraries belong in `src/backend/`, `src/db/`, or `src/frontend/`, not in domain code.",
+      "detection_pattern": "Review edits under `src/domain/` for framework, transport, persistence, ORM, or frontend imports (e.g. a web framework such as FastAPI/Express, an ORM such as SQLAlchemy/Prisma, an HTTP client, or a frontend framework such as React/Vue — examples, not an exhaustive allow/deny list).",
+      "correct_pattern": "Domain modules expose pure business logic. Backend wiring lives in `src/backend/`, persistence in `src/db/`, and frontend code in `src/frontend/`."
+    },
+    {
+      "rule_id": "archetype-fullstack-app-persistence-boundary",
+      "severity": "HIGH",
+      "prevents": "database driver and ORM leakage into backend, domain, or frontend modules",
+      "triggers": [
+        "backend, domain, or frontend file gains a direct database driver or ORM import",
+        "raw SQL or ORM session handling appears outside src/db/"
+      ],
+      "rule": "Confine database drivers, ORM sessions, and raw queries to `src/db/`, whatever datastore the product selects. Backend and domain modules depend on repository or data-access interfaces exposed by `src/db/`.",
+      "detection_pattern": "Review edits under `src/backend/`, `src/domain/`, and `src/frontend/` for database driver imports, ORM session creation, or inline SQL.",
+      "correct_pattern": "`src/db/` exposes repository functions or classes; callers depend on those abstractions and receive them via injection at the composition root."
+    },
+    {
+      "rule_id": "archetype-fullstack-app-frontend-backend-boundary",
+      "severity": "HIGH",
+      "prevents": "the frontend reaching into backend, domain, or persistence internals instead of the API boundary",
+      "triggers": [
+        "frontend file imports from src/backend/, src/domain/, or src/db/",
+        "frontend reads or writes persistence directly instead of calling the backend API"
+      ],
+      "rule": "Keep `src/frontend/` decoupled from backend internals. The frontend communicates with the backend only through the published HTTP/API boundary; it must not import `src/backend/`, `src/domain/`, or `src/db/`.",
+      "detection_pattern": "Review imports under `src/frontend/` for relative or package paths into `src/backend/`, `src/domain/`, or `src/db/`.",
+      "correct_pattern": "The frontend calls backend endpoints over HTTP and depends only on shared, transport-safe contract types (request/response shapes)."
+    },
+    {
+      "rule_id": "archetype-fullstack-app-infra-boundary",
+      "severity": "HIGH",
+      "prevents": "infrastructure-as-code leaking into the application and application logic leaking into infrastructure",
+      "triggers": [
+        "application file under src/ gains an infrastructure-as-code SDK import",
+        "infra/ module imports application business logic from src/domain/ or src/backend/"
+      ],
+      "rule": "Confine infrastructure-as-code (whatever tool the product selects — CDK, Terraform, Pulumi, etc.) to `infra/`. Application code under `src/` must not import IaC constructs; infrastructure code under `infra/` must not import application business logic.",
+      "detection_pattern": "Review edits under `src/` for IaC SDK imports (e.g. `aws_cdk`, `pulumi`, `constructs`), and edits under `infra/` for imports of `src.domain` or `src.backend` business modules.",
+      "correct_pattern": "Infrastructure (compute, networking, secrets) is declared in `infra/`. The application is packaged (e.g. a container image) and deployed by the infra definitions; the two communicate through configuration and environment, not shared imports."
+    }
+  ]
+}
