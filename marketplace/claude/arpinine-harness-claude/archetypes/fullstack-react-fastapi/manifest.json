@@ -1,0 +1,93 @@
+{
+  "name": "fullstack-react-fastapi",
+  "description": "Stack-specific fullstack web app: React 18 + Vite + TypeScript frontend, Python 3.13+ FastAPI backend, AWS ECS Fargate + CDK deployment",
+  "directories": [
+    "frontend/src/components/ui",
+    "frontend/src/components",
+    "frontend/src/pages",
+    "frontend/src/hooks",
+    "frontend/src/stores",
+    "frontend/src/services",
+    "backend/api",
+    "backend/core",
+    "backend/data",
+    "backend/prompts",
+    "backend/tests/unit",
+    "backend/tests/api",
+    "docs",
+    "iac/cdk"
+  ],
+  "template_files": [
+    "PROJECT_CONVENTIONS.md"
+  ],
+  "constitution_principles": [
+    "Frontend components never import directly from backend modules; all data crosses the API boundary via HTTP.",
+    "FastAPI route handlers in backend/api/ are thin wrappers only — validate input, call a service in backend/core/, return a response. No business logic in route handlers.",
+    "Server state lives in React Query. Local UI state lives in Zustand or useState. Never duplicate server state in the client store.",
+    "Pydantic models define the API contract. Zod schemas on the frontend mirror them. When either changes, the other changes in the same commit.",
+    "Secrets are never committed. Use .env for local development and SSM Parameter Store for production.",
+    "Infrastructure-as-code (AWS CDK) is confined to iac/cdk/; application code never imports CDK constructs, and infrastructure code never imports application business logic."
+  ],
+  "starter_rules": [
+    {
+      "rule_id": "archetype-fullstack-react-fastapi-route-handler-boundary",
+      "severity": "HIGH",
+      "prevents": "business logic and persistence access leaking into FastAPI route handlers",
+      "triggers": [
+        "route handler file under backend/api/ contains database queries, ORM access, or non-trivial computation",
+        "plan or implementation adds logic directly inside a route function instead of a service"
+      ],
+      "rule": "FastAPI route handlers in `backend/api/` are thin wrappers only: validate input, call a function in `backend/core/`, return a response. Business logic and data access belong in `backend/core/`.",
+      "detection_pattern": "Review edits under `backend/api/` for ORM/database driver imports, direct DB queries, or logic that belongs in a service or core module. The executable hook blocks persistence/ORM imports under `backend/api/`.",
+      "correct_pattern": "Route handler delegates to `backend/core/`. The core function owns the logic and data access and is independently testable."
+    },
+    {
+      "rule_id": "archetype-fullstack-react-fastapi-frontend-backend-boundary",
+      "severity": "HIGH",
+      "prevents": "the React frontend importing backend modules instead of crossing the API boundary",
+      "triggers": [
+        "frontend file imports from backend/ (api, core, data)",
+        "frontend reaches into backend internals instead of calling the HTTP API"
+      ],
+      "rule": "The frontend communicates with the backend only through the published HTTP API. Frontend modules must not import from `backend/`.",
+      "detection_pattern": "Review imports under `frontend/` for paths into `backend/`. The executable hook blocks backend imports from frontend files.",
+      "correct_pattern": "Frontend `services/` call FastAPI endpoints over HTTP (Axios) and depend only on shared, transport-safe contract types (Zod schemas mirroring Pydantic models)."
+    },
+    {
+      "rule_id": "archetype-fullstack-react-fastapi-state-management",
+      "severity": "HIGH",
+      "prevents": "server state duplicated or manually synced in a client-side Zustand store",
+      "triggers": [
+        "Zustand store under frontend/src/stores/ holds data fetched from an API endpoint",
+        "frontend code copies or syncs server response data into a local store"
+      ],
+      "rule": "Use React Query for all server state (fetching, caching, mutations). Use Zustand only for UI-only state that does not come from the server (sidebar open, modal visibility, local preferences).",
+      "detection_pattern": "Review Zustand stores for API access. The executable hook blocks `axios`, React Query, or `fetch(` usage inside `frontend/src/stores/`.",
+      "correct_pattern": "API data lives in a React Query query or mutation result; components call `useQuery`/`useMutation`. Data is never copied into a Zustand store."
+    },
+    {
+      "rule_id": "archetype-fullstack-react-fastapi-api-contract",
+      "severity": "HIGH",
+      "prevents": "frontend and backend drifting from the agreed data contract",
+      "triggers": [
+        "Pydantic response model is changed without a corresponding Zod schema update",
+        "frontend TypeScript type is defined manually without mirroring the API contract"
+      ],
+      "rule": "Pydantic models define the API contract. Zod schemas on the frontend must mirror them. Both sides change in the same commit when the contract changes.",
+      "detection_pattern": "Cross-file, same-commit invariant — not enforced by the single-edit hook. Reviewed during at-implement/at-plan: a Pydantic model change must ship with a matching Zod schema change in the same diff.",
+      "correct_pattern": "Change Pydantic model and Zod schema together. If `openapi-typescript` or similar generation is configured, regenerate and commit the output."
+    },
+    {
+      "rule_id": "archetype-fullstack-react-fastapi-infra-boundary",
+      "severity": "HIGH",
+      "prevents": "AWS CDK / infrastructure code leaking into the application and application logic leaking into infrastructure",
+      "triggers": [
+        "application file under frontend/ or backend/ gains an `aws_cdk` or `constructs` import",
+        "iac/ module imports application business logic from backend/core/"
+      ],
+      "rule": "Confine AWS CDK constructs to `iac/cdk/`. Application code must not import `aws_cdk`; infrastructure code must not import application business logic.",
+      "detection_pattern": "The executable hook blocks `aws_cdk`/`constructs` imports under `frontend/` and `backend/`, and blocks `backend/core` imports under `iac/`.",
+      "correct_pattern": "Infrastructure (ECS Fargate service, networking, secrets) is declared in `iac/cdk/`. The backend ships as a container image and is deployed by the stack; the two communicate through configuration and environment, not shared imports."
+    }
+  ]
+}

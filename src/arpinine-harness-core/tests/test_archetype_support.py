@@ -32,6 +32,7 @@ class ArchetypeSupportTests(unittest.TestCase):
         self.assertIn("agent-app", available)
         self.assertIn("ml-pipeline", available)
         self.assertIn("fullstack-app", available)
+        self.assertIn("fullstack-react-fastapi", available)
 
     def test_load_manifest_reads_fullstack_app_fields(self) -> None:
         manifest = archetype_support.load_manifest(ARCHETYPES_ROOT, "fullstack-app")
@@ -39,6 +40,14 @@ class ArchetypeSupportTests(unittest.TestCase):
         self.assertIn("infra", manifest["directories"])
         rule_ids = {rule["rule_id"] for rule in manifest["starter_rules"]}
         self.assertIn("archetype-fullstack-app-infra-boundary", rule_ids)
+
+    def test_load_manifest_reads_fullstack_react_fastapi_fields(self) -> None:
+        manifest = archetype_support.load_manifest(ARCHETYPES_ROOT, "fullstack-react-fastapi")
+        self.assertEqual(manifest["name"], "fullstack-react-fastapi")
+        self.assertIn("backend/api", manifest["directories"])
+        self.assertIn("iac/cdk", manifest["directories"])
+        rule_ids = {rule["rule_id"] for rule in manifest["starter_rules"]}
+        self.assertIn("archetype-fullstack-react-fastapi-route-handler-boundary", rule_ids)
 
     def test_load_manifest_reads_structured_fields(self) -> None:
         manifest = archetype_support.load_manifest(ARCHETYPES_ROOT, "agent-app")

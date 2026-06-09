@@ -256,6 +256,7 @@ Current shared archetypes:
 - `agent-app` — starter structure for agent-oriented applications with `src/agents`, `src/tools`, `src/domain`, `evals`, and `tests`
 - `ml-pipeline` — starter structure for ML/data applications with `src/pipelines`, `src/features`, `src/models`, `data/`, `notebooks`, `evals`, and `tests`
 - `fullstack-app` — technology-agnostic fullstack structure with `src/backend`, `src/frontend`, `src/domain`, `src/db`, `src/observability`, `infra`, `evals`, and `tests`; enforces layer boundaries (domain purity, frontend↔backend via API, persistence in `src/db`, IaC in `infra`) while leaving the concrete stack to a per-product ADR
+- `fullstack-react-fastapi` — stack-specific React 18 + Vite + TypeScript / Python FastAPI / AWS ECS Fargate + CDK structure (`frontend/`, `backend/`, `iac/cdk`); enforces thin route handlers, frontend↔backend HTTP boundary, React Query for server state, and CDK isolation
 
 The archetype contract is intentionally narrow:
 

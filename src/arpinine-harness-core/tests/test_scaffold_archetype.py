@@ -52,6 +52,17 @@ class ScaffoldArchetypeTests(unittest.TestCase):
         self.assertTrue((self.repo / "PROJECT_CONVENTIONS.md").exists())
         self.assertTrue((self.repo / ".specify" / "archetype.json").exists())
 
+    def test_scaffold_fullstack_react_fastapi_into_empty_repo(self) -> None:
+        result = self.run_script("fullstack-react-fastapi")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.repo / "frontend" / "src" / "stores" / ".gitkeep").exists())
+        self.assertTrue((self.repo / "frontend" / "src" / "services" / ".gitkeep").exists())
+        self.assertTrue((self.repo / "backend" / "api" / ".gitkeep").exists())
+        self.assertTrue((self.repo / "backend" / "core" / ".gitkeep").exists())
+        self.assertTrue((self.repo / "iac" / "cdk" / ".gitkeep").exists())
+        self.assertTrue((self.repo / "PROJECT_CONVENTIONS.md").exists())
+        self.assertTrue((self.repo / ".specify" / "archetype.json").exists())
+
     def test_scaffold_agent_app_into_empty_repo(self) -> None:
         result = self.run_script("agent-app")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

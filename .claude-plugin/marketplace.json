@@ -5,13 +5,13 @@
   },
   "metadata": {
     "description": "Arpinine Harness Claude Code marketplace (install directly from GitHub)",
-    "version": "1.5.0"
+    "version": "1.6.0"
   },
   "plugins": [
     {
       "name": "arpinine-harness",
       "description": "Governed product-engineering workflow: ADRs, drift detection, evaluation, compounding rule learning",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "source": "./marketplace/claude/arpinine-harness-claude"
     }
   ]

@@ -359,6 +359,19 @@ Technology-agnostic fullstack application with backend, frontend, domain, persis
   - `src/frontend/` talks to the backend only through the published API boundary — it never imports `src/backend/`, `src/domain/`, or `src/db/`
   - infrastructure-as-code stays in `infra/`; application code never imports IaC constructs and vice versa
 
+### `fullstack-react-fastapi`
+
+Stack-specific fullstack web app — React 18 + Vite + TypeScript frontend, Python 3.13+ FastAPI backend, AWS ECS Fargate + CDK. Use this when the stack is settled; use `fullstack-app` when you want a stack-neutral layout.
+
+- Layout: `frontend/src/{components,pages,hooks,stores,services}`, `backend/{api,core,data,prompts,tests}`, `iac/cdk`, `docs`
+- Stack: React 18 + Vite + TypeScript, shadcn/ui v4, Tailwind v4, TanStack React Query v5, Zustand, FastAPI, Pydantic v2, Zod, pytest + Vitest, AWS ECS Fargate + CDK
+- Enforces (pre-edit hook):
+  - FastAPI route handlers in `backend/api/` stay thin — no DB/ORM access; logic lives in `backend/core/`
+  - the frontend never imports from `backend/` — data crosses the HTTP API boundary
+  - React Query owns server state; Zustand stores cannot hold `axios`/`fetch`/React Query
+  - AWS CDK stays in `iac/cdk/`; app code never imports CDK and infra never imports `backend/core/`
+  - (review-only) Pydantic ↔ Zod contract changes ship in the same commit
+
 Skip archetypes when reversing an existing codebase — use `/at-bootstrap-from-code` instead, which infers structure and governance from what already exists.
 
 ---
