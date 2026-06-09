@@ -361,7 +361,7 @@ Technology-agnostic fullstack application with backend, frontend, domain, persis
 
 ### `fullstack-react-fastapi`
 
-Opinionated fullstack web app — React 18 + Vite + TypeScript frontend, Python 3.13+ FastAPI backend, AWS ECS Fargate + CDK. Use this when the stack is settled; use `fullstack-app` when you want a stack-neutral layout.
+Stack-specific fullstack web app — React 18 + Vite + TypeScript frontend, Python 3.13+ FastAPI backend, AWS ECS Fargate + CDK. Use this when the stack is settled; use `fullstack-app` when you want a stack-neutral layout.
 
 - Layout: `frontend/src/{components,pages,hooks,stores,services}`, `backend/{api,core,data,prompts,tests}`, `iac/cdk`, `docs`
 - Stack: React 18 + Vite + TypeScript, shadcn/ui v4, Tailwind v4, TanStack React Query v5, Zustand, FastAPI, Pydantic v2, Zod, pytest + Vitest, AWS ECS Fargate + CDK

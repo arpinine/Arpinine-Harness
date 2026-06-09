@@ -1,6 +1,6 @@
 {
   "name": "fullstack-react-fastapi",
-  "description": "Opinionated fullstack web app: React 18 + Vite + TypeScript frontend, Python 3.13+ FastAPI backend, AWS ECS Fargate + CDK deployment",
+  "description": "Stack-specific fullstack web app: React 18 + Vite + TypeScript frontend, Python 3.13+ FastAPI backend, AWS ECS Fargate + CDK deployment",
   "directories": [
     "frontend/src/components/ui",
     "frontend/src/components",

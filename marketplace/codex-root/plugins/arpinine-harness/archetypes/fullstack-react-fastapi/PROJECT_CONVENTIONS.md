@@ -17,7 +17,7 @@
 | Packages | pnpm (frontend), uv (backend) |
 | Deploy | AWS ECS Fargate + CDK |
 
-This is an **opinionated** archetype: the stack above is the default. Record any deviation
+This is a **stack-specific** archetype: the stack above is the default. Record any deviation
 in `docs/TECH_STACK.md` and, for consequential swaps, an ADR. If you want a stack-neutral
 fullstack layout instead, use the `fullstack-app` archetype.
 
