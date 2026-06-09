@@ -328,6 +328,19 @@ For new repos, `at-init` can scaffold a starter structure before governance setu
 - **Constitution principles** — boundary rules added to your constitution
 - **Starter governance rules** — `HIGH`-severity rules the drift and architecture hooks check on every write
 
+Archetypes are auto-discovered — `at-init` lists whatever ships in `archetypes/`, and the same `HIGH` rules are enforced identically across Claude, Codex, and Copilot. List them any time with `scaffold_archetype.py --list`.
+
+### Choosing an archetype
+
+| Archetype | Use when | Stack |
+|-----------|----------|-------|
+| [`agent-app`](#agent-app) | Building an LLM/agent app with tools and evals | provider-agnostic |
+| [`ml-pipeline`](#ml-pipeline) | Building an ML/data pipeline with training and notebooks | provider-agnostic |
+| [`fullstack-app`](#fullstack-app) | Building a web app, stack not yet decided | technology-agnostic — choose per product via ADR |
+| [`fullstack-react-fastapi`](#fullstack-react-fastapi) | Building a web app on the React/FastAPI/AWS stack | React 18 + Vite + TS / FastAPI / ECS Fargate + CDK |
+
+The two fullstack archetypes are a pair: `fullstack-app` fixes the *layer boundaries* and leaves the technology open; `fullstack-react-fastapi` is the same shape with one concrete stack already chosen. Start agnostic if the stack is still in flux; pick the stack-specific one once it is settled.
+
 ### `agent-app`
 
 AI agent application with tools, domain, and evaluation support.
