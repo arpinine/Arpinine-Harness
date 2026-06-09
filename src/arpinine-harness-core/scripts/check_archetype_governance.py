@@ -46,6 +46,18 @@ APP_INTERNAL_IMPORT_RE = re.compile(
 )
 # Infrastructure code importing application business logic.
 APP_LOGIC_FROM_INFRA_RE = re.compile(r"\b(src[\\/.])(domain|backend)\b", re.IGNORECASE)
+# Opinionated fullstack-react-fastapi layout (frontend/ + backend/ + iac/ at repo root).
+BACKEND_PATH_RE = re.compile(r"(^|/)backend(/|$)", re.IGNORECASE)
+BACKEND_API_PATH_RE = re.compile(r"(^|/)backend/api(/|$)", re.IGNORECASE)
+STORES_PATH_RE = re.compile(r"(^|/)stores(/|$)", re.IGNORECASE)
+IAC_PATH_RE = re.compile(r"(^|/)(iac|infra)(/|$)", re.IGNORECASE)
+SERVER_STATE_RE = re.compile(
+    r"\b(axios|react-query|@tanstack/react-query|useQuery|useMutation|useInfiniteQuery)\b|\bfetch\s*\(",
+    re.IGNORECASE,
+)
+IAC_APP_IMPORT_RE = re.compile(
+    r"(from|import|require)\b[^\n]*\bbackend[\\/.](core|api)\b", re.IGNORECASE
+)
 
 
 def read_payload() -> tuple[str, str]:
@@ -125,6 +137,33 @@ def main() -> int:
         # 4b. infrastructure code must not import application business logic
         if INFRA_PATH_RE.search(rel) and APP_LOGIC_FROM_INFRA_RE.search(pending):
             print("VIOLATION: fullstack-app infrastructure code cannot import application business logic from src/.")
+            print("Infra communicates with the app through configuration and environment, not shared imports.")
+            return 1
+
+    if archetype == "fullstack-react-fastapi":
+        # frontend talks to the backend only through the HTTP API boundary
+        if FRONTEND_PATH_RE.search(rel) and APP_INTERNAL_IMPORT_RE.search(pending):
+            print("VIOLATION: fullstack-react-fastapi frontend cannot import from backend/.")
+            print("Call the FastAPI endpoints over HTTP (Axios) and depend only on shared contract types (Zod).")
+            return 1
+        # route handlers in backend/api/ are thin wrappers — no persistence/ORM access
+        if BACKEND_API_PATH_RE.search(rel) and PERSISTENCE_IMPORT_RE.search(pending):
+            print("VIOLATION: fullstack-react-fastapi route handlers in backend/api/ cannot access the database/ORM directly.")
+            print("Keep handlers thin; move data access and business logic into backend/core/.")
+            return 1
+        # server state belongs in React Query, not Zustand stores
+        if STORES_PATH_RE.search(rel) and SERVER_STATE_RE.search(pending):
+            print("VIOLATION: fullstack-react-fastapi Zustand stores cannot hold server state (no axios/fetch/React Query).")
+            print("Use React Query for server state; keep stores for UI-only state.")
+            return 1
+        # AWS CDK confined to iac/ — application code must not import it
+        if (FRONTEND_PATH_RE.search(rel) or BACKEND_PATH_RE.search(rel)) and IAC_IMPORT_RE.search(pending):
+            print("VIOLATION: fullstack-react-fastapi application code cannot import AWS CDK / infrastructure constructs.")
+            print("Keep CDK inside iac/cdk/.")
+            return 1
+        # infrastructure code must not import application business logic
+        if IAC_PATH_RE.search(rel) and IAC_APP_IMPORT_RE.search(pending):
+            print("VIOLATION: fullstack-react-fastapi infrastructure code cannot import application business logic from backend/.")
             print("Infra communicates with the app through configuration and environment, not shared imports.")
             return 1
 

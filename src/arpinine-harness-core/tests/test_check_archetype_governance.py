@@ -96,6 +96,40 @@ class CheckArchetypeGovernanceTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("cannot import application business logic", result.stdout)
 
+    def test_react_fastapi_blocks_frontend_importing_backend(self) -> None:
+        self.scaffold("fullstack-react-fastapi")
+        result = self.run_hook("frontend/src/pages/Home.tsx", "import { svc } from '../../../backend/core/orders'\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("frontend cannot import from backend/", result.stdout)
+
+    def test_react_fastapi_blocks_orm_in_route_handler(self) -> None:
+        self.scaffold("fullstack-react-fastapi")
+        result = self.run_hook("backend/api/orders.py", "import sqlalchemy\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("route handlers in backend/api/", result.stdout)
+
+    def test_react_fastapi_allows_orm_in_core(self) -> None:
+        self.scaffold("fullstack-react-fastapi")
+        result = self.run_hook("backend/core/orders.py", "import sqlalchemy\n")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_react_fastapi_blocks_server_state_in_store(self) -> None:
+        self.scaffold("fullstack-react-fastapi")
+        result = self.run_hook("frontend/src/stores/orders.ts", "import axios from 'axios'\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Zustand stores cannot hold server state", result.stdout)
+
+    def test_react_fastapi_allows_ui_only_store(self) -> None:
+        self.scaffold("fullstack-react-fastapi")
+        result = self.run_hook("frontend/src/stores/ui.ts", "export const useUi = create(() => ({ sidebarOpen: false }))\n")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_react_fastapi_blocks_cdk_import_in_app(self) -> None:
+        self.scaffold("fullstack-react-fastapi")
+        result = self.run_hook("backend/core/service.py", "import aws_cdk\n")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("cannot import AWS CDK", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

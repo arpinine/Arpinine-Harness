@@ -148,7 +148,7 @@ Create the shared governance structure for the repo.
 **Manual**
 - run the command
 - inspect the output for dependency warnings
-- if the repo is new, choose an archetype such as `agent-app` or `ml-pipeline`, or skip scaffolding
+- if the repo is new, choose an archetype such as `agent-app`, `ml-pipeline`, `fullstack-app`, or `fullstack-react-fastapi`, or skip scaffolding
 
 **Automatic**
 - `.specify/specs/`
