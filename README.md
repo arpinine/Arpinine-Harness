@@ -195,9 +195,7 @@ Automatic checks fire on every file write:
 
 ## Installation
 
-Install from GitHub with no build. Claude can install straight from the repo-root marketplace. Codex needs a Codex-only local marketplace root staged from the committed GitHub contents because this repo also carries the Claude marketplace manifest at the root.
-
-> The marketplace is named `arpinine-harness-local` on every host. The `-local` suffix is just the registered marketplace id — you still install live from GitHub and update from GitHub. It is not a local-only build.
+Choose your host and use the matching install path.
 
 ### Claude
 
@@ -215,53 +213,27 @@ claude plugin marketplace add arpinine/Arpinine-Harness
 claude plugin install arpinine-harness@arpinine-harness-local
 ```
 
-Restart Claude Code. Update later with `/plugin marketplace update arpinine-harness-local`.
+Restart Claude Code after install.
 
 ### Codex
 
-The repository is private, so the bootstrap is fetched with the authenticated
-`gh` CLI (an unauthenticated `raw.githubusercontent.com` fetch 404s on a private
-repo). Run `gh auth login` first; `gh auth setup-git` also lets the installer's
-HTTPS clone authenticate without a separate `GIT_REMOTE_URL`.
+Authenticate once with `gh auth login`, then run:
 
 ```bash
 gh api repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh \
   -H "Accept: application/vnd.github.raw" | bash
 ```
 
-Then **fully restart Codex** (the running client does not hot-load plugins).
+Restart Codex after install.
 
-The installer does a sparse Git checkout of only the Codex marketplace files,
-stages them under `~/.codex/marketplaces/arpinine-harness-local-codex/`, then
-runs:
-
-```bash
-codex plugin marketplace add <staged-local-root>
-codex plugin add arpinine-harness@arpinine-harness-local
-```
-
-Use `REMOTE_REF=<tag|branch|sha>` to pin a version, or `GIT_REMOTE_URL=git@github.com:owner/repo.git`
-for private-repo SSH access:
-
-```bash
-REF=v1.7.0
-gh api "repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh?ref=$REF" \
-  -H "Accept: application/vnd.github.raw" | REMOTE_REF=$REF bash
-```
-
-> **Why not `codex plugin marketplace add arpinine/Arpinine-Harness`?** Codex resolves this multi-host repo against the root Claude marketplace manifest, so a direct root-level add installs the Claude payload instead of the Codex one. The installer stages a Codex-only marketplace root to avoid that conflict.
->
-> **Access:** the installer clones the repo over HTTPS by default. For private repos, use an authenticated HTTPS URL or set `GIT_REMOTE_URL=git@github.com:owner/repo.git`.
->
-> **Copilot** cannot install from the committed marketplace (it bakes machine-absolute hook paths at install time). It installs from a release zip instead — see **Copilot** below.
+Notes:
+- This stages a Codex-only local marketplace root, then installs `arpinine-harness@arpinine-harness-local`.
+- To pin a version: `REMOTE_REF=<tag|branch|sha> ... | bash`
+- To use SSH for the repo clone: set `GIT_REMOTE_URL=git@github.com:owner/repo.git`
 
 ### Copilot
 
-Copilot installs from a release zip, not the marketplace: it runs hooks from the
-repo-root working directory with no plugin-root env var, so hook paths must be
-absolute and are baked into `hooks.json` at install time by the bundled
-`install.sh`. The repo is private, so download the asset with the authenticated
-`gh` CLI (`gh auth login` first):
+Copilot installs from a release zip.
 
 ```bash
 gh release download v1.7.0 -R arpinine/Arpinine-Harness -p '*copilot*.zip'
@@ -269,75 +241,70 @@ unzip arpinine-harness-copilot-v1.7.0.zip -d arpinine-harness-copilot
 cd arpinine-harness-copilot && ./install.sh
 ```
 
-`install.sh` resolves hook paths to `~/.copilot/installed-plugins/arpinine-harness-local/arpinine-harness`, registers the marketplace from the extracted bundle, and installs the plugin. Restart Copilot afterward. Override the install base with `COPILOT_PLUGIN_HOME` if your Copilot home is non-default.
+Restart Copilot after install.
 
-To **update**, remove the old plugin, then repeat with the newer tag:
+Notes:
+- `install.sh` resolves the required absolute hook paths automatically.
+- If your Copilot home is non-default, set `COPILOT_PLUGIN_HOME` before running `install.sh`.
 
-```bash
-copilot plugin remove arpinine-harness                       # ignore "not found"
-copilot plugin marketplace remove arpinine-harness-local     # ignore "not found"
-gh release download <newer-tag> -R arpinine/Arpinine-Harness -p '*copilot*.zip'
-unzip arpinine-harness-copilot-<newer-tag>.zip -d arpinine-harness-copilot
-cd arpinine-harness-copilot && ./install.sh
-```
+## Updating
 
-> Maintainer: build the bundle with `make release IMPLEMENTATION=copilot` and publish it with `make release-publish TAG=vX.Y.Z`. Details: `make help`.
-
-### Replace a pre-installed / local copy with the remote version
-
-If you previously installed from a local directory or a `make install` build, remove it first so the host uses the always-updated GitHub marketplace instead of a stale local tree.
-
-Claude — in Claude Code:
-
-```text
-/plugin uninstall arpinine-harness
-/plugin marketplace remove arpinine-harness-local
-/plugin marketplace add arpinine/Arpinine-Harness
-/plugin install arpinine-harness@arpinine-harness-local
-```
-
-Or from the terminal:
-
-```bash
-claude plugin uninstall arpinine-harness                  # ignore "not found" if absent
-claude plugin marketplace remove arpinine-harness-local   # ignore "not found" if absent
-claude plugin marketplace add arpinine/Arpinine-Harness
-claude plugin install arpinine-harness@arpinine-harness-local
-```
-
-Codex:
-
-```bash
-codex plugin remove arpinine-harness
-codex plugin marketplace remove arpinine-harness-local
-gh api repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh \
-  -H "Accept: application/vnd.github.raw" | bash
-```
-
-Restart the host after switching.
-
-### Stay on the latest version
-
-The remote marketplace tracks `main`. Pull the newest published version anytime:
+### Claude
 
 ```text
 /plugin marketplace update arpinine-harness-local
 ```
 
+Or:
+
 ```bash
 claude plugin marketplace update arpinine-harness-local
 ```
 
-For Codex, rerun the installer so the staged local marketplace root is refreshed:
+Restart Claude Code after update.
+
+### Codex
+
+Rerun the installer:
 
 ```bash
 gh api repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh \
   -H "Accept: application/vnd.github.raw" | bash
 ```
 
-Copilot does not track the marketplace — pull the newer release zip and re-run `install.sh` (see the **Copilot** update steps above).
+Restart Codex after update.
 
-Restart the host to load the updated plugin.
+### Copilot
+
+Remove the old plugin, then install the newer release:
+
+```bash
+copilot plugin remove arpinine-harness                   # ignore "not found"
+copilot plugin marketplace remove arpinine-harness-local # ignore "not found"
+gh release download <newer-tag> -R arpinine/Arpinine-Harness -p '*copilot*.zip'
+unzip arpinine-harness-copilot-<newer-tag>.zip -d arpinine-harness-copilot
+cd arpinine-harness-copilot && ./install.sh
+```
+
+Restart Copilot after update.
+
+## Replacing an older local install
+
+If you previously installed from a local directory or a `make install` build, remove the old plugin first, then follow the install steps above.
+
+Claude:
+
+```bash
+claude plugin uninstall arpinine-harness                # ignore "not found"
+claude plugin marketplace remove arpinine-harness-local # ignore "not found"
+```
+
+Codex:
+
+```bash
+codex plugin remove arpinine-harness                    # ignore "not found"
+codex plugin marketplace remove arpinine-harness-local  # ignore "not found"
+```
 
 ---
 
