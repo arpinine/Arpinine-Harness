@@ -253,7 +253,35 @@ gh api "repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_rem
 >
 > **Access:** the installer clones the repo over HTTPS by default. For private repos, use an authenticated HTTPS URL or set `GIT_REMOTE_URL=git@github.com:owner/repo.git`.
 >
-> **Copilot** cannot install from the committed marketplace (it bakes machine-absolute hook paths at install time). Build a release bundle with `make release IMPLEMENTATION=copilot` and run the bundled `install.sh`. Maintainer build/release details: `make help`.
+> **Copilot** cannot install from the committed marketplace (it bakes machine-absolute hook paths at install time). It installs from a release zip instead — see **Copilot** below.
+
+### Copilot
+
+Copilot installs from a release zip, not the marketplace: it runs hooks from the
+repo-root working directory with no plugin-root env var, so hook paths must be
+absolute and are baked into `hooks.json` at install time by the bundled
+`install.sh`. The repo is private, so download the asset with the authenticated
+`gh` CLI (`gh auth login` first):
+
+```bash
+gh release download v1.7.0 -R arpinine/Arpinine-Harness -p '*copilot*.zip'
+unzip arpinine-harness-copilot-v1.7.0.zip -d arpinine-harness-copilot
+cd arpinine-harness-copilot && ./install.sh
+```
+
+`install.sh` resolves hook paths to `~/.copilot/installed-plugins/arpinine-harness-local/arpinine-harness`, registers the marketplace from the extracted bundle, and installs the plugin. Restart Copilot afterward. Override the install base with `COPILOT_PLUGIN_HOME` if your Copilot home is non-default.
+
+To **update**, remove the old plugin, then repeat with the newer tag:
+
+```bash
+copilot plugin remove arpinine-harness                       # ignore "not found"
+copilot plugin marketplace remove arpinine-harness-local     # ignore "not found"
+gh release download <newer-tag> -R arpinine/Arpinine-Harness -p '*copilot*.zip'
+unzip arpinine-harness-copilot-<newer-tag>.zip -d arpinine-harness-copilot
+cd arpinine-harness-copilot && ./install.sh
+```
+
+> Maintainer: build the bundle with `make release IMPLEMENTATION=copilot` and publish it with `make release-publish TAG=vX.Y.Z`. Details: `make help`.
 
 ### Replace a pre-installed / local copy with the remote version
 
@@ -306,6 +334,8 @@ For Codex, rerun the installer so the staged local marketplace root is refreshed
 gh api repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh \
   -H "Accept: application/vnd.github.raw" | bash
 ```
+
+Copilot does not track the marketplace — pull the newer release zip and re-run `install.sh` (see the **Copilot** update steps above).
 
 Restart the host to load the updated plugin.
 
