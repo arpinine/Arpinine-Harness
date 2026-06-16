@@ -48,6 +48,9 @@ The facade may optionally summarize the outcome and recommend a next step after 
 | `/at-retro` | Retrospective for one spec; bounded |
 | `/at-adr` | ADR creation; bounded |
 | `/at-observe` | Observation recording; bounded |
+| `/at-report-costs` | Read-only token and cost report; always returns |
+| `/at-report-harness-costs` | Read-only harness delivery cost report; always returns |
+| `/at-report-total-costs` | Read-only combined cost report; always returns |
 
 ---
 
@@ -135,6 +138,9 @@ Match the user's intent text against the vocabulary below. Select the route whos
 | `/at-retro` | "retrospective", "what did we learn", "after shipping", "post-mortem", "lessons learned" |
 | `/at-adr` | "decision record", "ADR", "architectural decision", "document this choice" |
 | `/at-observe` | "record observation", "log runtime behavior", "what happened in prod", "observation" |
+| `/at-report-costs` | "report costs", "token consumption", "how many tokens", "how much did it cost", "cost report", "token usage", "spend so far", "which model cost" |
+| `/at-report-harness-costs` | "harness cost", "harness usage cost", "what has the harness cost", "what has Arpinine Harness cost", "delivery cost", "what did the harness itself cost" |
+| `/at-report-total-costs` | "total delivery cost", "combined cost", "combined total cost", "all-in cost", "overall cost", "total cost including harness" |
 | `/at-status` | "what should I do next", "what's the state", "show me the status", "what's left", "where are we" |
 | `/at-bootstrap-from-code` | "existing codebase", "bootstrap from code", "reverse engineer the specs", "already have code", "legacy system" |
 

@@ -26,6 +26,9 @@ HANDOFF_COMMANDS: frozenset[str] = frozenset({
 READ_ONLY_RETURN_COMMANDS: frozenset[str] = frozenset({
     "/at-status",
     "/at-ask",
+    "/at-report-costs",
+    "/at-report-harness-costs",
+    "/at-report-total-costs",
 })
 
 EXPLICIT_COMMANDS: dict[str, str] = {
@@ -55,6 +58,12 @@ EXPLICIT_COMMANDS: dict[str, str] = {
     "/at-observe": "/at-observe",
     "at-status": "/at-status",
     "/at-status": "/at-status",
+    "at-report-costs": "/at-report-costs",
+    "/at-report-costs": "/at-report-costs",
+    "at-report-harness-costs": "/at-report-harness-costs",
+    "/at-report-harness-costs": "/at-report-harness-costs",
+    "at-report-total-costs": "/at-report-total-costs",
+    "/at-report-total-costs": "/at-report-total-costs",
     "at-init": "/at-init",
     "/at-init": "/at-init",
     "at-bootstrap-from-code": "/at-bootstrap-from-code",
@@ -165,6 +174,32 @@ INTENT_VOCABULARY: dict[str, tuple[str, ...]] = {
         "what's left",
         "where are we",
     ),
+    "/at-report-costs": (
+        "report costs",
+        "token consumption",
+        "how many tokens",
+        "how much did it cost",
+        "cost report",
+        "token usage",
+        "spend so far",
+        "which model cost",
+    ),
+    "/at-report-harness-costs": (
+        "harness cost",
+        "harness usage cost",
+        "what has the harness cost",
+        "what has arpinine harness cost",
+        "delivery cost",
+        "what did the harness itself cost",
+    ),
+    "/at-report-total-costs": (
+        "total delivery cost",
+        "combined cost",
+        "combined total cost",
+        "all-in cost",
+        "overall cost",
+        "total cost including harness",
+    ),
     "/at-bootstrap-from-code": (
         "existing codebase",
         "bootstrap from code",
@@ -196,6 +231,9 @@ ROUTE_PRIORITY: tuple[str, ...] = (
     "/at-discover",
     "/at-map",
     "/at-bootstrap-from-code",
+    "/at-report-total-costs",
+    "/at-report-harness-costs",
+    "/at-report-costs",
     "/at-status",
 )
 
@@ -272,6 +310,12 @@ def score_intents(intent_lower: str) -> dict[str, int]:
         scores["/at-discover"] += 1
     if re.search(r"\b(spec|specification)\b", intent_lower) and re.search(r"\b(review|refine|tighten|improve)\b", intent_lower):
         scores["/at-review"] += 1
+    if "harness" in intent_lower:
+        scores["/at-report-harness-costs"] += 2
+    if "delivery cost" in intent_lower or "combined cost" in intent_lower or "overall cost" in intent_lower:
+        scores["/at-report-total-costs"] += 2
+    if "total cost" in intent_lower and "harness" in intent_lower:
+        scores["/at-report-total-costs"] += 2
     return scores
 
 
@@ -501,6 +545,9 @@ def route(intent: str, state: dict[str, Any]) -> dict[str, Any]:
         "/at-audit": "The request explicitly asks for drift detection or audit.",
         "/at-retro": "The request is asking for post-delivery learning or retrospective review.",
         "/at-observe": "The request is asking to record or review runtime observations.",
+        "/at-report-costs": "The request is asking for a token consumption and cost report from recorded telemetry.",
+        "/at-report-harness-costs": "The request is asking for Arpinine Harness delivery cost from the governed harness-usage ledger.",
+        "/at-report-total-costs": "The request is asking for combined product/runtime and harness delivery cost totals.",
         "/at-adr": "The request explicitly asks to document an architectural decision.",
         "/at-ask": "The request is asking for a focused question to a named specialist.",
         "/at-new": "The request is asking to create a new governed spec directly.",

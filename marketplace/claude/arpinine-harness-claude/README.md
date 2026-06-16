@@ -110,6 +110,9 @@ This is meant to stop the common failure mode where good product language in the
 | `/arpinine-harness:at-adr` | Decide | Create and manage decision records |
 | `/arpinine-harness:at-eval` | Evaluate | Define and run framework-agnostic evaluation |
 | `/arpinine-harness:at-observe` | Evaluate | Record and review runtime observations |
+| `/arpinine-harness:at-report-costs` | Evaluate | Report product/runtime token consumption and cost by model from observation telemetry |
+| `/arpinine-harness:at-report-harness-costs` | Evaluate | Report Arpinine Harness delivery cost by command, host, and model from the harness-usage ledger |
+| `/arpinine-harness:at-report-total-costs` | Evaluate | Report separated product/runtime and harness subtotals plus a combined total |
 | `/arpinine-harness:at-implement` | Execute | Implement with TDD and security review |
 | `/arpinine-harness:at-audit` | Realign | Detect drift, attribute failures, trigger refinement |
 | `/arpinine-harness:at-retro` | Learn | Extract lessons as compounding rules |
@@ -362,6 +365,10 @@ The agents don't own anything on this list. Your team does.
       auth-001.md
     architecture/
       arch-001.md
+  harness-usage/            # local-only (gitignored) delivery-cost ledger
+    index.jsonl
+    history/
+      <run-id>.json
 ```
 
 Each ADR links to its governing spec via `governs:` and to a concrete decision or drift key via `covers:`.
@@ -371,6 +378,8 @@ Discovery artifacts preserve pre-spec idea refinement, one-question-at-a-time Q&
 Observation artifacts let you compare documented harness strategy against actual tool use, documented permission model against actual approval events, and documented memory model against actual state behavior.
 
 When benchmarked evaluation is enabled, observation and eval history support aggregate metrics such as latency P50/P95, token/cost summaries, and regression comparison against an approved baseline.
+
+Cost reporting separates two domains. `/at-report-costs` aggregates product/runtime spend from observation telemetry; `/at-report-harness-costs` aggregates Arpinine Harness delivery spend from the local `harness-usage/` ledger (auto-recorded on every file write, attributed by team via `ARPININE_HARNESS_TEAM_ID`); `/at-report-total-costs` reports both subtotals plus a combined total. Runs missing token or cost telemetry are excluded from totals rather than synthesized, and the harness-usage ledger is gitignored local telemetry, not version-governed evidence.
 
 Each rule documents what pattern triggers it (`triggers:`), what failure it prevents (`prevents:`), and which retro or ADR it came from (`source-adr:`, `evidence-project:`).
 

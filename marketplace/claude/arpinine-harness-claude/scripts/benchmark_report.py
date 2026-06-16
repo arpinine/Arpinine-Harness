@@ -166,9 +166,18 @@ def evaluate_thresholds(aggregate: dict, thresholds: list[dict[str, object]], mi
     for threshold in thresholds:
         actual = metric_value(str(threshold["metric"]), aggregate)
         if actual is None:
-            if verdict != "FAIL":
-                verdict = "WARN"
-            notes.append(f"metric unavailable for threshold: {threshold['metric']}")
+            # Fail closed: a release-blocking threshold cannot be proven met when
+            # its required telemetry is absent. Non-blocking thresholds warn only.
+            if "block" in str(threshold.get("failure_action", "")).lower():
+                verdict = "FAIL"
+                notes.append(
+                    f"required telemetry missing for release-blocking threshold: {threshold['metric']} "
+                    f"({threshold['failure_action']})"
+                )
+            else:
+                if verdict != "FAIL":
+                    verdict = "WARN"
+                notes.append(f"metric unavailable for threshold: {threshold['metric']}")
             continue
         actual_float = float(actual)
         operator = str(threshold["operator"])
