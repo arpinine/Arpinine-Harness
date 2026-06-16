@@ -14,8 +14,8 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_NAME="arpinine-harness"
 MARKETPLACE="arpinine-harness-local"
-COPILOT_HOME="${COPILOT_PLUGIN_HOME:-$HOME/.copilot}"
-INSTALL_DIR="$COPILOT_HOME/installed-plugins/$MARKETPLACE/$PLUGIN_NAME"
+COPILOT_HOME_EFFECTIVE="${COPILOT_HOME:-${COPILOT_PLUGIN_HOME:-$HOME/.copilot}}"
+INSTALL_DIR="$COPILOT_HOME_EFFECTIVE/installed-plugins/$MARKETPLACE/$PLUGIN_NAME"
 
 HOOKS="$HERE/plugins/$PLUGIN_NAME/hooks/hooks.json"
 test -f "$HOOKS" || { echo "Bundle layout unexpected: missing $HOOKS" >&2; exit 1; }
@@ -29,6 +29,11 @@ if grep -q "__COPILOT_PLUGIN_INSTALL_PATH__" "$HOOKS"; then
 fi
 
 command -v copilot >/dev/null || { echo "copilot CLI not found on PATH" >&2; exit 1; }
+export COPILOT_HOME="$COPILOT_HOME_EFFECTIVE"
+
+echo "Refreshing existing Copilot install state ..."
+copilot plugin uninstall "$PLUGIN_NAME@$MARKETPLACE" 2>/dev/null || true
+copilot plugin marketplace remove "$MARKETPLACE" --force 2>/dev/null || true
 
 echo "Registering marketplace from $HERE ..."
 copilot plugin marketplace add "$HERE"

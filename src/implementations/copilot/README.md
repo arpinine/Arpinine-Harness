@@ -30,7 +30,7 @@ To avoid that, every hook command is stored as `__COPILOT_PLUGIN_INSTALL_PATH__/
 
 Notes:
 - `${COPILOT_PLUGIN_DATA}` is a writable per-plugin *data* directory, not the code/scripts directory, so it cannot be used to reach bundled scripts. Copilot exposes no env var pointing at the plugin's own install dir, which is why the absolute install path is baked at assemble time.
-- The baked path includes `$HOME`, resolved at assemble time. Assemble on the same machine/user that installs. Override the base with `make ... COPILOT_PLUGIN_HOME=/custom/.copilot` if Copilot's home differs.
+- The baked path includes Copilot's home directory. Release-bundle installs resolve that at consumer install time from `COPILOT_HOME` (falling back to `~/.copilot`). Source/assemble flows can still override the base with `make ... COPILOT_PLUGIN_HOME=/custom/.copilot` when assembling on the same machine that will install.
 
 ## Goal
 

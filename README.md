@@ -235,17 +235,32 @@ Notes:
 
 Copilot installs from a release zip.
 
+If a GitHub Release for the version already exists:
+
 ```bash
 gh release download v1.7.0 -R arpinine/Arpinine-Harness -p '*copilot*.zip'
-unzip arpinine-harness-copilot-v1.7.0.zip -d arpinine-harness-copilot
-cd arpinine-harness-copilot && ./install.sh
+rm -rf arpinine-harness-copilot-v1.7.0
+unzip arpinine-harness-copilot-v1.7.0.zip -d arpinine-harness-copilot-v1.7.0
+cd arpinine-harness-copilot-v1.7.0 && ./install.sh
+```
+
+If you are working from the repo and the GitHub Release has not been published yet, build the local bundle first, then install from it:
+
+```bash
+make release IMPLEMENTATION=copilot
+unzip -q dist/copilot/release/arpinine-harness-copilot-v1.7.0.zip -d /tmp/arpinine-harness-copilot-v1.7.0
+cd /tmp/arpinine-harness-copilot-v1.7.0/arpinine-harness-copilot-v1.7.0
+./install.sh
 ```
 
 Restart Copilot after install.
 
 Notes:
 - `install.sh` resolves the required absolute hook paths automatically.
-- If your Copilot home is non-default, set `COPILOT_PLUGIN_HOME` before running `install.sh`.
+- If your Copilot home is non-default, set `COPILOT_HOME` before running `install.sh`.
+- `install.sh` is safe to rerun: it refreshes the marketplace registration and reinstalls the plugin.
+- `gh release download ...` fails with `release not found` when that GitHub Release tag has not been published yet.
+- `dist/copilot/release/*.zip` does not exist until you run `make release IMPLEMENTATION=copilot`.
 
 ## Updating
 
@@ -276,14 +291,22 @@ Restart Codex after update.
 
 ### Copilot
 
-Remove the old plugin, then install the newer release:
+Install the newer published release bundle and rerun `install.sh`:
 
 ```bash
-copilot plugin remove arpinine-harness                   # ignore "not found"
-copilot plugin marketplace remove arpinine-harness-local # ignore "not found"
 gh release download <newer-tag> -R arpinine/Arpinine-Harness -p '*copilot*.zip'
-unzip arpinine-harness-copilot-<newer-tag>.zip -d arpinine-harness-copilot
-cd arpinine-harness-copilot && ./install.sh
+rm -rf arpinine-harness-copilot-<newer-tag>
+unzip arpinine-harness-copilot-<newer-tag>.zip -d arpinine-harness-copilot-<newer-tag>
+cd arpinine-harness-copilot-<newer-tag> && ./install.sh
+```
+
+If you are updating from source before a GitHub Release exists, rebuild the local bundle first, then reinstall from `dist/`:
+
+```bash
+make release IMPLEMENTATION=copilot
+unzip -q dist/copilot/release/arpinine-harness-copilot-v<version>.zip -d /tmp/arpinine-harness-copilot-v<version>
+cd /tmp/arpinine-harness-copilot-v<version>/arpinine-harness-copilot-v<version>
+./install.sh
 ```
 
 Restart Copilot after update.
