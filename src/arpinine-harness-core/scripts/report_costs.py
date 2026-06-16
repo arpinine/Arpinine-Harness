@@ -98,14 +98,12 @@ def aggregate_costs(repo: pathlib.Path, slugs: list[str]) -> dict:
                     "token_count_input": 0,
                     "token_count_output": 0,
                     "cost_usd": 0.0,
-                    "cost_known": has_cost,
                 },
             )
             bucket["runs"] += 1
             bucket["token_count_input"] += int(_num(record.get("token_count_input")))
             bucket["token_count_output"] += int(_num(record.get("token_count_output")))
             bucket["cost_usd"] += _num(record.get("cost_usd"))
-            bucket["cost_known"] = bucket["cost_known"] or has_cost
 
     models = sorted(by_model.values(), key=lambda item: item["cost_usd"], reverse=True)
     total_cost = sum(item["cost_usd"] for item in models)
@@ -137,7 +135,7 @@ def render_report(report: dict) -> str:
     lines.append(f"{'Model':<34}{'Runs':>6}{'Tokens in':>14}{'Tokens out':>14}{'Cost USD':>14}".rstrip())
     lines.append("-" * width)
     for item in report["models"]:
-        cost = f"${item['cost_usd']:.4f}" if item["cost_known"] else "n/a"
+        cost = f"${item['cost_usd']:.4f}"
         label = model_label(item)
         lines.append(
             f"{label[:33]:<34}{item['runs']:>6}{item['token_count_input']:>14,}{item['token_count_output']:>14,}{cost:>14}"

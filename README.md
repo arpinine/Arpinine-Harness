@@ -125,8 +125,9 @@ Each command routes to the specialists that matter for that stage.
 | `eval-plan.md` | Quality gate: metrics, thresholds, scenarios |
 | `ADR-*.md` | Why key decisions were made |
 | `drift-report.md` | Where code and intent have diverged |
-| `observation artifacts` | Runtime evidence |
+| `observation artifacts` | Runtime evidence; source for product/runtime cost reports |
 | `coordination/*.json` | Multi-assistant task leases |
+| `harness-usage/` | Local-only (gitignored) harness delivery-cost ledger; source for harness and total cost reports |
 
 ---
 
@@ -182,6 +183,7 @@ Automatic checks fire on every file write:
 | `check-style-governance.sh` | Canonical style config must exist for the language |
 | `check-task-claim.sh` | Current team must own an active task claim |
 | `quick-drift-check.sh` | Lightweight spec-alignment pass after every write |
+| `record-harness-usage.sh` | Records harness delivery cost/tokens to the local `harness-usage/` ledger after every write (incomplete when the host exposes no telemetry — never faked) |
 
 ---
 
