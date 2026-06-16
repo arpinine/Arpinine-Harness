@@ -189,7 +189,7 @@ When the policy returns medium confidence and a meaningful mutation or handoff i
 
 For medium-confidence return commands:
 
-- the read-only return commands are `/at-status` and `/at-ask`; those may execute directly without confirmation
+- the read-only return commands are `/at-status`, `/at-ask`, `/at-report-costs`, `/at-report-harness-costs`, and `/at-report-total-costs`; those may execute directly without confirmation
 - if the selected command mutates governed artifacts or meaningfully changes workflow state, ask for confirmation before invoking it
 
 When the policy returns low confidence:

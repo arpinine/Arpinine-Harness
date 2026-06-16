@@ -4,12 +4,35 @@
 from __future__ import annotations
 
 import json
+import os
 import pathlib
+import time
 from datetime import datetime, timezone
 
 
 def utc_now_run_id(prefix: str = "run") -> str:
     return f"{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{prefix}"
+
+
+def unique_utc_now_run_id(prefix: str = "run") -> str:
+    entropy = f"{os.getpid()}-{time.time_ns() % 1_000_000_000:09d}"
+    return f"{utc_now_run_id(prefix)}-{entropy}"
+
+
+def resolve_host() -> str:
+    """Resolve the recording team/host for harness usage.
+
+    The canonical override is `ARPININE_HARNESS_TEAM_ID` (see README). When the
+    host does not expose its own identity we fall back to runtime heuristics.
+    """
+    team = os.environ.get("ARPININE_HARNESS_TEAM_ID")
+    if team:
+        return team
+    if "CLAUDE_PLUGIN_ROOT" in os.environ:
+        return "claude"
+    if "/.agents/plugins/" in str(pathlib.Path(__file__).resolve()):
+        return "codex"
+    return "unknown-host"
 
 
 def _write_text(path: pathlib.Path, text: str) -> None:
@@ -48,6 +71,16 @@ def eval_paths(repo: pathlib.Path, slug: str) -> dict[str, pathlib.Path]:
         "baseline": root / "baseline.json",
         "dataset_manifest": root / "dataset-manifest.json",
         "latest_session": root / "latest-benchmark-session.json",
+    }
+
+
+def harness_usage_paths(repo: pathlib.Path) -> dict[str, pathlib.Path]:
+    root = repo / ".specify" / "harness-usage"
+    return {
+        "root": root,
+        "history": root / "history",
+        "index": root / "index.jsonl",
+        "latest_session": root / "latest-session.json",
     }
 
 
@@ -123,6 +156,46 @@ def write_observation_run(
         "latest_trace": paths["latest_trace"],
         "history_json": history_json,
         "history_markdown": history_md,
+        "index": paths["index"],
+        "session_id": session_id or "",
+    }
+
+
+def write_harness_usage_run(
+    repo: pathlib.Path,
+    usage: dict,
+    session_id: str | None = None,
+) -> dict[str, pathlib.Path]:
+    paths = harness_usage_paths(repo)
+    run_id = usage.get("run_id") or unique_utc_now_run_id(str(usage.get("command", "harness")))
+    usage = {**usage, "run_id": run_id}
+    if session_id:
+        usage["session_id"] = session_id
+    history_dir = session_history_dir(paths["history"], session_id)
+    history_json = history_dir / f"{run_id}.json"
+
+    _write_json(history_json, usage)
+    _append_jsonl(
+        paths["index"],
+        {
+            "run_id": run_id,
+            "session_id": usage.get("session_id"),
+            "spec_slug": usage.get("spec_slug"),
+            "command": usage.get("command"),
+            "host": usage.get("host"),
+            "model_name": usage.get("model_name"),
+            "model_version": usage.get("model_version"),
+            "token_count_input": usage.get("token_count_input"),
+            "token_count_output": usage.get("token_count_output"),
+            "cost_usd": usage.get("cost_usd"),
+            "outcome": usage.get("outcome"),
+            "timestamp": usage.get("timestamp"),
+        },
+    )
+    if session_id:
+        write_latest_session(paths["latest_session"], session_id)
+    return {
+        "history_json": history_json,
         "index": paths["index"],
         "session_id": session_id or "",
     }

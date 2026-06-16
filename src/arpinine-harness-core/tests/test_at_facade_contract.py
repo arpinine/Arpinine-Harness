@@ -38,7 +38,7 @@ class AtFacadeContractTests(unittest.TestCase):
         )
         self.assertContains(
             self.at_command,
-            "the read-only return commands are `/at-status` and `/at-ask`",
+            "the read-only return commands are `/at-status`, `/at-ask`, `/at-report-costs`, `/at-report-harness-costs`, and `/at-report-total-costs`",
         )
 
     def test_command_classes_cover_primary_handoff_commands(self) -> None:

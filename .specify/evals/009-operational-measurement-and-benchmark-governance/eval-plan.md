@@ -37,11 +37,24 @@
 | Claude packaging | validate-structure exit status | >= 1.00 | block completion |
 | Codex packaging | validate-structure exit status | >= 1.00 | block completion |
 | Copilot packaging | validate-structure exit status | >= 1.00 | block completion |
+| Cost / budget | cost_total_usd | <= 5.00 | block release |
+| Token budget | token_output_total | <= 2000000 | block release |
+
+> **Token budget gate.** The `cost_total_usd` and `token_output_total` rows are
+> release-blocking operational budgets. They are enforced by
+> `/arpinine-harness:at-eval benchmark 009-operational-measurement-and-benchmark-governance`,
+> which reads aggregated telemetry from observation history. Arpinine Harness
+> governs the presence of this telemetry and the threshold check; it does not
+> synthesize token or cost numbers the runtime did not emit. When the required
+> telemetry is absent, the benchmark fails closed rather than reporting a pass.
+> Use `/arpinine-harness:at-report-costs --spec 009-operational-measurement-and-benchmark-governance`
+> for an ad-hoc consumption snapshot between benchmark runs.
 
 ## Regression Policy
 - Rerun evaluation after changes to shared scripts, commands, templates, or tests under `src/arpinine-harness-core/`.
 - Any failing shared-core test blocks completion.
 - Any assembled plugin structure failure blocks completion.
+- Aggregated `cost_total_usd` or `token_output_total` exceeding the declared budget is release-blocking; optimize execution or revise the budget with documented justification.
 
 ## Baseline Comparison
 - Baseline required: No
@@ -52,7 +65,8 @@
 ## Reporting
 - Latest results path: `.specify/evals/009-operational-measurement-and-benchmark-governance/latest-results.md`
 - Historical storage: optional; this feature uses test and structure evidence rather than benchmark history to close implementation
-- Observation history source: not applicable
+- Observation history source: `.specify/observations/009-operational-measurement-and-benchmark-governance/history/<session-id>/` (token/cost telemetry for the budget gate)
+- Ad-hoc cost snapshot: `python3 src/arpinine-harness-core/scripts/report_costs.py --slug 009-operational-measurement-and-benchmark-governance`
 
 ## Approval Rule
 - Work is not complete until the shared-core test suite passes and all assembled plugin structures (Claude, Codex, Copilot) validate.

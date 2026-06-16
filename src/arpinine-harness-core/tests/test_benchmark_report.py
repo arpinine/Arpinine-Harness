@@ -164,6 +164,79 @@ class BenchmarkReportTests(unittest.TestCase):
         self.assertEqual(payload["result"], "FAIL")
         self.assertTrue(any("minimum benchmark scenario count" in note for note in payload["threshold_notes"]))
 
+    def test_missing_release_blocking_telemetry_fails_closed(self) -> None:
+        # Eval plan declares a release-blocking cost budget, but the runs carry no
+        # cost telemetry. The verdict must FAIL, not silently downgrade to WARN.
+        (self.repo / ".specify" / "evals" / "001-demo" / "eval-plan.md").write_text(
+            "\n".join(
+                [
+                    "# Evaluation Plan: Demo",
+                    "",
+                    "## Benchmark Policy",
+                    "- Minimum scenario count for aggregated reporting: 3",
+                    "",
+                    "## Metrics And Thresholds",
+                    "| Dimension | Metric | Threshold | Failure Action |",
+                    "|-----------|--------|-----------|----------------|",
+                    "| Cost / budget | cost_total_usd | <= 5.00 | block release |",
+                    "",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        base = {
+            "dataset_version": "v1.0.0",
+            "variant_id": "variant-a",
+            "model_name": "demo-model",
+            "model_version": "2026-04",
+            "scenario_set": "core",
+            "result": "PASS",
+        }
+        self.write_result("r1", {**base, "run_id": "r1", "latency_ms": 100})
+        self.write_result("r2", {**base, "run_id": "r2", "latency_ms": 120})
+        self.write_result("r3", {**base, "run_id": "r3", "latency_ms": 140})
+        result = self.run_report("--json")
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["result"], "FAIL")
+        self.assertTrue(any("required telemetry missing" in note for note in payload["threshold_notes"]))
+
+    def test_missing_non_blocking_metric_warns_only(self) -> None:
+        # A non-blocking threshold whose metric is absent warns but does not FAIL.
+        (self.repo / ".specify" / "evals" / "001-demo" / "eval-plan.md").write_text(
+            "\n".join(
+                [
+                    "# Evaluation Plan: Demo",
+                    "",
+                    "## Benchmark Policy",
+                    "- Minimum scenario count for aggregated reporting: 3",
+                    "",
+                    "## Metrics And Thresholds",
+                    "| Dimension | Metric | Threshold | Failure Action |",
+                    "|-----------|--------|-----------|----------------|",
+                    "| Cost / latency | cost_total_usd | <= 5.00 | optimize execution |",
+                    "",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        base = {
+            "dataset_version": "v1.0.0",
+            "variant_id": "variant-a",
+            "model_name": "demo-model",
+            "model_version": "2026-04",
+            "scenario_set": "core",
+            "result": "PASS",
+        }
+        self.write_result("r1", {**base, "run_id": "r1", "latency_ms": 100})
+        self.write_result("r2", {**base, "run_id": "r2", "latency_ms": 120})
+        self.write_result("r3", {**base, "run_id": "r3", "latency_ms": 140})
+        result = self.run_report("--json")
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["result"], "WARN")
+        self.assertTrue(any("metric unavailable" in note for note in payload["threshold_notes"]))
+
     def test_latest_session_isolated_from_older_history(self) -> None:
         base = {
             "dataset_version": "v1.0.0",

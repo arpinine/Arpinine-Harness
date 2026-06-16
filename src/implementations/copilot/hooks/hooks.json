@@ -61,6 +61,15 @@
       {
         "matcher": "edit|create",
         "type": "command",
+        "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-record-harness-usage.sh",
+        "env": {
+          "ARPININE_HARNESS_TEAM_ID": "copilot"
+        },
+        "timeoutSec": 10
+      },
+      {
+        "matcher": "edit|create",
+        "type": "command",
         "bash": "__COPILOT_PLUGIN_INSTALL_PATH__/scripts/copilot-quick-drift-check.sh",
         "env": {
           "ARPININE_HARNESS_TEAM_ID": "copilot"

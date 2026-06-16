@@ -58,6 +58,15 @@
     ],
     "PostToolUse": [
       {
+        "description": "Record harness delivery usage after file writes",
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/scripts/record-harness-usage.sh",
+          "timeout": 10
+        }]
+      },
+      {
         "description": "Detect lightweight spec drift after file writes, including implementation-time plan updates",
         "matcher": "Edit|Write",
         "hooks": [{

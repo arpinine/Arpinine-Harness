@@ -62,6 +62,35 @@ class RouteAtTests(unittest.TestCase):
         self.assertEqual(payload["confidence"], "medium")
         self.assertTrue(payload["requires_confirmation"])
 
+    def test_cost_intent_routes_to_report_costs_no_confirm(self) -> None:
+        (self.repo / ".specify").mkdir()
+        self.write(".specify/specs/001-demo/spec.md", "# Spec\n")
+        payload = self.run_json("how many tokens have we consumed and what did it cost", self.repo)
+        self.assertEqual(payload["route"], "/at-report-costs")
+        self.assertEqual(payload["command_class"], "return")
+        self.assertFalse(payload["requires_confirmation"])
+
+    def test_explicit_report_costs_is_read_only_return(self) -> None:
+        (self.repo / ".specify").mkdir()
+        payload = self.run_json("/at-report-costs", self.repo)
+        self.assertEqual(payload["route"], "/at-report-costs")
+        self.assertEqual(payload["command_class"], "return")
+        self.assertFalse(payload["requires_confirmation"])
+
+    def test_harness_cost_intent_routes_to_harness_report(self) -> None:
+        (self.repo / ".specify").mkdir()
+        payload = self.run_json("what has the harness itself cost us so far", self.repo)
+        self.assertEqual(payload["route"], "/at-report-harness-costs")
+        self.assertEqual(payload["command_class"], "return")
+        self.assertFalse(payload["requires_confirmation"])
+
+    def test_total_cost_intent_routes_to_combined_report(self) -> None:
+        (self.repo / ".specify").mkdir()
+        payload = self.run_json("show the total delivery cost including harness", self.repo)
+        self.assertEqual(payload["route"], "/at-report-total-costs")
+        self.assertEqual(payload["command_class"], "return")
+        self.assertFalse(payload["requires_confirmation"])
+
     def test_broad_goal_routes_to_map(self) -> None:
         (self.repo / ".specify").mkdir()
         payload = self.run_json("I want to build a product for remote retrospectives", self.repo)

@@ -92,6 +92,48 @@ class MeasurementArtifactsTests(unittest.TestCase):
         self.assertFalse(compatible)
         self.assertEqual(mismatches, ["variant_id"])
 
+    def test_write_harness_usage_run_updates_history_and_index(self) -> None:
+        payload = {
+            "run_id": "20260428T120000Z-at-plan",
+            "timestamp": "2026-04-28T12:00:00Z",
+            "command": "at-plan",
+            "spec_slug": "001-demo",
+            "host": "codex",
+            "model_name": "gpt-5",
+            "token_count_input": 100,
+            "token_count_output": 40,
+            "cost_usd": 0.42,
+            "outcome": "PASS",
+        }
+        paths = self.module.write_harness_usage_run(self.repo, payload, session_id="session-a")
+        self.assertTrue(paths["history_json"].exists())
+        self.assertEqual(paths["history_json"].parent.name, "session-a")
+        self.assertTrue(paths["index"].exists())
+        lines = paths["index"].read_text(encoding="utf-8").strip().splitlines()
+        self.assertEqual(len(lines), 1)
+        stored = json.loads(lines[0])
+        self.assertEqual(stored["command"], "at-plan")
+        self.assertEqual(stored["cost_usd"], 0.42)
+
+    def test_write_harness_usage_run_generates_unique_run_ids(self) -> None:
+        payload = {
+            "timestamp": "2026-04-28T12:00:00Z",
+            "command": "write",
+            "spec_slug": "001-demo",
+            "host": "codex",
+            "model_name": "gpt-5",
+            "token_count_input": 10,
+            "token_count_output": 2,
+            "cost_usd": 0.03,
+            "outcome": "RECORDED",
+        }
+        first = self.module.write_harness_usage_run(self.repo, payload, session_id="session-a")
+        second = self.module.write_harness_usage_run(self.repo, payload, session_id="session-a")
+
+        self.assertNotEqual(first["history_json"].name, second["history_json"].name)
+        lines = first["index"].read_text(encoding="utf-8").strip().splitlines()
+        self.assertEqual(len(lines), 2)
+
 
 if __name__ == "__main__":
     unittest.main()

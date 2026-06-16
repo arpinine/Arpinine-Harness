@@ -63,6 +63,9 @@ Typical routed outcomes:
 | `/arpinine-harness:at-adr` | Decide | Create and manage Architecture Decision Records |
 | `/arpinine-harness:at-eval` | Evaluate | Define, run, and benchmark evaluation |
 | `/arpinine-harness:at-observe` | Evaluate | Record and review runtime observations |
+| `/arpinine-harness:at-report-costs` | Evaluate | Report token consumption and cost by model from recorded telemetry |
+| `/arpinine-harness:at-report-harness-costs` | Evaluate | Report Arpinine Harness delivery cost by command, host, and model |
+| `/arpinine-harness:at-report-total-costs` | Evaluate | Report separated product/runtime and harness subtotals plus a combined total |
 | `/arpinine-harness:at-implement` | Execute | Implement with TDD and security review |
 | `/arpinine-harness:at-audit` | Realign | Detect drift and trigger refinement |
 | `/arpinine-harness:at-retro` | Learn | Extract lessons as compounding rules |
@@ -145,7 +148,7 @@ Because intent lives in shared files rather than in any one assistant's context,
 
 ### Team identity
 
-Each assistant is automatically resolved to a team id (`claude`, `codex`, or `copilot`) from its host runtime — the harness detects which plugin root is set and assigns the team for you. You can override it with the `ARPININE_HARNESS_TEAM_ID` environment variable only when the host doesn't expose its own identity.
+Each assistant is automatically resolved to a team id (`claude`, `codex`, or `copilot`) from its host runtime unless `ARPININE_HARNESS_TEAM_ID` is already set. When that environment variable is present, the harness treats it as the canonical team identity and uses host detection only as fallback.
 
 ### Task ownership through leases
 
