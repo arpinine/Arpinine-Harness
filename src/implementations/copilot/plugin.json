@@ -6,8 +6,8 @@
     "name": "Arpinine",
     "url": "https://github.com/Arpinine"
   },
-  "homepage": "https://github.com/Arpinine/specops",
-  "repository": "https://github.com/Arpinine/specops",
+  "homepage": "https://github.com/arpinine/Arpinine-Harness",
+  "repository": "https://github.com/arpinine/Arpinine-Harness",
   "license": "MIT",
   "keywords": ["copilot", "governance", "workflow", "spec-kit", "adr", "evaluation"],
   "skills": "./skills/",

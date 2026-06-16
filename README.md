@@ -219,8 +219,14 @@ Restart Claude Code. Update later with `/plugin marketplace update arpinine-harn
 
 ### Codex
 
+The repository is private, so the bootstrap is fetched with the authenticated
+`gh` CLI (an unauthenticated `raw.githubusercontent.com` fetch 404s on a private
+repo). Run `gh auth login` first; `gh auth setup-git` also lets the installer's
+HTTPS clone authenticate without a separate `GIT_REMOTE_URL`.
+
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/arpinine/Arpinine-Harness/main/tools/release/install_codex_remote.sh)
+gh api repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh \
+  -H "Accept: application/vnd.github.raw" | bash
 ```
 
 Then **fully restart Codex** (the running client does not hot-load plugins).
@@ -238,7 +244,9 @@ Use `REMOTE_REF=<tag|branch|sha>` to pin a version, or `GIT_REMOTE_URL=git@githu
 for private-repo SSH access:
 
 ```bash
-REMOTE_REF=v1.4.9 bash <(curl -fsSL https://raw.githubusercontent.com/arpinine/Arpinine-Harness/main/tools/release/install_codex_remote.sh)
+REF=v1.7.0
+gh api "repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh?ref=$REF" \
+  -H "Accept: application/vnd.github.raw" | REMOTE_REF=$REF bash
 ```
 
 > **Why not `codex plugin marketplace add arpinine/Arpinine-Harness`?** Codex resolves this multi-host repo against the root Claude marketplace manifest, so a direct root-level add installs the Claude payload instead of the Codex one. The installer stages a Codex-only marketplace root to avoid that conflict.
@@ -274,7 +282,8 @@ Codex:
 ```bash
 codex plugin remove arpinine-harness
 codex plugin marketplace remove arpinine-harness-local
-bash <(curl -fsSL https://raw.githubusercontent.com/arpinine/Arpinine-Harness/main/tools/release/install_codex_remote.sh)
+gh api repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh \
+  -H "Accept: application/vnd.github.raw" | bash
 ```
 
 Restart the host after switching.
@@ -294,7 +303,8 @@ claude plugin marketplace update arpinine-harness-local
 For Codex, rerun the installer so the staged local marketplace root is refreshed:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/arpinine/Arpinine-Harness/main/tools/release/install_codex_remote.sh)
+gh api repos/arpinine/Arpinine-Harness/contents/tools/release/install_codex_remote.sh \
+  -H "Accept: application/vnd.github.raw" | bash
 ```
 
 Restart the host to load the updated plugin.
