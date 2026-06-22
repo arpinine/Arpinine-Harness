@@ -10,7 +10,17 @@ covers:
 # ADR-0018: CCR original store location, access policy, and no-sync invariant
 
 ## Status
-Accepted
+Accepted — **amended by the Option A (proxy-only) decision (see ADR-0013).**
+
+> **Amendment (Option A).** Under proxy-only integration, reversible retrieval
+> (CCR) is owned by the **headroom engine**, not re-implemented in the harness.
+> The harness no longer ships its own CCR store, sealing, or `store_original`/
+> `read_original` path — those are retired. This ADR's location/permission/no-sync
+> guidance now applies to **headroom's** CCR store: when compression is enabled,
+> `check_compression_setup.py` must verify headroom's configured CCR directory is
+> not under the git worktree or a cloud-sync path and is mode 700/600. The
+> "primary protection is the no-sync + permission invariant, not encryption"
+> reasoning below still holds and now governs headroom's store configuration.
 
 ## Context
 

@@ -2,35 +2,37 @@
 HeadroomContextCompressionProvider — the default ContextCompressionProvider.
 
 Scaffolded into the product package as `context_compression/headroom_provider.py`.
-Wraps the headroom engine (PyPI `headroom-ai[proxy]`, pinned per ADR-0014). ALL
-headroom imports stay in this file (ADR-0014 import-boundary; enforced by
-check_compression_setup.py). The interface and the noop provider never import it.
+Proxy-only model (ADR-0013 Option A / ADR-0015): `activate()` starts a local
+`headroom proxy` and returns an opaque endpoint the host routes its provider calls
+through; compression and reversible retrieval (CCR) happen transparently inside
+headroom. `deactivate()` stops the proxy. The harness does NOT call a per-payload
+compress()/retrieve() — that is the engine's job.
 
-Security controls (concrete, via the headroom-free `security` helpers which are
-unit-tested):
-  - credentials scrubbed before any log or CCR write (ADR-0014)
-  - reversible-retrieval (CCR) originals stored at ~/.arpinine/ccr-store, 700/600
-    (ADR-0018)
-  - headroom proxy run network-restricted to loopback; no third-party egress
-    (ADR-0014 / NFR-001)
-  - no full-payload/debug logging (logger stays at WARN; payloads never logged)
+ALL headroom usage stays in this file (ADR-0014 import-boundary, enforced by
+check_compression_setup.py). The interface and noop provider never import it.
 
-Lifecycle is per-session (ADR-0019): activate() starts the proxy, deactivate()
-stops it, no state persists across sessions.
+Security (ADR-0014 / NFR-001):
+  - the proxy binds to loopback (127.0.0.1) only — no third-party egress
+  - headroom is pinned + hash-verified at install; the import name is `headroom`
+    (PyPI dist `headroom-ai`, `[proxy]` extra required for the proxy transport)
+  - CCR originals are owned and stored by headroom; ADR-0018's no-sync + 700/600
+    invariant governs headroom's CCR directory (verified by the setup check)
+
+Lifecycle is per-session (ADR-0019): one proxy per governed session, no state
+persisted across sessions.
 
 ============================ INTEGRATION NOTE ============================
-The headroom 0.27.0 Python API surface (proxy start/stop entry points, the
-compress() signature, and how segment originals are exposed for reversible
-retrieval) MUST be confirmed against the installed SDK during the golden-session
-integration (TASK-008/009) and wired into the clearly-marked `_engine_*` seams
-below. Those seams are the ONLY places that touch headroom; everything else
-(security, CCR store, lifecycle, the interface contract) is concrete and tested.
-This file is a scaffold template and is intentionally NOT import-tested here
-(headroom is not a dev dependency of the harness itself), mirroring the
-deepeval / opentelemetry provider templates.
+The proxy is started via the `headroom proxy` CLI as a subprocess (verified
+against headroom 0.27.0: `headroom proxy --host 127.0.0.1 --port <p>`; host wiring
+is `ANTHROPIC_BASE_URL=http://127.0.0.1:<p>`). Port selection, readiness probing,
+and graceful shutdown are wired in the `_engine_*` seams. This file is a scaffold
+template and is intentionally NOT import-tested in the harness (headroom is a
+product dependency, not a harness dev dependency), mirroring the deepeval /
+opentelemetry provider templates. The seams are exercised by the live integration
+tests (TASK-010) in an environment where `headroom-ai[proxy]` is installed.
 =========================================================================
 
-Governs: specs/011-context-compression-governance (TASK-002).
+Governs: specs/011-context-compression-governance (TASK-002, Option A).
 """
 
 from __future__ import annotations
@@ -38,96 +40,114 @@ from __future__ import annotations
 import logging
 import pathlib
 
-# headroom SDK — confined to this module (ADR-0014). Pinned/hash-verified at
-# install (ADR-0014); run network-restricted (NFR-001).
-import headroom_ai  # noqa: F401  (used via the _engine_* seams below)
+# headroom SDK — confined to this module (ADR-0014). Import name is `headroom`
+# (PyPI dist `headroom-ai`). Used via the `_engine_*` seams below.
+import headroom  # noqa: F401
 
-from .context_compression_provider import (
-    CompressionEndpoint,
-    CompressionError,
-    CompressionResult,
-)
-from .security import (
-    ensure_ccr_store,
-    read_original,
-    store_original,
-)
+from .context_compression_provider import CompressionEndpoint, CompressionError
 
 logger = logging.getLogger(__name__)
 
-# ADR-0018: fixed, non-synced store. Never under the repo or a cloud-sync path;
-# check_compression_setup.py enforces this at setup and at activation.
-DEFAULT_CCR_STORE = pathlib.Path.home() / ".arpinine" / "ccr-store"
+# Loopback only — no third-party egress (NFR-001).
+PROXY_HOST = "127.0.0.1"
+
+# ADR-0018: headroom's CCR store must not live inside the git worktree or under a
+# cloud-sync path (governed content would be committed / leave the machine).
+_CLOUD_SYNC_RELATIVE_PREFIXES = (
+    "Library/Mobile Documents", "Dropbox", "OneDrive", "Google Drive", "Documents", "Desktop",
+)
+
+
+def _sqlite_store_dir(store_url: str) -> pathlib.Path | None:
+    """Resolve the filesystem directory of a sqlite store_url, else None (in-memory/non-file)."""
+    if not store_url or not store_url.startswith("sqlite:///"):
+        return None
+    db_path = store_url[len("sqlite:///"):]
+    if not db_path or db_path == ":memory:":
+        return None
+    return pathlib.Path(db_path).resolve().parent
+
+
+def _git_worktree_root(start: pathlib.Path) -> pathlib.Path:
+    """
+    Return the enclosing git worktree root for `start`, falling back to `start`
+    when no `.git` ancestor is found. This enforces ADR-0018 against the actual
+    repository boundary, not merely the process cwd.
+    """
+    current = start.resolve()
+    for candidate in (current, *current.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return current
 
 
 class HeadroomContextCompressionProvider:
     """
-    Default provider backed by the headroom engine. Implements
-    ContextCompressionProvider structurally (runtime_checkable Protocol).
+    Default provider backed by a local `headroom proxy`. Lifecycle-only
+    (ADR-0013 Option A): activate -> opaque endpoint, deactivate -> stop.
     """
 
-    def __init__(self, ccr_store: pathlib.Path | None = None) -> None:
-        self._ccr_store = pathlib.Path(ccr_store) if ccr_store else DEFAULT_CCR_STORE
-        self._proxy = None  # opaque engine handle; set in activate()
-
-    # --- lifecycle (ADR-0019: per-session) ---
+    def __init__(self) -> None:
+        self._proxy = None  # opaque subprocess/handle, set in activate()
 
     def activate(self) -> CompressionEndpoint:
-        ensure_ccr_store(self._ccr_store)  # 700; tested in security helpers
-        self._proxy = self._engine_start_proxy_loopback_only()
-        token = self._engine_endpoint_token(self._proxy)
-        # Opaque endpoint only — never expose the raw port/address (ADR-0015).
-        return CompressionEndpoint(token=token)
+        try:
+            self._engine_validate_configured_ccr_directory()
+            self._proxy, port = self._engine_start_proxy_loopback_only()
+        except Exception as exc:  # never leak internals into the message
+            raise CompressionError("failed to start headroom proxy") from exc
+        # Provider supplies a ready-to-use loopback base_url; host wiring sets it
+        # verbatim and never derives the port itself (ADR-0015). token stays opaque.
+        return CompressionEndpoint(
+            token=f"headroom://session/{port}",
+            base_url=f"http://{PROXY_HOST}:{port}",
+            metadata={"engine": "headroom"},
+        )
 
     def deactivate(self) -> None:
         if self._proxy is not None:
             self._engine_stop_proxy(self._proxy)
             self._proxy = None
 
-    # --- compression ---
-
-    def compress(self, payload: bytes) -> CompressionResult:
-        try:
-            compressed, segments = self._engine_compress(payload)
-        except Exception as exc:  # never leak payloads into the message
-            raise CompressionError("headroom compression failed") from exc
-        # Persist exact originals for reversible retrieval; security helper
-        # seals them at rest so retrieve() stays byte-equal while credentials
-        # are not persisted in plaintext.
-        for key, original in segments:
-            store_original(self._ccr_store, key, original)
-        return CompressionResult(
-            payload=compressed,
-            segment_keys=[k for k, _ in segments],
-            original_bytes=len(payload),
-        )
-
-    def retrieve(self, segment_key: str) -> bytes:
-        # Byte-equal recovery from the CCR store (ADR-0018). KeyError if absent.
-        return read_original(self._ccr_store, segment_key)
-
     # ===================== headroom engine seams =====================
-    # The ONLY code that touches headroom. Wire to the confirmed 0.27.0 API at
-    # golden-session integration (see INTEGRATION NOTE). Keep payload scrubbing
-    # (scrub_credentials) on any headers before they are logged or stored.
+    # The ONLY code that touches headroom / the proxy process. Wired against
+    # headroom 0.27.0 and exercised by the live integration tests (TASK-010).
+
+    def _engine_validate_configured_ccr_directory(self) -> None:
+        """
+        Validate headroom's configured CCR store location before activation
+        (ADR-0018). headroom stores CCR originals in a sqlite `store_url`
+        (default `sqlite:///headroom.db`, which resolves into the CWD — unsafe
+        inside a repo). Reject a store dir that is inside the git worktree or
+        under a known cloud-sync path. In-memory / non-file stores are exempt.
+
+        Raises CompressionError on an unsafe location (callers degrade to
+        passthrough rather than risk leaking governed originals).
+        """
+        store_dir = _sqlite_store_dir(headroom.HeadroomConfig().store_url)
+        if store_dir is None:
+            return None
+        worktree = _git_worktree_root(pathlib.Path.cwd())
+        home = pathlib.Path.home().resolve()
+        if store_dir == worktree or worktree in store_dir.parents:
+            raise CompressionError(f"headroom CCR store {store_dir} is inside the git worktree (ADR-0018)")
+        for rel in _CLOUD_SYNC_RELATIVE_PREFIXES:
+            prefix = (home / rel).resolve()
+            if store_dir == prefix or prefix in store_dir.parents:
+                raise CompressionError(f"headroom CCR store {store_dir} is under cloud-sync path {rel} (ADR-0018)")
+        return None
 
     def _engine_start_proxy_loopback_only(self):
-        """Start the headroom proxy bound to loopback only (no egress)."""
+        """
+        Start `headroom proxy --host 127.0.0.1 --port <p>` as a subprocess bound
+        to loopback, wait for readiness, and return (handle, port). The base-URL
+        the host is pointed at is http://127.0.0.1:<p> (ADR-0015 / TASK-006).
+        """
         raise NotImplementedError(
-            "wire headroom 0.27.0 proxy start (loopback-only) at integration"
+            "wire `headroom proxy` subprocess start (loopback, readiness probe) "
+            "in the TASK-010 live-integration environment"
         )
 
     def _engine_stop_proxy(self, proxy) -> None:
-        raise NotImplementedError("wire headroom 0.27.0 proxy stop at integration")
-
-    def _engine_endpoint_token(self, proxy) -> str:
-        """Return an opaque endpoint token for host wiring (never a raw port)."""
-        raise NotImplementedError("wire headroom 0.27.0 endpoint token at integration")
-
-    def _engine_compress(self, payload: bytes):
-        """
-        Return (compressed_bytes, [(segment_key, original_bytes), ...]) using
-        headroom. Apply scrub_credentials()/scrub_bytes() to any header material
-        before it is logged. Stored originals are sealed by store_original().
-        """
-        raise NotImplementedError("wire headroom 0.27.0 compress() at integration")
+        """Gracefully terminate the proxy subprocess started in activate()."""
+        raise NotImplementedError("wire `headroom proxy` graceful shutdown (TASK-010)")

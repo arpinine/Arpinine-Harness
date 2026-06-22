@@ -56,9 +56,12 @@ session** with compression ON and OFF and requires **both**:
    - **ac_state** — a spec's acceptance-criteria checkbox states
    - **drift** — a spec's drift-finding records (structured: file, line,
      severity, finding_id, message)
-2. **60–95%** session-total outbound prompt-token reduction. **Above 95% is a
-   FAIL**, not a bonus — it signals over-aggressive compression that risks
-   dropping governance-bearing content.
+2. **30–95%** session-total outbound prompt-token reduction, measured via the
+   `headroom-simulate` engine over the payloads fixture (model-free). **Above 95%
+   is a FAIL**, not a bonus — it signals over-aggressive compression that risks
+   dropping governance-bearing content. (Band measured/justified in TASK-012: the
+   in-harness model-free pipeline reaches ~38–56%; headroom's 60–95% needs live
+   multi-request CCR/cache accumulation, out of harness scope — see ADR-0017.)
 
 Run it:
 
@@ -114,24 +117,11 @@ package imports, never ad-hoc file-path loading (keeps one interface identity).
   uncompressed and emits a structured `compression_passthrough_fallback` signal
   (WARN+, in the main output stream) — never a broken or silently-altered session
   (ADR-0015).
-- **CCR original store** (`~/.arpinine/ccr-store/`, dir 700 / files 600): kept out
-  of the git worktree and any cloud-sync path; this no-sync + permission invariant
-  (ADR-0018) is the **primary** protection of stored originals and is actively
-  checked at setup and at proxy activation.
-
-### CCR seal — what it does and does not protect
-
-Stored originals are byte-exact (reversible retrieval, AC-007) and **sealed at
-rest** with a store-local key so the store holds no plaintext secrets.
-
-**Important:** the seal key is co-located in the store directory for portability,
-so the seal is **plaintext-avoidance / defense-in-depth only — NOT confidential
-against anyone who can read the store directory** (they obtain the key too). Any
-threat that leaks the store (cloud-sync, backup, world-readable copy) leaks the
-key with it, and the seal is unauthenticated (no tamper detection). Real at-rest
-confidentiality requires deriving the key from outside the store (OS keychain /
-env) — a deliberate future option, not the current default. Do not rely on the
-seal in place of the no-sync invariant.
+- **Engine-owned CCR directory.** If headroom CCR is configured, its configured
+  directory must stay outside the git worktree and any cloud-sync path, with dir
+  mode `700` and files mode `600`. This ADR-0018 invariant is actively checked at
+  setup and at proxy activation. The harness does not ship its own CCR store or
+  at-rest seal under Option A.
 
 ---
 

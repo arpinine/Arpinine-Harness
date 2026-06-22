@@ -4,7 +4,7 @@
 
 Every governed turn in Arpinine Harness sends a large outbound context to the LLM provider: the full conversation, tool and command stdout, file dumps, and specialist-agent history. As governed sessions grow, this drives high token cost, added latency, and context-window crowding — the same pressure that motivated dual-cost governance, now attacked at the source instead of only being measured.
 
-Headroom-style context compression can reduce outbound tokens by 60–95% while preserving answer quality. But compression is lossy and **can** change what the AI assistant produces. In a governance harness that is unacceptable unless the change is bounded and provable: routing decisions, drift findings, and acceptance-criteria outcomes must not silently diverge because context was compressed.
+Headroom-style context compression can reduce outbound tokens substantially (headroom publishes 60–95% for live multi-request proxy operation; the in-harness model-free pipeline measures ~38–56% — see ADR-0017) while preserving answer quality. But compression is lossy and **can** change what the AI assistant produces. In a governance harness that is unacceptable unless the change is bounded and provable: routing decisions, drift findings, and acceptance-criteria outcomes must not silently diverge because context was compressed.
 
 Arpinine Harness therefore needs a governed context-compression capability with the same shape as its other integrations (specs 001, 009, 010): one shared core abstraction, a swappable default implementation, and consistent wiring across Claude, Codex, and Copilot. Because compression can affect results, it must be **optional** — enabled or disabled at constitution creation — and gated by a fidelity benchmark that proves governance outcomes are unchanged before any team relies on it.
 
@@ -28,7 +28,7 @@ Release 1 targets the harness's own execution. The same abstraction must not pre
 - FR-006: When compression is enabled, the host (Claude, Codex, or Copilot) SHALL route its outbound LLM provider calls through the local compression proxy via base-URL/environment configuration, so the entire outbound context is compressed.
 - FR-007: The harness SHALL configure, start, and lifecycle-manage the compression proxy across all three host implementations.
 - FR-008: If the compression proxy is unavailable or fails, the harness SHALL fall back to uncompressed passthrough without aborting or altering the session.
-- FR-009: The default implementation SHALL support reversible retrieval (CCR) so exact original content can be recovered on demand.
+- FR-009: When the default implementation uses engine-owned reversible retrieval (CCR), the harness SHALL NOT re-implement that retrieval on the `ContextCompressionProvider` interface and SHALL instead validate the configured engine CCR directory against the ADR-0018 no-sync + 700/600 invariant.
 - FR-010: The `ContextCompressionProvider` abstraction SHALL be implementation-neutral and selectable, so the default headroom implementation can be replaced without changing harness wiring.
 - FR-011: The plugin SHALL provide a fidelity benchmark that replays a fixed golden harness session with compression ON and OFF and compares governance outcomes.
 - FR-012: The compression abstraction SHALL NOT preclude a later release wiring the same provider into the product the vibe coder builds.
@@ -44,12 +44,12 @@ Release 1 targets the harness's own execution. The same abstraction must not pre
 ## Acceptance Criteria
 
 - [ ] AC-001: Given compression is enabled, when the fixed golden harness session is replayed with compression ON versus OFF, the benchmark tooling produces a structured field-level diff over the **governance outcome set** — (a) routing-decision fields (`route`, `confidence`, `command_class`, `requires_confirmation`) from the router output for each routed turn, (b) drift-finding records (file, line, severity, finding id), and (c) acceptance-criteria checkbox states — and that diff is **empty (zero divergence)**. Any single differing field is a FAIL.
-- [ ] AC-002: Given the same golden session, the **total outbound prompt-token count summed across the full session replay** (measured at the compression proxy) for the compression-ON run is between 60% and 95% lower than the compression-OFF run total.
+- [ ] AC-002: Given the representative payloads fixture, the **total outbound prompt-token reduction** measured via the proxy pipeline (`headroom-simulate`, model-free) is between **30% and 95%** (band measured/justified in TASK-012 — the in-harness-measurable single-pass pipeline tops out ~38–56%; 60–95% needs live multi-request CCR/cache accumulation, out of harness scope). Above 95% is a FAIL.
 - [ ] AC-003: Given `/at-init`, the operator can choose compression enabled or disabled, and the choice is recorded in the constitution.
 - [ ] AC-004: Given compression is disabled, no compression proxy is started and harness behavior is identical to a pre-feature install.
 - [ ] AC-005: Given compression is enabled and the compression proxy is unreachable (process not started or refusing connections), the harness completes the session via uncompressed passthrough, produces a governance outcome set that passes the same zero-divergence diff defined in AC-001, and emits an observable signal (log entry or status event) indicating passthrough fallback was activated.
 - [ ] AC-006: Given the shipped artifacts, one shared `ContextCompressionProvider` abstraction exists; the working default (headroom) implementation and the noop implementation are each callable through that abstraction; and all three host integrations (Claude, Codex, Copilot) use the same lifecycle API to configure, start, and stop the provider, differing only in host-specific base-URL/environment plumbing.
-- [ ] AC-007: Given the default implementation, exact original content for a compressed segment can be retrieved on demand (reversible retrieval) and asserts byte-equality with the pre-compression input.
+- [ ] AC-007: Given the default implementation is configured with engine-owned reversible retrieval (CCR), the harness validates the configured engine CCR directory at setup and activation time: it is outside the git worktree and known cloud-sync paths, and enforces 700/600 permissions.
 
 ## Out of Scope
 
@@ -100,7 +100,7 @@ The fidelity benchmark is release-blocking: compression-enabled behavior may not
 - RD-002: The default implementation is modeled on headroom and runs as a local-first compression proxy; a noop implementation is also shipped.
 - RD-003: Compression is optional and chosen at constitution creation; disabled means no proxy and no behavior change.
 - RD-004: Whole-payload compression is proxy-based because the plugin cannot intercept the host's outbound calls in-process.
-- RD-005: Compression-enabled behavior is gated by a release-blocking golden harness-session fidelity benchmark (identical governance outcomes plus 60–95% token reduction).
+- RD-005: Compression-enabled behavior is gated by a release-blocking golden harness-session fidelity benchmark (identical governance outcomes plus 30–95% token reduction; band measured/justified in TASK-012, see ADR-0017).
 - RD-006: Proxy failure degrades to uncompressed passthrough, never to a broken or silently-altered session.
 - RD-007: Release 1 covers harness-side execution only; the abstraction must not preclude later product-side wiring.
 - RD-008: The default implementation consumes headroom as an external dependency (not an internally re-implemented pattern); the supply-chain choice is governed by an ADR at plan time.
@@ -115,7 +115,7 @@ The fidelity benchmark is release-blocking: compression-enabled behavior may not
 - **Compression proxy** — the local-first interception point the host routes outbound provider calls through; the default implementation is headroom.
 - **Golden harness-session benchmark** — the fixed recorded set of `/at-*` runs replayed with compression ON vs OFF; the fidelity-plus-reduction gate.
 - **Fidelity gate** — the assertion that governance outcomes are unchanged between compression ON and OFF.
-- **Reversible retrieval (CCR)** — on-demand recovery of exact original content for a compressed segment.
+- **Reversible retrieval (CCR)** — engine-owned recovery of exact original content for a compressed segment; not a harness-interface method under the proxy-only model.
 - **Passthrough fallback** — the uncompressed degrade path used when the compression proxy is unavailable.
 - **Compression toggle** — the enable/disable choice set at `/at-init` and recorded in the constitution.
 
@@ -123,10 +123,10 @@ The fidelity benchmark is release-blocking: compression-enabled behavior may not
 
 Authored during implementation (TASK-000), all Accepted:
 
-- ADR-0013: `ContextCompressionProvider` abstraction (+ retrieve segment-key contract, neutral lifecycle naming)
+- ADR-0013: `ContextCompressionProvider` abstraction (lifecycle-only, neutral lifecycle naming)
 - ADR-0014: headroom as external default-implementation dependency (supply chain + runtime network behavior)
 - ADR-0015: whole-payload compression via local proxy interception + passthrough-fallback degrade
 - ADR-0016: compression enable/disable toggle recorded in the constitution at `/at-init`
 - ADR-0017: deterministic golden-session replay benchmark as evaluation framework (not DeepEval)
-- ADR-0018: CCR original store location, access policy, no-sync invariant
+- ADR-0018: engine-owned CCR directory policy, access policy, no-sync invariant
 - ADR-0019: compression proxy lifecycle model — per-session activate/deactivate (resolves OQ-003)

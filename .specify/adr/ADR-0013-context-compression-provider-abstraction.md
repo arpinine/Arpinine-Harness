@@ -24,13 +24,22 @@ The interface is also the load-bearing surface for two subtle requirements: reve
 
 Define a single `ContextCompressionProvider` interface as the sole harness-facing surface for governed context compression, with `compress`, `retrieve`, `activate`, and `deactivate` operations.
 
+**Amended (Option A, proxy-only).** Live integration against `headroom-ai==0.27.0`
+showed compression in the chosen model (ADR-0015) happens **transparently inside
+the proxy at the HTTP layer** — the host points its provider base-URL at a local
+`headroom proxy` and the harness never calls a per-payload `compress()`/`retrieve()`
+in-process (it cannot — that was the reason for proxy mode). headroom's library
+`compress(messages)` exists but is library-mode, not the transport path. Therefore
+the harness-facing interface is **lifecycle-only**; per-payload compression and
+reversible retrieval (CCR) are owned by headroom, not re-implemented in the harness.
+
 Constraints that make the abstraction durable:
 
 1. The interface has zero dependencies. It MUST NOT reference headroom, any proxy/port concept, any host API, or the constitution.
-2. Lifecycle method names are vendor/transport-neutral (`activate`/`deactivate`, not `start_proxy`), so the noop implementation satisfies them as no-ops without inheriting a proxy metaphor.
-3. The lifecycle API exposes only an opaque endpoint token (or a configure-host callback) to host integrations — never the proxy's raw local port or address — so the three host wirings cannot couple to network coordinates.
-4. `retrieve()` is governed by an explicit segment-key scheme so reversible retrieval can assert byte-equality stably across provider versions.
-5. Compressed output of governed artifacts MUST preserve the same DATA delimiter/role boundary as uncompressed artifacts (the data boundary must survive compression).
+2. The interface is lifecycle-only: `activate() -> CompressionEndpoint` and `deactivate()`. Names are vendor/transport-neutral so the noop implementation satisfies them as no-ops.
+3. `activate()` returns only an **opaque endpoint token** to host integrations — never the proxy's raw port/address — so host wirings cannot couple to network coordinates.
+4. Per-payload `compress()`/`retrieve()` are NOT on the harness interface. Compression is transparent in the proxy; reversible retrieval (CCR) is owned by the headroom engine. (Superseded the earlier compress/retrieve + segment-key design.)
+5. The data boundary (governed artifacts stay DATA) is preserved by the proxy transform and asserted by the fidelity benchmark; it is not a per-call harness responsibility.
 
 The default (headroom) and noop implementations are both selected through this interface.
 
@@ -39,7 +48,8 @@ The default (headroom) and noop implementations are both selected through this i
 - Positive: Host integrations and the fidelity benchmark depend only on the interface; the compression engine is swappable without touching them.
 - Positive: The noop path is a first-class implementation, making "compression disabled" a clean substitution rather than scattered conditionals.
 - Positive: The opaque-endpoint rule prevents latent coupling between the three host wirings and the proxy's network details.
-- Negative: Getting the lifecycle and segment-key contract wrong is expensive to reverse once all three hosts are wired against it, so the interface must be settled before host wiring (TASK-006) begins.
+- Negative: Getting the lifecycle contract wrong is expensive to reverse once all three hosts are wired against it, so the interface must be settled before host wiring (TASK-006) begins.
+- Positive (Option A): a lifecycle-only interface shrinks the harness's security surface — no harness-side payload handling or CCR storage to get wrong; headroom owns compression and CCR.
 
 ## Alternatives Considered
 

@@ -43,15 +43,10 @@ class TestNoopContextCompressionProvider(unittest.TestCase):
             self.provider, self.iface.ContextCompressionProvider
         )
 
-    def test_compress_is_byte_identical_passthrough(self) -> None:
-        payload = b'{"role":"user","content":"hello"}'
-        result = self.provider.compress(payload)
-        self.assertEqual(result.payload, payload)
-        self.assertEqual(result.original_bytes, len(payload))
-
-    def test_compress_yields_no_segments(self) -> None:
-        result = self.provider.compress(b"anything")
-        self.assertEqual(result.segment_keys, [])
+    def test_is_lifecycle_only_no_compress_or_retrieve(self) -> None:
+        # Option A: noop is lifecycle-only.
+        self.assertFalse(hasattr(self.provider, "compress"))
+        self.assertFalse(hasattr(self.provider, "retrieve"))
 
     def test_activate_returns_opaque_endpoint_without_starting_anything(self) -> None:
         endpoint = self.provider.activate()
@@ -64,10 +59,6 @@ class TestNoopContextCompressionProvider(unittest.TestCase):
     def test_deactivate_is_idempotent(self) -> None:
         self.assertIsNone(self.provider.deactivate())
         self.assertIsNone(self.provider.deactivate())
-
-    def test_retrieve_raises_keyerror_since_nothing_is_stored(self) -> None:
-        with self.assertRaises(KeyError):
-            self.provider.retrieve("any-key")
 
     def test_starts_no_subprocess_and_opens_no_socket(self) -> None:
         """ADR-0016: disabled path must impose zero overhead — no proxy/socket."""
@@ -90,7 +81,6 @@ class TestNoopContextCompressionProvider(unittest.TestCase):
         socket.socket = _spy_socket  # type: ignore[assignment]
         try:
             ep = self.provider.activate()
-            self.provider.compress(b"payload")
             self.provider.deactivate()
             _ = ep
         finally:

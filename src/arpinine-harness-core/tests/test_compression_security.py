@@ -3,8 +3,8 @@ Tests for the compression-security helper template — the headroom-free,
 security-critical logic the headroom provider depends on.
 
 Governs: specs/011-context-compression-governance (TASK-002)
-ADRs: ADR-0014 (credential scrubbing before any log/store), ADR-0018 (CCR store
-      700/600, byte-equal reversible retrieval).
+ADRs: ADR-0014 (credential scrubbing before any log path), ADR-0018 (engine-owned
+      CCR directory policy; harness store retired under Option A).
 
 These helpers contain NO headroom import so they are unit-testable without the
 SDK installed and are reused by both the headroom provider and the check script.
@@ -94,49 +94,15 @@ class TestScrubBytes(unittest.TestCase):
         self.assertIsInstance(self.m.scrub_bytes(b"Authorization: x"), bytes)
 
 
-class TestCcrStore(unittest.TestCase):
+class TestCcrRetired(unittest.TestCase):
+    """Option A: the harness no longer ships a CCR store — headroom owns it."""
+
     def setUp(self) -> None:
         self.m = _load()
-        self._tmp = tempfile.TemporaryDirectory()
-        self.store = pathlib.Path(self._tmp.name) / "ccr-store"
 
-    def tearDown(self) -> None:
-        self._tmp.cleanup()
-
-    def test_ensure_store_creates_dir_mode_700(self) -> None:
-        path = self.m.ensure_ccr_store(self.store)
-        self.assertTrue(path.is_dir())
-        self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o700)
-
-    def test_store_original_writes_mode_600(self) -> None:
-        self.m.ensure_ccr_store(self.store)
-        p = self.m.store_original(self.store, "seg-1", b"governed original")
-        self.assertEqual(stat.S_IMODE(p.stat().st_mode), 0o600)
-
-    def test_store_original_does_not_persist_plain_secret_bytes(self) -> None:
-        self.m.ensure_ccr_store(self.store)
-        secret = b"Authorization: Bearer sk-SECRET\r\n"
-        p = self.m.store_original(self.store, "seg-secret", secret)
-        raw = p.read_bytes()
-        self.assertNotIn(b"sk-SECRET", raw)
-        self.assertNotIn(secret, raw)
-
-    def test_retrieve_is_byte_equal(self) -> None:
-        self.m.ensure_ccr_store(self.store)
-        data = b'{"role":"user","content":"\x00\x01 binary-ish"}'
-        self.m.store_original(self.store, "seg-xyz", data)
-        self.assertEqual(self.m.read_original(self.store, "seg-xyz"), data)
-
-    def test_retrieve_secret_bearing_content_is_byte_equal(self) -> None:
-        self.m.ensure_ccr_store(self.store)
-        data = b"Authorization: Bearer sk-SECRET\r\nCookie: session=abc\r\n"
-        self.m.store_original(self.store, "seg-secret", data)
-        self.assertEqual(self.m.read_original(self.store, "seg-secret"), data)
-
-    def test_retrieve_unknown_key_raises_keyerror(self) -> None:
-        self.m.ensure_ccr_store(self.store)
-        with self.assertRaises(KeyError):
-            self.m.read_original(self.store, "missing")
+    def test_store_helpers_are_gone(self) -> None:
+        for removed in ("store_original", "read_original", "ensure_ccr_store"):
+            self.assertFalse(hasattr(self.m, removed), f"{removed} should be retired")
 
 
 if __name__ == "__main__":

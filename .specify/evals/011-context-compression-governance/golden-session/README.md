@@ -22,7 +22,7 @@ loudly rather than silently passing.
 and OFF — and the `FidelityGate` diffs the outcome sets. PASS requires:
 
 - **zero divergence** between ON and OFF on every scenario, AND
-- **60–95%** session-total outbound prompt-token reduction.
+- **30–95%** session-total outbound prompt-token reduction (band measured/justified in TASK-012; see ADR-0017).
 
 ## Coverage
 

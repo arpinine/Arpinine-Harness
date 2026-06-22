@@ -31,7 +31,7 @@ from __future__ import annotations
 # Dev/template-tree only: templates/ is not an importable package and the
 # interface file has hyphens, so we load it by path here. The scaffolder
 # replaces this whole block with:
-#     from .context_compression_provider import CompressionEndpoint, CompressionResult
+#     from .context_compression_provider import CompressionEndpoint
 import importlib.util
 import pathlib
 
@@ -62,14 +62,14 @@ def _load_interface():
 
 _iface = _load_interface()
 CompressionEndpoint = _iface.CompressionEndpoint
-CompressionResult = _iface.CompressionResult
 # === arpinine:scaffold-replace-end ===
 
 
 class NoopContextCompressionProvider:
     """
-    Passthrough provider. Implements ContextCompressionProvider structurally
-    (the interface is a runtime_checkable Protocol, so no inheritance needed).
+    Lifecycle-only passthrough provider (ADR-0013, Option A). Implements
+    ContextCompressionProvider structurally (the interface is a runtime_checkable
+    Protocol, so no inheritance needed). Starts no process and opens no socket.
     """
 
     def activate(self) -> CompressionEndpoint:
@@ -79,13 +79,3 @@ class NoopContextCompressionProvider:
     def deactivate(self) -> None:
         # Nothing was started; idempotent no-op.
         return None
-
-    def compress(self, payload: bytes) -> CompressionResult:
-        # Byte-for-byte passthrough; no segments stored.
-        return CompressionResult(
-            payload=payload, segment_keys=[], original_bytes=len(payload)
-        )
-
-    def retrieve(self, segment_key: str) -> bytes:
-        # Nothing is ever stored, so no key can be resolved.
-        raise KeyError(segment_key)

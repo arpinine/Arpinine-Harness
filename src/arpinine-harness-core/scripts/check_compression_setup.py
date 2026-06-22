@@ -5,8 +5,9 @@ compression. Gated by the constitution toggle: when compression is disabled
 there is nothing to enforce.
 
 Checks (HIGH findings block; ADR-0014 / ADR-0016 / ADR-0018):
-  - CCR store path safety: not inside the git worktree, not under a cloud-sync
-    prefix; directory permissions 700.
+  - Configured headroom CCR directory safety: not inside the git worktree, not
+    under a cloud-sync prefix; directory permissions 700 and stored-original
+    files permissions 600.
   - headroom import boundary: `headroom`/`headroom_ai` imports only in the
     designated default-provider module.
   - headroom pin: installed version+hash match the pinned values.
@@ -74,13 +75,13 @@ def check_ccr_store_path(
     repo_root: pathlib.Path,
     home: pathlib.Path,
 ) -> dict | None:
-    """ADR-0018: CCR store must not be in the worktree or a cloud-sync path."""
+    """ADR-0018: configured engine CCR directory must not be in the worktree or a cloud-sync path."""
     store = pathlib.Path(store)
     if _is_relative_to(store, pathlib.Path(repo_root)):
         return _finding(
             "HIGH",
             "ccr-store-in-worktree",
-            f"CCR store {store} is inside the git worktree; governed originals could be committed.",
+            f"Configured engine CCR directory {store} is inside the git worktree; governed originals could be committed.",
             path=str(store),
         )
     for rel in CLOUD_SYNC_RELATIVE_PREFIXES:
@@ -88,7 +89,7 @@ def check_ccr_store_path(
             return _finding(
                 "HIGH",
                 "ccr-store-cloud-synced",
-                f"CCR store {store} is under a cloud-sync path ({rel}); governed content could leave the machine.",
+                f"Configured engine CCR directory {store} is under a cloud-sync path ({rel}); governed content could leave the machine.",
                 path=str(store),
             )
     return None
@@ -96,7 +97,7 @@ def check_ccr_store_path(
 
 def check_store_permissions(store: pathlib.Path) -> dict | None:
     """
-    ADR-0018: store directory must be 700 and every stored-original file 600
+    ADR-0018: configured engine CCR directory must be 700 and every stored-original file 600
     (no group/other access). A world/group-readable file inside a 700 dir is
     exactly the leak this control must catch, so files are walked too.
     """
@@ -108,7 +109,7 @@ def check_store_permissions(store: pathlib.Path) -> dict | None:
         return _finding(
             "HIGH",
             "ccr-store-permissions",
-            f"CCR store {store} has mode {oct(dir_mode)}; require 700 (no group/other access).",
+            f"Configured engine CCR directory {store} has mode {oct(dir_mode)}; require 700 (no group/other access).",
             path=str(store),
             mode=oct(dir_mode),
         )
@@ -119,7 +120,7 @@ def check_store_permissions(store: pathlib.Path) -> dict | None:
                 return _finding(
                     "HIGH",
                     "ccr-store-permissions",
-                    f"CCR store subdirectory {child} has mode {oct(child_mode)}; require 700.",
+                    f"Configured engine CCR subdirectory {child} has mode {oct(child_mode)}; require 700.",
                     path=str(child),
                     mode=oct(child_mode),
                 )
@@ -127,7 +128,7 @@ def check_store_permissions(store: pathlib.Path) -> dict | None:
             return _finding(
                 "HIGH",
                 "ccr-store-file-permissions",
-                f"CCR original {child} has mode {oct(child_mode)}; require 600 (no group/other access).",
+                f"Configured engine CCR original {child} has mode {oct(child_mode)}; require 600 (no group/other access).",
                 path=str(child),
                 mode=oct(child_mode),
             )
@@ -192,7 +193,7 @@ def check_no_full_payload_logging(logging_config: dict) -> dict | None:
     return None
 
 
-DEFAULT_CCR_STORE = pathlib.Path.home() / ".arpinine" / "ccr-store"
+DEFAULT_HEADROOM_CCR_DIR = pathlib.Path.home() / ".arpinine" / "ccr-store"
 DEFAULT_PINNED_VERSION = "0.27.0"
 DEFAULT_PINNED_HASH = "<pinned-sha256>"
 
@@ -210,12 +211,14 @@ def run_checks(
     Toggle-gated aggregate that actually invokes every enforced check.
 
     When compression is disabled, returns ok with no findings. When enabled,
-    runs: CCR store path safety + permissions, headroom import-boundary scan,
+    runs: configured engine CCR directory safety + permissions, headroom
+    import-boundary scan,
     full-payload logging, and headroom pin.
 
     Inputs default to ADR-0018 conventions so the security controls run even
     before the headroom provider config lands:
-      - store_path defaults to ~/.arpinine/ccr-store
+      - store_path defaults to the expected configured headroom CCR directory
+        (~/.arpinine/ccr-store) when no explicit engine config is supplied
       - provider_root defaults to <repo>/compression (scanned only if present)
       - logging_config defaults to {} (clean)
       - headroom: {version, hash, pinned_version, pinned_hash}; None => not
@@ -227,7 +230,10 @@ def run_checks(
         return {"status": "ok", "compression_enabled": False, "findings": []}
 
     home = pathlib.Path(home) if home else pathlib.Path.home()
-    store = pathlib.Path(store_path) if store_path else DEFAULT_CCR_STORE
+    configured_ccr_dir = None
+    if headroom is not None:
+        configured_ccr_dir = headroom.get("ccr_dir")
+    store = pathlib.Path(store_path or configured_ccr_dir) if (store_path or configured_ccr_dir) else DEFAULT_HEADROOM_CCR_DIR
     proot = pathlib.Path(provider_root) if provider_root else (repo / "context_compression")
 
     findings: list[dict] = []

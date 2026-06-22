@@ -24,7 +24,7 @@ Implement whole-payload compression by pointing each host's LLM provider base-UR
 
 Coupled into this single decision (not split out):
 
-1. Host wirings receive only an opaque endpoint token, never the raw proxy port/address.
+1. Host wirings receive an opaque endpoint token plus a provider-supplied, ready-to-use `base_url`. They set `base_url` **verbatim** (e.g. `ANTHROPIC_BASE_URL`) and MUST NOT parse or derive a port/host from it or construct network coordinates themselves; `base_url is None` means no override (disabled/noop → host talks direct). The endpoint exposes no separate port/host field.
 2. Proxy-unreachable (process not started or refusing connections) degrades to uncompressed passthrough — the session always completes.
 3. The passthrough path emits a structured signal `compression_passthrough_fallback` at WARN or above, with mandatory fields `timestamp`, `reason`, `session_id`, surfaced in the harness's main output stream.
 4. The passthrough run's governance outcomes must still pass the `FidelityGate` zero-divergence diff (it is identical to compression-OFF by construction).

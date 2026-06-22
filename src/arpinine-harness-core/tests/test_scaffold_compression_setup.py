@@ -87,24 +87,44 @@ class TestScaffoldCompressionSetup(unittest.TestCase):
         self.m.scaffold(self.target)
         noop_src = (self.target / "context_compression" / "noop_provider.py").read_text()
         self.assertIn(
-            "from .context_compression_provider import CompressionEndpoint, CompressionResult",
+            "from .context_compression_provider import CompressionEndpoint",
             noop_src,
         )
         self.assertNotIn("scaffold-replace-start", noop_src)
         self.assertNotIn("spec_from_file_location", noop_src)
 
-    def test_scaffolds_security_and_headroom_provider(self) -> None:
+    def test_scaffolds_security_headroom_and_host_wiring(self) -> None:
         self.m.scaffold(self.target)
         comp = self.target / "context_compression"
         self.assertTrue((comp / "security.py").exists())
         self.assertTrue((comp / "headroom_provider.py").exists())
+        self.assertTrue((comp / "host_wiring.py").exists())
+
+    def test_package_exposes_host_wiring(self) -> None:
+        self.m.scaffold(self.target)
+        pkg = self._import_package()
+        self.assertTrue(hasattr(pkg, "compression_session"))
+        self.assertTrue(hasattr(pkg, "host_env"))
+        # disabled endpoint -> no override
+        ep = pkg.CompressionEndpoint(token="noop")
+        self.assertEqual(pkg.host_env(ep, "claude"), {})
+
+    def test_scaffolded_host_wiring_uses_package_import_not_path_loader(self) -> None:
+        self.m.scaffold(self.target)
+        wiring_src = (self.target / "context_compression" / "host_wiring.py").read_text()
+        self.assertIn(
+            "from .context_compression_provider import CompressionError",
+            wiring_src,
+        )
+        self.assertNotIn("host-wiring-replace-start", wiring_src)
+        self.assertNotIn("spec_from_file_location", wiring_src)
 
     def test_headroom_import_confined_to_headroom_provider(self) -> None:
         """ADR-0014: only headroom_provider.py may IMPORT headroom (per the real checker)."""
         self.m.scaffold(self.target)
         comp = self.target / "context_compression"
         # headroom_provider.py has the import statement.
-        self.assertIn("import headroom_ai", (comp / "headroom_provider.py").read_text())
+        self.assertIn("import headroom", (comp / "headroom_provider.py").read_text())
         # Run the enforced boundary check: zero violations when the allowed
         # module is headroom_provider.py.
         checker = _load_checker()
@@ -149,7 +169,6 @@ class TestScaffoldCompressionSetup(unittest.TestCase):
         self.assertIs(noop.CompressionEndpoint, iface.CompressionEndpoint)
         provider = noop.NoopContextCompressionProvider()
         self.assertIsInstance(provider.activate(), iface.CompressionEndpoint)
-        self.assertIsInstance(provider.compress(b"x"), iface.CompressionResult)
 
     def test_package_import_noop_first_shares_identity(self) -> None:
         self.m.scaffold(self.target)

@@ -3,7 +3,8 @@ Tests for check_compression_setup.py — enforced compression security controls.
 
 Governs: specs/011-context-compression-governance (TASK-005)
 ADRs: ADR-0014 (headroom pin+hash, import confinement), ADR-0016 (toggle-gated:
-      disabled => nothing to check), ADR-0018 (CCR store path safety + 700/600).
+      disabled => nothing to check), ADR-0018 (configured engine CCR dir path
+      safety + 700/600).
 
 Checks are pure functions so they can be unit-tested without an installed
 headroom or a live proxy. The top-level run is gated by the constitution toggle.
@@ -118,13 +119,13 @@ class TestHeadroomImportBoundary(unittest.TestCase):
         self._tmp.cleanup()
 
     def test_import_only_in_allowed_module_passes(self) -> None:
-        self.allowed.write_text("import headroom_ai\n")
+        self.allowed.write_text("import headroom\n")
         findings = self.m.check_headroom_import_boundary(self.root, self.allowed)
         self.assertEqual(findings, [])
 
     def test_import_outside_allowed_module_is_high(self) -> None:
-        self.allowed.write_text("import headroom_ai\n")
-        (self.root / "rogue.py").write_text("from headroom_ai import compress\n")
+        self.allowed.write_text("import headroom\n")
+        (self.root / "rogue.py").write_text("from headroom import proxy\n")
         findings = self.m.check_headroom_import_boundary(self.root, self.allowed)
         self.assertEqual(len(findings), 1)
         self.assertEqual(findings[0]["severity"], "HIGH")
@@ -209,7 +210,7 @@ class TestToggleGate(unittest.TestCase):
         cc.set_compression_enabled(self.repo, True)
 
     def test_enabled_runs_real_ccr_path_check(self) -> None:
-        """run_checks must actually invoke the CCR-path helper, not just a stub."""
+        """run_checks must actually invoke the configured-engine-CCR-path helper."""
         self._enable()
         unsafe = self.repo / ".specify" / "ccr"  # inside the worktree
         report = self.m.run_checks(
@@ -223,13 +224,12 @@ class TestToggleGate(unittest.TestCase):
         self._enable()
         provider_root = self.repo / "compression"
         provider_root.mkdir()
-        (provider_root / "headroom_provider.py").write_text("import headroom_ai\n")
-        (provider_root / "rogue.py").write_text("from headroom_ai import compress\n")
+        (provider_root / "headroom_provider.py").write_text("import headroom\n")
+        (provider_root / "rogue.py").write_text("from headroom import proxy\n")
         report = self.m.run_checks(
             self.repo,
-            store_path=pathlib.Path.home() / ".arpinine" / "ccr-store",
             provider_root=provider_root,
-            headroom={"version": "0.27.0", "hash": "x", "pinned_version": "0.27.0", "pinned_hash": "x"},
+            headroom={"version": "0.27.0", "hash": "x", "pinned_version": "0.27.0", "pinned_hash": "x", "ccr_dir": str(pathlib.Path.home() / ".arpinine" / "ccr-store")},
         )
         codes = {f["code"] for f in report["findings"]}
         self.assertIn("headroom-import-boundary", codes)
@@ -238,9 +238,8 @@ class TestToggleGate(unittest.TestCase):
         self._enable()
         report = self.m.run_checks(
             self.repo,
-            store_path=pathlib.Path.home() / ".arpinine" / "ccr-store",
             logging_config={"log_full_payload": True},
-            headroom={"version": "0.27.0", "hash": "x", "pinned_version": "0.27.0", "pinned_hash": "x"},
+            headroom={"version": "0.27.0", "hash": "x", "pinned_version": "0.27.0", "pinned_hash": "x", "ccr_dir": str(pathlib.Path.home() / ".arpinine" / "ccr-store")},
         )
         codes = {f["code"] for f in report["findings"]}
         self.assertIn("full-payload-logging", codes)
@@ -249,12 +248,27 @@ class TestToggleGate(unittest.TestCase):
         self._enable()
         report = self.m.run_checks(
             self.repo,
-            store_path=pathlib.Path.home() / ".arpinine" / "ccr-store",
             logging_config={"log_level": "WARN"},
-            headroom={"version": "0.27.0", "hash": "x", "pinned_version": "0.27.0", "pinned_hash": "x"},
+            headroom={"version": "0.27.0", "hash": "x", "pinned_version": "0.27.0", "pinned_hash": "x", "ccr_dir": str(pathlib.Path.home() / ".arpinine" / "ccr-store")},
         )
         self.assertEqual(report["findings"], [])
         self.assertEqual(report["status"], "ok")
+
+    def test_enabled_uses_configured_headroom_ccr_dir_when_store_path_omitted(self) -> None:
+        self._enable()
+        unsafe = self.repo / ".specify" / "ccr"
+        report = self.m.run_checks(
+            self.repo,
+            headroom={
+                "version": "0.27.0",
+                "hash": "x",
+                "pinned_version": "0.27.0",
+                "pinned_hash": "x",
+                "ccr_dir": str(unsafe),
+            },
+        )
+        codes = {f["code"] for f in report["findings"]}
+        self.assertIn("ccr-store-in-worktree", codes)
 
 
 if __name__ == "__main__":

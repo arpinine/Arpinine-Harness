@@ -27,6 +27,7 @@ _TEMPLATES_DIR = pathlib.Path(__file__).resolve().parents[1] / "templates"
 _PROVIDERS = (
     ("context-compression-provider-template.py", "context_compression_provider.py", True),
     ("compression-security-template.py", "security.py", True),
+    ("host-wiring-template.py", "host_wiring.py", True),
     ("noop-context-compression-provider-template.py", "noop_provider.py", True),
     # headroom default provider imports the headroom SDK at module top, so it is
     # NOT imported by __init__ (kept lazy); the disabled/noop path stays import-safe
@@ -42,7 +43,14 @@ _SCAFFOLD_REPLACE_RE = re.compile(
     re.DOTALL,
 )
 _PACKAGE_IMPORT = (
-    "from .context_compression_provider import CompressionEndpoint, CompressionResult"
+    "from .context_compression_provider import CompressionEndpoint"
+)
+_HOST_WIRING_REPLACE_RE = re.compile(
+    r"# === arpinine:host-wiring-replace-start.*?# === arpinine:host-wiring-replace-end ===",
+    re.DOTALL,
+)
+_HOST_WIRING_PACKAGE_IMPORT = (
+    "from .context_compression_provider import CompressionError"
 )
 
 _INIT_CONTENTS = (
@@ -56,16 +64,26 @@ _INIT_CONTENTS = (
     "from .context_compression_provider import (\n"
     "    CompressionEndpoint,\n"
     "    CompressionError,\n"
-    "    CompressionResult,\n"
     "    ContextCompressionProvider,\n"
     ")\n"
-    "from .noop_provider import NoopContextCompressionProvider\n\n"
+    "from .noop_provider import NoopContextCompressionProvider\n"
+    "from .host_wiring import (\n"
+    "    PASSTHROUGH_FALLBACK_EVENT,\n"
+    "    compression_session,\n"
+    "    emit_passthrough_fallback,\n"
+    "    host_env,\n"
+    "    supported_hosts,\n"
+    ")\n\n"
     '__all__ = [\n'
     '    "CompressionEndpoint",\n'
     '    "CompressionError",\n'
-    '    "CompressionResult",\n'
     '    "ContextCompressionProvider",\n'
     '    "NoopContextCompressionProvider",\n'
+    '    "PASSTHROUGH_FALLBACK_EVENT",\n'
+    '    "compression_session",\n'
+    '    "emit_passthrough_fallback",\n'
+    '    "host_env",\n'
+    '    "supported_hosts",\n'
     "]\n"
 )
 
@@ -74,6 +92,8 @@ def _render_dest(template_name: str, src_text: str) -> str:
     """Transform template text into its scaffolded form."""
     if template_name == "noop-context-compression-provider-template.py":
         return _SCAFFOLD_REPLACE_RE.sub(_PACKAGE_IMPORT, src_text)
+    if template_name == "host-wiring-template.py":
+        return _HOST_WIRING_REPLACE_RE.sub(_HOST_WIRING_PACKAGE_IMPORT, src_text)
     return src_text
 
 
