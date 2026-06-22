@@ -1,5 +1,5 @@
 {
-  "slug": "001-plugin-abstraction",
+  "slug": "010-dual-cost-governance",
   "tasks": {
     "TASK-001": {
       "assigned_team": null
@@ -26,6 +26,9 @@
       "assigned_team": null
     },
     "TASK-009": {
+      "assigned_team": null
+    },
+    "TASK-010": {
       "assigned_team": null
     }
   },

@@ -14,3 +14,10 @@
 | ADR-0010 | Machine-readable AIN fields in spec.md as the gating source of truth | Accepted | specs/004-ain-readiness-gates | decision:004-ain-readiness-gates:machine-readable-ain-source-of-truth |
 | ADR-0011 | Shared JSON violation contract as the output format for rule execution | Accepted | specs/005-deterministic-rule-engine | decision:005-deterministic-rule-engine:shared-json-violation-contract |
 | ADR-0012 | Semantic drift detection as opt-in LLM-judge at audit time | Accepted | specs/002-arpinine-harness-core-workflow | decision:002-arpinine-harness-core-workflow:semantic-drift-detection-mechanism |
+| ADR-0013 | One shared ContextCompressionProvider abstraction with swappable implementations | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:provider-abstraction |
+| ADR-0014 | Consume headroom as the external default compression dependency | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:headroom-dependency |
+| ADR-0015 | Whole-payload compression via local proxy interception with passthrough fallback | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:proxy-interception |
+| ADR-0016 | Record the compression enable/disable toggle in the constitution at /at-init | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:constitution-toggle |
+| ADR-0017 | Deterministic golden-session replay benchmark as the evaluation framework | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:eval-framework |
+| ADR-0018 | CCR original store location, access policy, and no-sync invariant | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:ccr-store-location |
+| ADR-0019 | Compression proxy lifecycle — per-session activate/deactivate | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:proxy-lifecycle-model |

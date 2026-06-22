@@ -1,0 +1,123 @@
+{
+  "slug": "011-context-compression-governance",
+  "tasks": {
+    "TASK-000": {
+      "assigned_team": "claude",
+      "claimed_at": "2026-06-22T14:38:48Z",
+      "claimed_by": "claude:claude-main",
+      "completed_at": "2026-06-22T14:42:09Z",
+      "completed_by": "claude:claude-main",
+      "instance_id": "claude-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-000",
+      "team_id": "claude"
+    },
+    "TASK-001": {
+      "assigned_team": "claude",
+      "claimed_at": "2026-06-22T14:43:53Z",
+      "claimed_by": "claude:claude-main",
+      "completed_at": "2026-06-22T14:46:03Z",
+      "completed_by": "claude:claude-main",
+      "instance_id": "claude-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-001",
+      "team_id": "claude"
+    },
+    "TASK-002": {
+      "assigned_team": "claude",
+      "claimed_at": "2026-06-22T15:49:00Z",
+      "claimed_by": "claude:claude-main",
+      "completed_at": "2026-06-22T15:51:54Z",
+      "completed_by": "claude:claude-main",
+      "instance_id": "claude-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-002",
+      "team_id": "claude"
+    },
+    "TASK-003": {
+      "assigned_team": "claude",
+      "claimed_at": "2026-06-22T14:47:41Z",
+      "claimed_by": "claude:claude-main",
+      "completed_at": "2026-06-22T14:49:14Z",
+      "completed_by": "claude:claude-main",
+      "instance_id": "claude-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-003",
+      "team_id": "claude"
+    },
+    "TASK-004": {
+      "assigned_team": "claude",
+      "claimed_at": "2026-06-22T14:50:25Z",
+      "claimed_by": "claude:claude-main",
+      "completed_at": "2026-06-22T14:53:00Z",
+      "completed_by": "claude:claude-main",
+      "instance_id": "claude-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-004",
+      "team_id": "claude"
+    },
+    "TASK-005": {
+      "assigned_team": "claude",
+      "claimed_at": "2026-06-22T15:23:39Z",
+      "claimed_by": "claude:claude-main",
+      "completed_at": "2026-06-22T15:25:30Z",
+      "completed_by": "claude:claude-main",
+      "instance_id": "claude-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-005",
+      "team_id": "claude"
+    },
+    "TASK-006": {
+      "assigned_team": "codex"
+    },
+    "TASK-007": {
+      "assigned_team": "codex"
+    },
+    "TASK-008": {
+      "assigned_team": "claude",
+      "claimed_at": "2026-06-22T15:57:56Z",
+      "claimed_by": "claude:claude-main",
+      "completed_at": "2026-06-22T16:00:04Z",
+      "completed_by": "claude:claude-main",
+      "instance_id": "claude-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-008",
+      "team_id": "claude"
+    },
+    "TASK-009": {
+      "assigned_team": "claude",
+      "claimed_at": "2026-06-22T15:56:06Z",
+      "claimed_by": "claude:claude-main",
+      "completed_at": "2026-06-22T16:00:04Z",
+      "completed_by": "claude:claude-main",
+      "instance_id": "claude-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-009",
+      "team_id": "claude"
+    },
+    "TASK-010": {
+      "assigned_team": "codex"
+    },
+    "TASK-011": {
+      "assigned_team": "copilot",
+      "claimed_at": "2026-06-22T16:17:05Z",
+      "claimed_by": "copilot:copilot-main",
+      "completed_at": "2026-06-22T16:18:40Z",
+      "completed_by": "copilot:copilot-main",
+      "instance_id": "copilot-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-011",
+      "team_id": "copilot"
+    }
+  },
+  "updated_at": "2026-06-22T16:18:40Z"
+}

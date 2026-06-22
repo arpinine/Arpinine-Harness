@@ -1,0 +1,36 @@
+{
+  "slug": "012-context-rot-minimization-governance",
+  "tasks": {
+    "TASK-000": {
+      "assigned_team": "claude"
+    },
+    "TASK-001": {
+      "assigned_team": "claude"
+    },
+    "TASK-002": {
+      "assigned_team": "codex"
+    },
+    "TASK-003": {
+      "assigned_team": "codex"
+    },
+    "TASK-004": {
+      "assigned_team": "codex"
+    },
+    "TASK-005": {
+      "assigned_team": "codex"
+    },
+    "TASK-006": {
+      "assigned_team": "codex"
+    },
+    "TASK-007": {
+      "assigned_team": "copilot"
+    },
+    "TASK-008": {
+      "assigned_team": "codex"
+    },
+    "TASK-009": {
+      "assigned_team": "copilot"
+    }
+  },
+  "updated_at": "2026-06-22T16:18:34Z"
+}
