@@ -22,14 +22,16 @@ Lifecycle is per-session (ADR-0019): one proxy per governed session, no state
 persisted across sessions.
 
 ============================ INTEGRATION NOTE ============================
-The proxy is started via the `headroom proxy` CLI as a subprocess (verified
-against headroom 0.27.0: `headroom proxy --host 127.0.0.1 --port <p>`; host wiring
-is `ANTHROPIC_BASE_URL=http://127.0.0.1:<p>`). Port selection, readiness probing,
-and graceful shutdown are wired in the `_engine_*` seams. This file is a scaffold
-template and is intentionally NOT import-tested in the harness (headroom is a
-product dependency, not a harness dev dependency), mirroring the deepeval /
-opentelemetry provider templates. The seams are exercised by the live integration
-tests (TASK-010) in an environment where `headroom-ai[proxy]` is installed.
+The proxy is started via the `headroom proxy` CLI as a subprocess (against
+headroom 0.27.0: `headroom proxy --host 127.0.0.1 --port <p>`; host wiring is
+`ANTHROPIC_BASE_URL=http://127.0.0.1:<p>`). The `_engine_*` seams implement
+ephemeral loopback port selection, TCP readiness probing (with early-exit
+detection + timeout), and graceful terminate→kill shutdown. They are unit-tested
+in the harness via subprocess/socket mocks + a fake `headroom` module (the
+deepeval/opentelemetry templates stay import-only; this one is exercised because
+the transport logic is non-trivial). A LIVE run — proxy actually serving traffic —
+still requires `headroom-ai[proxy]` installed in the target runtime and is not
+executed in the harness CI.
 =========================================================================
 
 Governs: specs/011-context-compression-governance (TASK-002, Option A).
@@ -39,6 +41,9 @@ from __future__ import annotations
 
 import logging
 import pathlib
+import socket
+import subprocess
+import time
 
 # headroom SDK — confined to this module (ADR-0014). Import name is `headroom`
 # (PyPI dist `headroom-ai`). Used via the `_engine_*` seams below.
@@ -50,6 +55,8 @@ logger = logging.getLogger(__name__)
 
 # Loopback only — no third-party egress (NFR-001).
 PROXY_HOST = "127.0.0.1"
+PROXY_READY_TIMEOUT_S = 5.0
+PROXY_POLL_INTERVAL_S = 0.05
 
 # ADR-0018: headroom's CCR store must not live inside the git worktree or under a
 # cloud-sync path (governed content would be committed / leave the machine).
@@ -143,11 +150,54 @@ class HeadroomContextCompressionProvider:
         to loopback, wait for readiness, and return (handle, port). The base-URL
         the host is pointed at is http://127.0.0.1:<p> (ADR-0015 / TASK-006).
         """
-        raise NotImplementedError(
-            "wire `headroom proxy` subprocess start (loopback, readiness probe) "
-            "in the TASK-010 live-integration environment"
+        port = self._engine_pick_loopback_port()
+        cmd = ["headroom", "proxy", "--host", PROXY_HOST, "--port", str(port)]
+        logger.info("starting headroom proxy on %s:%s", PROXY_HOST, port)
+        proxy = subprocess.Popen(
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            text=True,
         )
+        try:
+            self._engine_wait_for_port(port, proxy, timeout_s=PROXY_READY_TIMEOUT_S)
+        except Exception:
+            self._engine_stop_proxy(proxy)
+            raise
+        return proxy, port
 
     def _engine_stop_proxy(self, proxy) -> None:
         """Gracefully terminate the proxy subprocess started in activate()."""
-        raise NotImplementedError("wire `headroom proxy` graceful shutdown (TASK-010)")
+        if proxy is None:
+            return None
+        if proxy.poll() is not None:
+            return None
+        proxy.terminate()
+        try:
+            proxy.wait(timeout=2.0)
+        except subprocess.TimeoutExpired:
+            proxy.kill()
+            proxy.wait(timeout=2.0)
+        return None
+
+    def _engine_pick_loopback_port(self) -> int:
+        """Reserve an ephemeral loopback port for the proxy subprocess."""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.bind((PROXY_HOST, 0))
+            return int(sock.getsockname()[1])
+
+    def _engine_wait_for_port(self, port: int, proxy, *, timeout_s: float) -> None:
+        """
+        Poll loopback until the proxy accepts TCP connections, or raise if the
+        subprocess exits early / readiness times out.
+        """
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() < deadline:
+            if proxy.poll() is not None:
+                raise RuntimeError(f"headroom proxy exited before readiness on port {port}")
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.settimeout(PROXY_POLL_INTERVAL_S)
+                if sock.connect_ex((PROXY_HOST, port)) == 0:
+                    return None
+            time.sleep(PROXY_POLL_INTERVAL_S)
+        raise TimeoutError(f"headroom proxy readiness timed out on port {port}")
