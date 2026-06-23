@@ -91,11 +91,12 @@ flip to `/at-implement` — and compression must not weaken that boundary.
 One shared abstraction with swappable implementations (ADR-0013), mirroring the
 001/009/010 provider pattern:
 
-- `ContextCompressionProvider` — the interface (`activate` / `deactivate` /
-  `compress` / `retrieve`). Zero dependencies; vendor/transport-neutral names; a
-  host receives only an **opaque endpoint token**, never a raw proxy port.
-- **headroom default** — wraps `headroom-ai[proxy]` (ADR-0014), confined to the
-  headroom provider module. Per-session lifecycle (ADR-0019).
+- `ContextCompressionProvider` — the lifecycle-only interface (`activate` /
+  `deactivate`). Zero dependencies; vendor/transport-neutral names; a host receives
+  an **opaque endpoint token** + a provider-supplied base-URL it sets verbatim.
+- **headroom default** — runs `headroom-ai[proxy]` as a **subprocess from a managed
+  venv** (ADR-0014/0021); the package imports headroom nowhere. Self-provisions venv
+  + CCR store on first activate. Per-session lifecycle (ADR-0019).
 - **noop** — the disabled path: passthrough, no proxy, no socket.
 
 Scaffolded into a product as the importable package **`context_compression/`**
@@ -144,27 +145,44 @@ What it does:
 
 - **Disabled** (default toggle) → execs the host directly. No proxy, no overhead —
   identical to launching the host yourself.
-- **Enabled** → validates the CCR directory, starts the local loopback proxy,
-  sets the host's base-URL env (`ANTHROPIC_BASE_URL` for Claude;
-  `OPENAI_BASE_URL` + `/v1` for Codex/Copilot), runs the interactive session, and
-  tears the proxy down on exit.
-- **Proxy unavailable** (e.g. `headroom-ai[proxy]` not installed, or it fails to
-  start) → runs the host **uncompressed** and emits a
-  `compression_passthrough_fallback` warning. The session always runs.
+- **Enabled** → **self-provisions** on first run (ADR-0021): ensures a managed venv
+  (`~/.arpinine/compression-venv`) with the pinned `headroom-ai[proxy]`, sets+creates
+  a safe CCR store (`~/.arpinine/ccr-store`, `700`), starts the local loopback proxy,
+  sets the host's base-URL env (`ANTHROPIC_BASE_URL` for Claude; `OPENAI_BASE_URL` +
+  `/v1` for Codex/Copilot), runs the interactive session, and tears the proxy down on
+  exit. No manual `pip install` or store export.
+- **Proxy unavailable** (provisioning fails, or the proxy can't start) → runs the host
+  **uncompressed** and emits a `compression_passthrough_fallback` warning. The session
+  always runs.
+
+### Zero-config (ADR-0021)
+
+The provider owns install + storage so the operator does not:
+
+- **headroom** is auto-installed, pinned + isolated, into the managed venv on first
+  `activate()` (idempotent; needs network once). The host's own Python never needs
+  headroom — the proxy is a subprocess from the venv, and the package imports headroom
+  **nowhere**.
+- The **CCR store** is auto-created at `~/.arpinine/ccr-store` (`700`) and validated
+  (rejected if inside the worktree or a cloud-sync path). An explicit override is
+  validated the same way.
+
+So setup is just: enable at `/at-init`, then launch via the wrapper. (Still manual by
+design: the enable toggle — lossy, a conscious choice — and choosing to launch via the
+wrapper, since a plugin inside the host can't repoint its own session, ADR-0020.)
 
 ### Live smoke checklist (operator, AC-008)
 
-The launcher logic is unit-tested with mocks; confirming true end-to-end
+The launcher + provisioning are unit-tested with mocks; confirming true end-to-end
 interception needs your runtime:
 
-1. `pip install "headroom-ai[proxy]==0.27.0"` in the environment that launches the host.
-2. Enable compression: `compression_config.py --repo <root> set --enabled true`.
-3. Run `run_compressed_session.py --host claude -- claude`; confirm the proxy
-   starts on `127.0.0.1:<port>` and the session works.
-4. Confirm the host's calls go through the proxy (e.g. headroom proxy logs / token stats).
-5. Exit the host; confirm the proxy subprocess is gone (clean teardown).
-6. Disable compression; confirm the launcher execs the host with no proxy.
-7. Kill/withhold the proxy; confirm passthrough + the fallback warning, session still runs.
+1. Enable compression: `compression_config.py --repo <root> set --enabled true`.
+2. Run `run_compressed_session.py --host claude -- claude`; on first run it provisions
+   the managed venv (network) and the CCR store, then starts the proxy on `127.0.0.1:<port>`.
+3. Confirm the host's calls go through the proxy (e.g. headroom proxy logs / token stats).
+4. Exit the host; confirm the proxy subprocess is gone (clean teardown).
+5. Disable compression; confirm the launcher execs the host with no proxy.
+6. Force a provisioning/proxy failure; confirm passthrough + the fallback warning, session still runs.
 
 ---
 
@@ -173,13 +191,13 @@ interception needs your runtime:
 - The `context_compression/` package and the `run_compressed_session.py` launcher
   ship in assembled Claude, Codex, and Copilot artifacts (asserted by
   `make validate-structure`).
-- Provider lifecycle seams (loopback proxy startup, readiness wait, endpoint
-  export, terminate→kill shutdown) are implemented and unit-tested with
-  subprocess/socket mocks; the launcher orchestration is unit-tested with injected
-  spawn/provider.
+- Provider seams — zero-config provisioning (managed venv + pinned headroom, owned
+  CCR store), loopback proxy startup, readiness wait, terminate→kill shutdown — are
+  implemented and unit-tested with injected installer + subprocess/socket mocks; the
+  launcher orchestration is unit-tested with injected spawn/provider.
 - The deterministic fidelity benchmark is runnable; `--engine headroom-simulate`
   is the supported measurable release-governance path (zero-divergence + in-band
   reduction over committed payload fixtures).
-- **Remaining:** the operator live-smoke run above — a real interactive host
-  session with `headroom-ai[proxy]` installed — is the one confirmation that runs
-  in your runtime, not in harness CI.
+- **Remaining:** the operator live-smoke run above — a real interactive host session
+  (first run provisions the venv over the network) — is the one confirmation that
+  runs in your runtime, not in harness CI.
