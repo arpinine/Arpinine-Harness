@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.8.3] - 2026-06-23
+
+### Fixed
+- Raised the compression proxy readiness timeout (5s -> 30s): headroom's cold start loads tokenizers/ML, so a fresh managed-venv first run could exceed 5s and spuriously degrade to passthrough. Verified by an operator live-smoke (provisioning + proxy start + host env wiring + teardown all confirmed end to end); warm starts remain sub-second.
+
+### Changed
+- AC-008 (live host interception via the launcher) marked satisfied after the live-smoke run; golden session re-recorded accordingly.
+
 ## [1.8.2] - 2026-06-23
 
 ### Fixed

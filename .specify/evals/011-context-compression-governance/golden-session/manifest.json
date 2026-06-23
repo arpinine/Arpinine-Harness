@@ -112,7 +112,7 @@
         "AC-005": false,
         "AC-006": false,
         "AC-007": false,
-        "AC-008": false,
+        "AC-008": true,
         "AC-009": false
       },
       "note": "Acceptance-criteria checkbox states of spec 011. Recorded from spec.md; the benchmark asserts compression does not flip any AC pass/fail."

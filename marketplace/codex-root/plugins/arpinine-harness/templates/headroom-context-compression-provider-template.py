@@ -41,7 +41,10 @@ from .context_compression_provider import CompressionEndpoint, CompressionError
 logger = logging.getLogger(__name__)
 
 PROXY_HOST = "127.0.0.1"
-PROXY_READY_TIMEOUT_S = 5.0
+# Cold start loads tokenizers/ML, so first boot can take well over a few seconds
+# (live-smoke: 5s spuriously fell back to passthrough on a fresh venv; warm starts
+# are sub-second). Generous timeout avoids a false first-run passthrough.
+PROXY_READY_TIMEOUT_S = 30.0
 PROXY_POLL_INTERVAL_S = 0.05
 
 # ADR-0021: provider-managed, zero-config locations under the user home.
