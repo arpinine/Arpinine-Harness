@@ -182,6 +182,12 @@ It is **off by default**. You make the call once, when the constitution is creat
 
 Because compression is lossy, it is governed like everything else. An evaluation gate replays a fixed session and requires the harness to reach the **same decisions** — routing, drift findings, acceptance criteria — plus a measured reduction, before compression is trusted. And if the proxy is ever unreachable, the session falls back to sending context uncompressed with a warning. The point of the harness is to ship what you intended; compression is held to that same bar.
 
+When enabled, you launch a host through it with the harness-provided launcher, which starts the proxy, points the host at it, and cleans up on exit:
+
+```bash
+python3 "<plugin>/scripts/run_compressed_session.py" --host claude -- claude
+```
+
 See [`docs/context-compression.md`](docs/context-compression.md) for the details.
 
 ---

@@ -21,3 +21,4 @@
 | ADR-0017 | Deterministic golden-session replay benchmark as the evaluation framework | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:eval-framework |
 | ADR-0018 | CCR original store location, access policy, and no-sync invariant | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:ccr-store-location |
 | ADR-0019 | Compression proxy lifecycle — per-session activate/deactivate | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:proxy-lifecycle-model |
+| ADR-0020 | Out-of-host launcher as the runtime delivery mechanism for compression | Accepted | specs/011-context-compression-governance | decision:011-context-compression-governance:launcher-runtime-delivery |

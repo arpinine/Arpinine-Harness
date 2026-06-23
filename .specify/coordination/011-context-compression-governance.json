@@ -156,7 +156,49 @@
       "state": "completed",
       "task_id": "TASK-012",
       "team_id": "codex"
+    },
+    "TASK-013": {
+      "assigned_team": "claude",
+      "claimed_at": null,
+      "claimed_by": null,
+      "completed_at": null,
+      "completed_by": null,
+      "instance_id": null,
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-013",
+      "team_id": null
+    },
+    "TASK-014": {
+      "assigned_team": "claude",
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-015": {
+      "assigned_team": "codex",
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-016": {
+      "assigned_team": "codex",
+      "lease_until": null,
+      "state": "completed"
+    },
+    "TASK-017": {
+      "assigned_team": "copilot",
+      "claimed_at": "2026-06-23T07:49:42Z",
+      "claimed_by": "copilot:copilot-main",
+      "completed_at": "2026-06-23T08:02:52Z",
+      "completed_by": "copilot:copilot-main",
+      "instance_id": "copilot-main",
+      "lease_until": null,
+      "state": "completed",
+      "task_id": "TASK-017",
+      "team_id": "copilot"
+    },
+    "TASK-018": {
+      "assigned_team": "claude"
     }
   },
-  "updated_at": "2026-06-22T18:40:21Z"
+  "updated_at": "2026-06-23T08:02:52Z"
 }

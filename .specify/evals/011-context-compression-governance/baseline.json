@@ -1,0 +1,12 @@
+{
+  "baseline_run_id": "20260623T000000Z-context-compression-golden-v1",
+  "approved_at": "2026-06-23T00:00:00Z",
+  "approved_by": "arpinine-harness-maintainers (/at-audit 011)",
+  "dataset_version": "v1.0.0",
+  "model_name": "claude-sonnet-4-5-20250929",
+  "model_version": "headroom-ai==0.27.0 simulate pipeline",
+  "variant_id": "compression-OFF",
+  "scenario_set": "context-compression-golden-session",
+  "source_results_path": ".specify/evals/011-context-compression-governance/golden-session/manifest.json",
+  "release_note": "Baseline for the deterministic fidelity gate (ADR-0017): the compression-OFF run of the golden session IS the baseline — its governance outcomes are the recorded `expected` values in golden-session/manifest.json, and the OFF outbound-token total is the reduction denominator. The gate (FidelityGate) requires the compression-ON run to reproduce this baseline exactly (zero divergence) plus 30-95% token reduction. Re-verified live each run; not a stored numeric snapshot."
+}

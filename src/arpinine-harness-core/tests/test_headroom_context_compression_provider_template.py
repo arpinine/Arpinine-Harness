@@ -140,6 +140,21 @@ class TestHeadroomContextCompressionProviderTemplate(unittest.TestCase):
             os.chdir(prev)
             outside_tmp.cleanup()
 
+    def test_ccr_validation_anchors_relative_store_to_repo_root_when_provided(self) -> None:
+        outside_tmp = tempfile.TemporaryDirectory()
+        outside = pathlib.Path(outside_tmp.name).resolve()
+        prev = pathlib.Path.cwd()
+        os.chdir(outside)
+        self._set_fake_store_url("sqlite:///headroom.db")
+        try:
+            with self.assertRaises(self.pkg.CompressionError):
+                self.mod.HeadroomContextCompressionProvider(
+                    repo_root=self.target
+                )._engine_validate_configured_ccr_directory()
+        finally:
+            os.chdir(prev)
+            outside_tmp.cleanup()
+
     # --- live transport seam wiring (TASK-006/TASK-012 boundary) ---
 
     def test_start_proxy_invokes_headroom_cli_with_loopback_port(self) -> None:

@@ -1,0 +1,18 @@
+{
+  "dataset_name": "context-compression-golden-session",
+  "dataset_version": "v1.0.0",
+  "owner": "arpinine-harness-maintainers",
+  "note": "The dataset for 011's deterministic fidelity benchmark (ADR-0017) is the golden harness session + the payloads fixture, not a runtime-observation dataset. Scenarios below mirror golden-session/manifest.json; the reduction dataset is golden-session/payloads.json. Re-verified against live extractors by the fixture test.",
+  "scenarios": [
+    {"scenario_id": "R1-status", "source": "recorded-route_at", "required": true, "tags": ["routing"], "expected_output_ref": "golden-session/manifest.json#R1-status", "adjudication_status": "approved"},
+    {"scenario_id": "R2-harness-costs", "source": "recorded-route_at", "required": true, "tags": ["routing"], "expected_output_ref": "golden-session/manifest.json#R2-harness-costs", "adjudication_status": "approved"},
+    {"scenario_id": "R3-total-costs", "source": "recorded-route_at", "required": true, "tags": ["routing"], "expected_output_ref": "golden-session/manifest.json#R3-total-costs", "adjudication_status": "approved"},
+    {"scenario_id": "R4-ask", "source": "recorded-route_at", "required": true, "tags": ["routing"], "expected_output_ref": "golden-session/manifest.json#R4-ask", "adjudication_status": "approved"},
+    {"scenario_id": "R5-audit", "source": "recorded-route_at", "required": true, "tags": ["routing"], "expected_output_ref": "golden-session/manifest.json#R5-audit", "adjudication_status": "approved"},
+    {"scenario_id": "R6-eval", "source": "recorded-route_at", "required": true, "tags": ["routing"], "expected_output_ref": "golden-session/manifest.json#R6-eval", "adjudication_status": "approved"},
+    {"scenario_id": "ADV-injection", "source": "recorded-route_at", "required": true, "tags": ["adversarial", "data-boundary"], "expected_output_ref": "golden-session/manifest.json#ADV-injection", "adjudication_status": "approved"},
+    {"scenario_id": "AC1-ac-state", "source": "spec-ac-parse", "required": true, "tags": ["ac_state"], "expected_output_ref": "golden-session/manifest.json#AC1-ac-state", "adjudication_status": "approved"},
+    {"scenario_id": "D1-drift", "source": "quick_drift_check", "required": true, "tags": ["drift"], "expected_output_ref": "golden-session/manifest.json#D1-drift", "adjudication_status": "approved"},
+    {"scenario_id": "reduction-payloads", "source": "build_compression_payloads", "required": true, "tags": ["token-reduction"], "expected_output_ref": "golden-session/payloads.json", "adjudication_status": "approved"}
+  ]
+}

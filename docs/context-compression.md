@@ -126,18 +126,60 @@ package imports, never ad-hoc file-path loading (keeps one interface identity).
 
 ---
 
-## Status / current limitations
+## Running a live compressed session (the launcher)
 
-- The scaffolded `context_compression/` package now ships in assembled Claude,
-  Codex, and Copilot plugin artifacts, including the lifecycle interface, noop
-  provider, headroom provider, host wiring, and security helpers.
-- The headroom provider lifecycle seams are wired and have a live smoke-tested
-  path against `headroom-ai[proxy]==0.27.0`: loopback-only proxy startup,
-  readiness wait, endpoint export, and shutdown.
-- The deterministic fidelity benchmark is runnable. `--engine
-  headroom-simulate` is the supported measurable path for release governance; it
-  validates zero-divergence plus in-band reduction against committed payload
-  fixtures.
-- What is still not proven here is host-native end-to-end interception inside a
-  real Claude/Codex/Copilot session. The harness now ships the host env wiring,
-  but a full interactive host run remains an external smoke/integration step.
+Live compression is delivered by a **launcher** that runs *around* the host, not
+by an `/at-*` command — a plugin running inside an already-started host cannot
+repoint its own session (ADR-0020). The launcher ships with the plugin at
+`scripts/run_compressed_session.py`:
+
+```bash
+# Launch a host through the compression proxy (when enabled in the constitution).
+python3 "<plugin>/scripts/run_compressed_session.py" --host claude  -- claude
+python3 "<plugin>/scripts/run_compressed_session.py" --host codex   -- codex
+python3 "<plugin>/scripts/run_compressed_session.py" --host copilot -- copilot
+```
+
+What it does:
+
+- **Disabled** (default toggle) → execs the host directly. No proxy, no overhead —
+  identical to launching the host yourself.
+- **Enabled** → validates the CCR directory, starts the local loopback proxy,
+  sets the host's base-URL env (`ANTHROPIC_BASE_URL` for Claude;
+  `OPENAI_BASE_URL` + `/v1` for Codex/Copilot), runs the interactive session, and
+  tears the proxy down on exit.
+- **Proxy unavailable** (e.g. `headroom-ai[proxy]` not installed, or it fails to
+  start) → runs the host **uncompressed** and emits a
+  `compression_passthrough_fallback` warning. The session always runs.
+
+### Live smoke checklist (operator, AC-008)
+
+The launcher logic is unit-tested with mocks; confirming true end-to-end
+interception needs your runtime:
+
+1. `pip install "headroom-ai[proxy]==0.27.0"` in the environment that launches the host.
+2. Enable compression: `compression_config.py --repo <root> set --enabled true`.
+3. Run `run_compressed_session.py --host claude -- claude`; confirm the proxy
+   starts on `127.0.0.1:<port>` and the session works.
+4. Confirm the host's calls go through the proxy (e.g. headroom proxy logs / token stats).
+5. Exit the host; confirm the proxy subprocess is gone (clean teardown).
+6. Disable compression; confirm the launcher execs the host with no proxy.
+7. Kill/withhold the proxy; confirm passthrough + the fallback warning, session still runs.
+
+---
+
+## Status
+
+- The `context_compression/` package and the `run_compressed_session.py` launcher
+  ship in assembled Claude, Codex, and Copilot artifacts (asserted by
+  `make validate-structure`).
+- Provider lifecycle seams (loopback proxy startup, readiness wait, endpoint
+  export, terminate→kill shutdown) are implemented and unit-tested with
+  subprocess/socket mocks; the launcher orchestration is unit-tested with injected
+  spawn/provider.
+- The deterministic fidelity benchmark is runnable; `--engine headroom-simulate`
+  is the supported measurable release-governance path (zero-divergence + in-band
+  reduction over committed payload fixtures).
+- **Remaining:** the operator live-smoke run above — a real interactive host
+  session with `headroom-ai[proxy]` installed — is the one confirmation that runs
+  in your runtime, not in harness CI.

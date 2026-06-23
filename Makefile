@@ -180,6 +180,7 @@ validate-structure: assemble
 		test -f $(BUILD_DIR)/context_compression/headroom_provider.py || (echo "Missing context_compression/headroom_provider.py" && exit 1); \
 		test -f $(BUILD_DIR)/context_compression/host_wiring.py || (echo "Missing context_compression/host_wiring.py" && exit 1); \
 		test -f $(BUILD_DIR)/context_compression/security.py || (echo "Missing context_compression/security.py" && exit 1); \
+		test -f $(BUILD_DIR)/scripts/run_compressed_session.py || (echo "Missing compression launcher scripts/run_compressed_session.py" && exit 1); \
 		test -d $(BUILD_DIR)/commands || (echo "Missing commands directory" && exit 1); \
 		test -d $(BUILD_DIR)/scripts || (echo "Missing scripts directory" && exit 1); \
 		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
@@ -195,6 +196,7 @@ validate-structure: assemble
 		test -f $(BUILD_DIR)/context_compression/headroom_provider.py || (echo "Missing context_compression/headroom_provider.py" && exit 1); \
 		test -f $(BUILD_DIR)/context_compression/host_wiring.py || (echo "Missing context_compression/host_wiring.py" && exit 1); \
 		test -f $(BUILD_DIR)/context_compression/security.py || (echo "Missing context_compression/security.py" && exit 1); \
+		test -f $(BUILD_DIR)/scripts/run_compressed_session.py || (echo "Missing compression launcher scripts/run_compressed_session.py" && exit 1); \
 		for agent in product-owner tech-architect security-reviewer ai-engineer devops data-engineer tdd-guide domain-linguist; do \
 			test -f "$(BUILD_DIR)/skills/$$agent/SKILL.md" || (echo "Missing Codex specialist wrapper: $$agent" && exit 1); \
 		done; \
@@ -220,6 +222,7 @@ validate-structure: assemble
 		test -f $(BUILD_DIR)/context_compression/headroom_provider.py || (echo "Missing context_compression/headroom_provider.py" && exit 1); \
 		test -f $(BUILD_DIR)/context_compression/host_wiring.py || (echo "Missing context_compression/host_wiring.py" && exit 1); \
 		test -f $(BUILD_DIR)/context_compression/security.py || (echo "Missing context_compression/security.py" && exit 1); \
+		test -f $(BUILD_DIR)/scripts/run_compressed_session.py || (echo "Missing compression launcher scripts/run_compressed_session.py" && exit 1); \
 		for agent in product-owner tech-architect security-reviewer ai-engineer devops data-engineer tdd-guide domain-linguist; do \
 			test -f "$(BUILD_DIR)/skills/$$agent/SKILL.md" || (echo "Missing Copilot specialist wrapper: $$agent" && exit 1); \
 		done; \

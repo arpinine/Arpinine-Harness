@@ -50,6 +50,7 @@ Release 1 targets the harness's own execution. The same abstraction must not pre
 - [ ] AC-005: Given compression is enabled and the compression proxy is unreachable (process not started or refusing connections), the harness completes the session via uncompressed passthrough, produces a governance outcome set that passes the same zero-divergence diff defined in AC-001, and emits an observable signal (log entry or status event) indicating passthrough fallback was activated.
 - [ ] AC-006: Given the shipped artifacts, one shared `ContextCompressionProvider` abstraction exists; the working default (headroom) implementation and the noop implementation are each callable through that abstraction; and all three host integrations (Claude, Codex, Copilot) use the same lifecycle API to configure, start, and stop the provider, differing only in host-specific base-URL/environment plumbing.
 - [ ] AC-007: Given the default implementation is configured with engine-owned reversible retrieval (CCR), the harness validates the configured engine CCR directory at setup and activation time: it is outside the git worktree and known cloud-sync paths, and enforces 700/600 permissions.
+- [ ] AC-008: Given the harness-provided launcher and compression **enabled**, launching a host (Claude/Codex/Copilot) through it starts the local proxy, points the host at it via the host's base-URL env, runs the interactive session, and tears the proxy down on exit. Given compression **disabled**, the launcher execs the host directly with no proxy and behavior identical to launching the host without the harness. Given the proxy fails to start, the launcher runs the host **uncompressed (passthrough)** and emits the fallback signal — the session always runs. (The launcher is a shell entry point that runs *around* the host, not an `/at-*` command — ADR-0020.)
 
 ## Out of Scope
 
@@ -101,6 +102,7 @@ The fidelity benchmark is release-blocking: compression-enabled behavior may not
 - RD-003: Compression is optional and chosen at constitution creation; disabled means no proxy and no behavior change.
 - RD-004: Whole-payload compression is proxy-based because the plugin cannot intercept the host's outbound calls in-process.
 - RD-005: Compression-enabled behavior is gated by a release-blocking golden harness-session fidelity benchmark (identical governance outcomes plus 30–95% token reduction; band measured/justified in TASK-012, see ADR-0017).
+- RD-013: Live interception is delivered by a harness-provided **launcher** — a shell entry point that starts the proxy, launches the host pointed at it, and tears it down — because a plugin running *inside* an already-started host cannot repoint its own session. The launcher is not an `/at-*` command. (ADR-0020)
 - RD-006: Proxy failure degrades to uncompressed passthrough, never to a broken or silently-altered session.
 - RD-007: Release 1 covers harness-side execution only; the abstraction must not preclude later product-side wiring.
 - RD-008: The default implementation consumes headroom as an external dependency (not an internally re-implemented pattern); the supply-chain choice is governed by an ADR at plan time.
@@ -130,3 +132,4 @@ Authored during implementation (TASK-000), all Accepted:
 - ADR-0017: deterministic golden-session replay benchmark as evaluation framework (not DeepEval)
 - ADR-0018: engine-owned CCR directory policy, access policy, no-sync invariant
 - ADR-0019: compression proxy lifecycle model — per-session activate/deactivate (resolves OQ-003)
+- ADR-0020: out-of-host launcher as the runtime delivery mechanism for live compression (AC-008)

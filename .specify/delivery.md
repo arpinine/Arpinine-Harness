@@ -165,7 +165,7 @@ Plan: [specs/010-dual-cost-governance/plan.md](specs/010-dual-cost-governance/pl
 | [TASK-010](specs/010-dual-cost-governance/plan.md#L79) | none | - | - | - |
 
 ## [011-context-compression-governance](specs/011-context-compression-governance/spec.md)
-Plan: [specs/011-context-compression-governance/plan.md](specs/011-context-compression-governance/plan.md) &nbsp;|&nbsp; Progress: 13/13 full, 0 partial
+Plan: [specs/011-context-compression-governance/plan.md](specs/011-context-compression-governance/plan.md) &nbsp;|&nbsp; Progress: 13/19 full, 0 partial
 
 | Task | Status | Assigned Team | Claimed By | Lease Until |
 |------|--------|---------------|------------|-------------|
@@ -182,6 +182,12 @@ Plan: [specs/011-context-compression-governance/plan.md](specs/011-context-compr
 | [TASK-010](specs/011-context-compression-governance/plan.md#L143) | full | codex | - | - |
 | [TASK-012](specs/011-context-compression-governance/plan.md#L144) | full | codex | - | - |
 | [TASK-011](specs/011-context-compression-governance/plan.md#L145) | full | copilot | - | - |
+| [TASK-013](specs/011-context-compression-governance/plan.md#L149) | none | claude | - | - |
+| [TASK-014](specs/011-context-compression-governance/plan.md#L150) | none | claude | - | - |
+| [TASK-015](specs/011-context-compression-governance/plan.md#L151) | none | codex | - | - |
+| [TASK-016](specs/011-context-compression-governance/plan.md#L152) | none | codex | - | - |
+| [TASK-017](specs/011-context-compression-governance/plan.md#L153) | none | copilot | - | - |
+| [TASK-018](specs/011-context-compression-governance/plan.md#L154) | none | claude | - | - |
 
 ## [012-context-rot-minimization-governance](specs/012-context-rot-minimization-governance/spec.md)
 Plan: [specs/012-context-rot-minimization-governance/plan.md](specs/012-context-rot-minimization-governance/plan.md) &nbsp;|&nbsp; Progress: 0/10 full, 0 partial
@@ -200,6 +206,6 @@ Plan: [specs/012-context-rot-minimization-governance/plan.md](specs/012-context-
 | [TASK-009](specs/012-context-rot-minimization-governance/plan.md#L111) | none | copilot | - | - |
 
 ---
-_Last updated: 2026-06-22 20:40_
+_Last updated: 2026-06-23 09:39_
 
-**Total tasks:** 114 &nbsp;|&nbsp; **Full:** 42 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 72
+**Total tasks:** 120 &nbsp;|&nbsp; **Full:** 42 &nbsp;|&nbsp; **Partial:** 0 &nbsp;|&nbsp; **Remaining:** 78

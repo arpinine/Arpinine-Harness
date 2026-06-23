@@ -111,7 +111,8 @@
         "AC-004": false,
         "AC-005": false,
         "AC-006": false,
-        "AC-007": false
+        "AC-007": false,
+        "AC-008": false
       },
       "note": "Acceptance-criteria checkbox states of spec 011. Recorded from spec.md; the benchmark asserts compression does not flip any AC pass/fail."
     },
@@ -121,27 +122,6 @@
       "target": "011-context-compression-governance",
       "expected": {
         "findings": [
-          {
-            "file": "/Users/anepoti/workspace/Arpinine/specops/.specify/specs/011-context-compression-governance/spec.md",
-            "line": null,
-            "severity": "HIGH",
-            "finding_id": "qdc-3088a2d68608",
-            "message": "benchmarked eval declared but dataset-manifest.json is missing"
-          },
-          {
-            "file": "/Users/anepoti/workspace/Arpinine/specops/.specify/specs/011-context-compression-governance/spec.md",
-            "line": null,
-            "severity": "HIGH",
-            "finding_id": "qdc-48c62ef55a39",
-            "message": "regression-sensitive eval declared but baseline.json is missing"
-          },
-          {
-            "file": "/Users/anepoti/workspace/Arpinine/specops/.specify/specs/011-context-compression-governance/spec.md",
-            "line": null,
-            "severity": "MEDIUM",
-            "finding_id": "qdc-d4e7e2740eb8",
-            "message": "benchmarked eval declared but no latest benchmark results were found"
-          },
           {
             "file": "/Users/anepoti/workspace/Arpinine/specops/.specify/specs/011-context-compression-governance/spec.md",
             "line": null,
@@ -158,7 +138,7 @@
           }
         ]
       },
-      "note": "Drift-finding records for spec 011 from quick_drift_check.py normalized into the AC-001 record shape (file, line, severity, finding_id, message). The benchmark asserts compression does not change drift findings. If these findings change (e.g. dataset-manifest.json/baseline.json are later added), the fixture test fails loudly and this golden must be re-recorded."
+      "note": "Drift-finding records for spec 011 from quick_drift_check.py normalized into the AC-001 record shape. Re-recorded after /at-audit 011 (2026-06-23) resolved the dataset-manifest/baseline/latest-results findings; the two remaining are the observation-ledger MEDIUMs accepted as not-applicable to the deterministic eval (see drift-report.md). The benchmark asserts compression does not change drift findings; if 011's drift state changes the fixture test fails loudly and this golden must be re-recorded."
     }
   ]
 }
