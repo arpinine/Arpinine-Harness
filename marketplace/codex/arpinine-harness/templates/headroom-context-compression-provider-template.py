@@ -32,7 +32,9 @@ import pathlib
 import socket
 import subprocess
 import sys
+import tempfile
 import time
+import hashlib
 
 from .context_compression_provider import CompressionEndpoint, CompressionError
 
@@ -46,6 +48,17 @@ PROXY_POLL_INTERVAL_S = 0.05
 MANAGED_VENV = pathlib.Path.home() / ".arpinine" / "compression-venv"
 MANAGED_CCR_STORE = pathlib.Path.home() / ".arpinine" / "ccr-store"
 HEADROOM_PIN = "headroom-ai[proxy]==0.27.0"
+# Per-platform wheel SHA256s, sourced from PyPI's published digests for the pin
+# (same trust model as `pip --require-hashes`). headroom ships posix wheels only.
+# To support a new platform, add its wheel filename + PyPI sha256 here.
+HEADROOM_VERIFIED_ARTIFACTS = {
+    "headroom_ai-0.27.0-cp310-abi3-macosx_11_0_arm64.whl":
+        "00b54b70533c841f4702fffaf215eff84bafed7612c07a56d675ef8a1ffab543",
+    "headroom_ai-0.27.0-cp310-abi3-manylinux_2_28_aarch64.whl":
+        "f8fa150061db2513e8584d2e4b50af930131bcfe301080f297464b351a03f577",
+    "headroom_ai-0.27.0-cp310-abi3-manylinux_2_28_x86_64.whl":
+        "640e67a41743265376582a92691a192a8c2448ef0b2167a0e14a2a458adbe2dd",
+}
 # Env var the proxy subprocess reads for its CCR/store location.
 STORE_ENV = "HEADROOM_DATABASE_URL"
 
@@ -126,7 +139,10 @@ class HeadroomContextCompressionProvider:
                 raise CompressionError(f"CCR store {store_dir} is under cloud-sync path {rel} (ADR-0018)")
         store_dir.mkdir(parents=True, exist_ok=True)
         os.chmod(store_dir, 0o700)
-        return store_dir / "headroom.db"
+        db_path = store_dir / "headroom.db"
+        db_path.touch(exist_ok=True)
+        os.chmod(db_path, 0o600)
+        return db_path
 
     def _engine_ensure_headroom(self) -> pathlib.Path:
         """
@@ -151,7 +167,11 @@ class HeadroomContextCompressionProvider:
         env[STORE_ENV] = f"sqlite:///{store_db}"
         proxy = subprocess.Popen(
             [str(headroom_bin), "proxy", "--host", PROXY_HOST, "--port", str(port)],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env, text=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            env=env,
+            text=True,
+            preexec_fn=lambda: os.umask(0o077),
         )
         try:
             self._engine_wait_for_port(port, proxy, timeout_s=PROXY_READY_TIMEOUT_S)
@@ -190,8 +210,55 @@ class HeadroomContextCompressionProvider:
 
 
 def _default_installer(venv_dir: pathlib.Path, pin: str) -> None:
-    """Create the managed venv (if absent) and pip-install the pinned headroom."""
+    """Create the managed venv (if absent) and install a hash-verified headroom wheel."""
     venv_dir.parent.mkdir(parents=True, exist_ok=True)
     if not (venv_dir / "bin" / "python").exists():
         subprocess.run([sys.executable, "-m", "venv", str(venv_dir)], check=True)
-    subprocess.run([str(venv_dir / "bin" / "python"), "-m", "pip", "install", "--quiet", pin], check=True)
+    python_bin = venv_dir / "bin" / "python"
+    with tempfile.TemporaryDirectory(prefix="arpinine-headroom-") as tmp:
+        download_dir = pathlib.Path(tmp)
+        subprocess.run(
+            [
+                str(python_bin),
+                "-m",
+                "pip",
+                "download",
+                "--quiet",
+                "--only-binary=:all:",
+                "--no-deps",
+                "--dest",
+                str(download_dir),
+                pin,
+            ],
+            check=True,
+        )
+        artifacts = sorted(download_dir.iterdir())
+        if len(artifacts) != 1:
+            raise CompressionError(
+                f"expected exactly one headroom artifact, found {len(artifacts)}"
+            )
+        artifact = artifacts[0]
+        expected_hash = HEADROOM_VERIFIED_ARTIFACTS.get(artifact.name)
+        if expected_hash is None:
+            raise CompressionError(
+                f"unverified headroom artifact {artifact.name}; add its SHA256 to the allowlist"
+            )
+        actual_hash = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        if actual_hash != expected_hash:
+            raise CompressionError(
+                f"headroom artifact hash mismatch for {artifact.name}"
+            )
+        # Install the hash-verified headroom wheel itself with --no-deps (the
+        # security-critical, full-traffic-visibility package is pinned + verified)...
+        subprocess.run(
+            [str(python_bin), "-m", "pip", "install", "--quiet", "--no-deps", str(artifact)],
+            check=True,
+        )
+        # ...then pull the `[proxy]` extra's runtime deps. headroom==0.27.0 is
+        # already satisfied by the verified wheel above, so pip only adds the
+        # missing deps (httpx, etc.) without re-fetching headroom. Without this
+        # the proxy cannot run (missing transitive deps).
+        subprocess.run(
+            [str(python_bin), "-m", "pip", "install", "--quiet", pin],
+            check=True,
+        )

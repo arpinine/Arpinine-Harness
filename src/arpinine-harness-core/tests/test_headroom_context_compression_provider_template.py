@@ -16,6 +16,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import hashlib
 
 CORE = pathlib.Path(__file__).resolve().parents[1]
 
@@ -63,6 +64,8 @@ class TestZeroConfigProvider(unittest.TestCase):
         self.assertEqual(db, store.resolve() / "headroom.db")
         self.assertTrue(store.exists())
         self.assertEqual(stat.S_IMODE(store.stat().st_mode), 0o700)
+        self.assertTrue(db.exists())
+        self.assertEqual(stat.S_IMODE(db.stat().st_mode), 0o600)
 
     def test_prepare_ccr_store_rejects_store_in_worktree(self) -> None:
         repo = self.tmp / "repo"
@@ -100,6 +103,16 @@ class TestZeroConfigProvider(unittest.TestCase):
         with self.assertRaises(self.Error):
             self.Provider(installer=lambda *a: None)._engine_ensure_headroom()
 
+    def test_verified_artifact_allowlist_is_multiplatform(self) -> None:
+        # #2: macOS arm64 + Linux aarch64/x86_64 all hash-pinned (PyPI digests).
+        names = self.mod.HEADROOM_VERIFIED_ARTIFACTS
+        self.assertGreaterEqual(len(names), 3)
+        self.assertTrue(any("macosx" in n and "arm64" in n for n in names))
+        self.assertTrue(any("manylinux" in n and "x86_64" in n for n in names))
+        self.assertTrue(any("manylinux" in n and "aarch64" in n for n in names))
+        for h in names.values():
+            self.assertEqual(len(h), 64)  # sha256 hex
+
     # proxy start: CLI + store env
     def test_start_proxy_uses_venv_bin_and_sets_store_env(self) -> None:
         captured = {}
@@ -108,8 +121,11 @@ class TestZeroConfigProvider(unittest.TestCase):
         class _Proc:
             def poll(self): return None
 
-        def fake_popen(cmd, stdout=None, stderr=None, env=None, text=None):
-            captured["cmd"] = cmd; captured["env"] = env; return _Proc()
+        def fake_popen(cmd, stdout=None, stderr=None, env=None, text=None, preexec_fn=None):
+            captured["cmd"] = cmd
+            captured["env"] = env
+            captured["preexec_fn"] = preexec_fn
+            return _Proc()
 
         subprocess.Popen = fake_popen  # type: ignore[assignment]
         try:
@@ -122,17 +138,25 @@ class TestZeroConfigProvider(unittest.TestCase):
 
         self.assertEqual(captured["cmd"], ["/v/bin/headroom", "proxy", "--host", "127.0.0.1", "--port", "8787"])
         self.assertEqual(captured["env"][self.mod.STORE_ENV], "sqlite:////s/h.db")
+        self.assertIsNotNone(captured["preexec_fn"])
 
     # readiness loop body
     def test_wait_for_port_returns_when_socket_accepts(self) -> None:
         class _Alive:
             def poll(self): return None
-        lis = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        lis.bind(("127.0.0.1", 0)); lis.listen(1); port = lis.getsockname()[1]
+        real_socket = self.mod.socket.socket
+
+        class _FakeSocket:
+            def settimeout(self, timeout): return None
+            def connect_ex(self, addr): return 0
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+
+        self.mod.socket.socket = lambda *a, **k: _FakeSocket()  # type: ignore[assignment]
         try:
-            self.Provider()._engine_wait_for_port(port, _Alive(), timeout_s=2.0)
+            self.Provider()._engine_wait_for_port(8787, _Alive(), timeout_s=2.0)
         finally:
-            lis.close()
+            self.mod.socket.socket = real_socket  # type: ignore[assignment]
 
     def test_wait_for_port_raises_fast_on_early_exit(self) -> None:
         class _Dead:
@@ -172,6 +196,55 @@ class TestZeroConfigProvider(unittest.TestCase):
         with hw.compression_session(_P(), "claude") as env:
             self.assertEqual(env, {"ANTHROPIC_BASE_URL": "http://127.0.0.1:8787"})
         self.assertEqual(events, ["a", "d"])
+
+    def test_default_installer_rejects_unverified_artifact(self) -> None:
+        venv = self.tmp / "venv4"
+        (venv / "bin").mkdir(parents=True)
+        (venv / "bin" / "python").write_text("#!/bin/sh\n")
+        original_run = subprocess.run
+        artifact_name = "headroom_ai-0.27.0-py3-none-any.whl"
+
+        def fake_run(cmd, check=True):
+            if "download" in cmd:
+                dest = pathlib.Path(cmd[cmd.index("--dest") + 1])
+                (dest / artifact_name).write_bytes(b"wheel-bytes")
+            return None
+
+        subprocess.run = fake_run  # type: ignore[assignment]
+        try:
+            with self.assertRaises(self.Error):
+                self.mod._default_installer(venv, self.mod.HEADROOM_PIN)
+        finally:
+            subprocess.run = original_run  # type: ignore[assignment]
+
+    def test_default_installer_installs_verified_artifact(self) -> None:
+        venv = self.tmp / "venv5"
+        (venv / "bin").mkdir(parents=True)
+        (venv / "bin" / "python").write_text("#!/bin/sh\n")
+        original_run = subprocess.run
+        runs = []
+        artifact_name = next(iter(self.mod.HEADROOM_VERIFIED_ARTIFACTS))
+        artifact_bytes = b"verified-wheel"
+        artifact_hash = hashlib.sha256(artifact_bytes).hexdigest()
+        original_hash = self.mod.HEADROOM_VERIFIED_ARTIFACTS[artifact_name]
+        self.mod.HEADROOM_VERIFIED_ARTIFACTS[artifact_name] = artifact_hash
+
+        def fake_run(cmd, check=True):
+            runs.append(cmd)
+            if "download" in cmd:
+                dest = pathlib.Path(cmd[cmd.index("--dest") + 1])
+                (dest / artifact_name).write_bytes(artifact_bytes)
+            return None
+
+        subprocess.run = fake_run  # type: ignore[assignment]
+        try:
+            self.mod._default_installer(venv, self.mod.HEADROOM_PIN)
+        finally:
+            self.mod.HEADROOM_VERIFIED_ARTIFACTS[artifact_name] = original_hash
+            subprocess.run = original_run  # type: ignore[assignment]
+
+        self.assertTrue(any("download" in cmd for cmd in runs))
+        self.assertTrue(any("install" in cmd for cmd in runs))
 
 
 if __name__ == "__main__":

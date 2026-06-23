@@ -254,6 +254,15 @@ class TestToggleGate(unittest.TestCase):
         self.assertEqual(report["findings"], [])
         self.assertEqual(report["status"], "ok")
 
+    def test_enabled_without_host_headroom_metadata_still_passes(self) -> None:
+        self._enable()
+        report = self.m.run_checks(
+            self.repo,
+            logging_config={"log_level": "WARN"},
+        )
+        self.assertEqual(report["findings"], [])
+        self.assertEqual(report["status"], "ok")
+
     def test_enabled_uses_configured_headroom_ccr_dir_when_store_path_omitted(self) -> None:
         self._enable()
         unsafe = self.repo / ".specify" / "ccr"

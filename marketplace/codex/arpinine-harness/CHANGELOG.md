@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.8.2] - 2026-06-23
+
+### Fixed
+- **Compression provisioning now installs a working proxy.** The managed-venv installer verifies the pinned headroom wheel against an allowlist of **PyPI-published SHA256s for all posix platforms** (macOS arm64, Linux aarch64, Linux x86_64) instead of a single macOS hash, then installs the verified wheel and pulls the `[proxy]` extra's runtime deps — previously a `--no-deps` install left the proxy missing its dependencies and unable to start. headroom itself stays hash-pinned; its transitive deps are PyPI-resolved.
+- CCR sqlite store file is pre-created `0600` and the proxy starts under `umask 077`, so engine-created files stay private (ADR-0018).
+- The setup checker no longer flags headroom as "not installed" on the host interpreter under the zero-config design (headroom lives in the managed venv); it uses the real pinned hash, not a placeholder.
+
 ## [1.8.1] - 2026-06-23
 
 ### Added

@@ -195,7 +195,7 @@ def check_no_full_payload_logging(logging_config: dict) -> dict | None:
 
 DEFAULT_HEADROOM_CCR_DIR = pathlib.Path.home() / ".arpinine" / "ccr-store"
 DEFAULT_PINNED_VERSION = "0.27.0"
-DEFAULT_PINNED_HASH = "<pinned-sha256>"
+DEFAULT_PINNED_HASH = "00b54b70533c841f4702fffaf215eff84bafed7612c07a56d675ef8a1ffab543"
 
 
 def run_checks(
@@ -221,8 +221,9 @@ def run_checks(
         (~/.arpinine/ccr-store) when no explicit engine config is supplied
       - provider_root defaults to <repo>/context_compression (scanned only if present)
       - logging_config defaults to {} (clean)
-      - headroom: {version, hash, pinned_version, pinned_hash}; None => not
-        installed, which is itself a HIGH finding while enabled.
+      - headroom: optional {version, hash, pinned_version, pinned_hash}; when
+        omitted, `run_checks()` skips the host-interpreter pin check because the
+        zero-config provider provisions headroom into its own managed venv.
     """
     repo = pathlib.Path(repo_root)
     enabled = bool(read_compression_enabled and read_compression_enabled(repo))
@@ -248,16 +249,7 @@ def run_checks(
 
     findings.append(check_no_full_payload_logging(logging_config or {}))
 
-    if headroom is None:
-        findings.append(
-            check_headroom_pin(
-                installed_version=None,
-                installed_hash=None,
-                pinned_version=DEFAULT_PINNED_VERSION,
-                pinned_hash=DEFAULT_PINNED_HASH,
-            )
-        )
-    else:
+    if headroom is not None:
         findings.append(
             check_headroom_pin(
                 installed_version=headroom.get("version"),
