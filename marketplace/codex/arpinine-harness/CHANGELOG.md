@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-06-23
+
+### Added
+- **Zero-config compression bootstrap (`spec 011`, ADR-0021).** Enabling compression no longer needs manual setup. On first `activate()` the headroom provider self-provisions: a managed, isolated venv (`~/.arpinine/compression-venv`) with the pinned `headroom-ai[proxy]==0.27.0` (idempotent), and a safe CCR store (`~/.arpinine/ccr-store`, mode 700) it creates and validates (rejects a worktree/cloud-sync location). The proxy runs as a subprocess from the venv, so the host's own Python never needs headroom — and the scaffolded `context_compression/` package imports headroom **nowhere**.
+- Net operator experience: setup collapses to the `/at-init` toggle + launching via `run_compressed_session.py`. Install + CCR-store configuration are automatic. The enable toggle (lossy → conscious) and choosing the wrapper (ADR-0020) remain deliberate.
+
 ## [1.8.0] - 2026-06-23
 
 ### Added

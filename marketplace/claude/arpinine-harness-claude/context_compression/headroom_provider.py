@@ -2,89 +2,62 @@
 HeadroomContextCompressionProvider — the default ContextCompressionProvider.
 
 Scaffolded into the product package as `context_compression/headroom_provider.py`.
-Proxy-only model (ADR-0013 Option A / ADR-0015): `activate()` starts a local
-`headroom proxy` and returns an opaque endpoint the host routes its provider calls
-through; compression and reversible retrieval (CCR) happen transparently inside
-headroom. `deactivate()` stops the proxy. The harness does NOT call a per-payload
-compress()/retrieve() — that is the engine's job.
+Proxy-only + zero-config (ADR-0013 Option A / ADR-0015 / ADR-0021): `activate()`
+self-provisions a managed venv with the pinned headroom, sets+creates a safe CCR
+store, starts a loopback `headroom proxy` SUBPROCESS, and returns an opaque
+endpoint the host routes its provider calls through. `deactivate()` stops it.
 
-ALL headroom usage stays in this file (ADR-0014 import-boundary, enforced by
-check_compression_setup.py). The interface and noop provider never import it.
+This module imports headroom **nowhere** — the proxy is purely a subprocess from a
+managed venv, so the host's own Python never needs headroom installed (ADR-0021).
+The benchmark's `headroom-simulate` engine imports headroom in its own module.
 
-Security (ADR-0014 / NFR-001):
-  - the proxy binds to loopback (127.0.0.1) only — no third-party egress
-  - headroom is pinned + hash-verified at install; the import name is `headroom`
-    (PyPI dist `headroom-ai`, `[proxy]` extra required for the proxy transport)
-  - CCR originals are owned and stored by headroom; ADR-0018's no-sync + 700/600
-    invariant governs headroom's CCR directory (verified by the setup check)
+Security (ADR-0014 / ADR-0018 / NFR-001):
+  - proxy binds to loopback (127.0.0.1) only — no third-party egress
+  - headroom is pinned and isolated in `~/.arpinine/compression-venv`
+  - the CCR store is provider-owned at `~/.arpinine/ccr-store` (700), created and
+    validated (no worktree / no cloud-sync) before the proxy starts
 
-Lifecycle is per-session (ADR-0019): one proxy per governed session, no state
-persisted across sessions.
+Lifecycle is per-session (ADR-0019). Bootstrap seams (`_engine_*`) are injectable
+so they are unit-tested without running real pip or starting a real proxy; a true
+live run still needs network on first provision (documented live-smoke).
 
-============================ INTEGRATION NOTE ============================
-The proxy is started via the `headroom proxy` CLI as a subprocess (against
-headroom 0.27.0: `headroom proxy --host 127.0.0.1 --port <p>`; host wiring is
-`ANTHROPIC_BASE_URL=http://127.0.0.1:<p>`). The `_engine_*` seams implement
-ephemeral loopback port selection, TCP readiness probing (with early-exit
-detection + timeout), and graceful terminate→kill shutdown. They are unit-tested
-in the harness via subprocess/socket mocks + a fake `headroom` module (the
-deepeval/opentelemetry templates stay import-only; this one is exercised because
-the transport logic is non-trivial). A LIVE run — proxy actually serving traffic —
-still requires `headroom-ai[proxy]` installed in the target runtime and is not
-executed in the harness CI.
-=========================================================================
-
-Governs: specs/011-context-compression-governance (TASK-002, Option A).
+Governs: specs/011-context-compression-governance (TASK-002/019/020).
 """
 
 from __future__ import annotations
 
 import logging
+import os
 import pathlib
 import socket
 import subprocess
+import sys
 import time
-
-# headroom SDK — confined to this module (ADR-0014). Import name is `headroom`
-# (PyPI dist `headroom-ai`). Used via the `_engine_*` seams below.
-import headroom  # noqa: F401
 
 from .context_compression_provider import CompressionEndpoint, CompressionError
 
 logger = logging.getLogger(__name__)
 
-# Loopback only — no third-party egress (NFR-001).
 PROXY_HOST = "127.0.0.1"
 PROXY_READY_TIMEOUT_S = 5.0
 PROXY_POLL_INTERVAL_S = 0.05
 
-# ADR-0018: headroom's CCR store must not live inside the git worktree or under a
+# ADR-0021: provider-managed, zero-config locations under the user home.
+MANAGED_VENV = pathlib.Path.home() / ".arpinine" / "compression-venv"
+MANAGED_CCR_STORE = pathlib.Path.home() / ".arpinine" / "ccr-store"
+HEADROOM_PIN = "headroom-ai[proxy]==0.27.0"
+# Env var the proxy subprocess reads for its CCR/store location.
+STORE_ENV = "HEADROOM_DATABASE_URL"
+
+# ADR-0018: the CCR store must not live inside the git worktree or under a
 # cloud-sync path (governed content would be committed / leave the machine).
 _CLOUD_SYNC_RELATIVE_PREFIXES = (
     "Library/Mobile Documents", "Dropbox", "OneDrive", "Google Drive", "Documents", "Desktop",
 )
 
 
-def _sqlite_store_dir(store_url: str, *, base_dir: pathlib.Path | None = None) -> pathlib.Path | None:
-    """Resolve the filesystem directory of a sqlite store_url, else None (in-memory/non-file)."""
-    if not store_url or not store_url.startswith("sqlite:///"):
-        return None
-    db_path = store_url[len("sqlite:///"):]
-    if not db_path or db_path == ":memory:":
-        return None
-    path = pathlib.Path(db_path)
-    if not path.is_absolute():
-        anchor = (base_dir or pathlib.Path.cwd()).resolve()
-        path = anchor / path
-    return path.resolve().parent
-
-
 def _git_worktree_root(start: pathlib.Path) -> pathlib.Path | None:
-    """
-    Return the enclosing git worktree root for `start`, or None when no `.git`
-    ancestor is found. This enforces ADR-0018 against the actual repository
-    boundary, not merely the process cwd.
-    """
+    """Enclosing git worktree root for `start`, or None when no `.git` ancestor."""
     current = start.resolve()
     for candidate in (current, *current.parents):
         if (candidate / ".git").exists():
@@ -94,22 +67,34 @@ def _git_worktree_root(start: pathlib.Path) -> pathlib.Path | None:
 
 class HeadroomContextCompressionProvider:
     """
-    Default provider backed by a local `headroom proxy`. Lifecycle-only
-    (ADR-0013 Option A): activate -> opaque endpoint, deactivate -> stop.
+    Default provider backed by a local `headroom proxy` subprocess. Lifecycle-only
+    (ADR-0013): activate -> opaque endpoint, deactivate -> stop. Self-provisioning
+    (ADR-0021): managed venv + owned CCR store, no operator setup.
     """
 
-    def __init__(self, *, repo_root: pathlib.Path | str | None = None) -> None:
-        self._proxy = None  # opaque subprocess/handle, set in activate()
+    def __init__(
+        self,
+        *,
+        repo_root: pathlib.Path | str | None = None,
+        ccr_store: pathlib.Path | str | None = None,
+        installer=None,
+    ) -> None:
         self._repo_root = pathlib.Path(repo_root).resolve() if repo_root else None
+        self._ccr_store = pathlib.Path(ccr_store) if ccr_store else MANAGED_CCR_STORE
+        self._installer = installer  # injectable: ensure venv + pinned headroom
+        self._proxy = None
+
+    # --- lifecycle ---
 
     def activate(self) -> CompressionEndpoint:
         try:
-            self._engine_validate_configured_ccr_directory()
-            self._proxy, port = self._engine_start_proxy_loopback_only()
+            store_db = self._engine_prepare_ccr_store()       # #2: own + create + validate
+            headroom_bin = self._engine_ensure_headroom()     # #1: managed venv + pinned install
+            self._proxy, port = self._engine_start_proxy_loopback_only(headroom_bin, store_db)
+        except CompressionError:
+            raise
         except Exception as exc:  # never leak internals into the message
             raise CompressionError("failed to start headroom proxy") from exc
-        # Provider supplies a ready-to-use loopback base_url; host wiring sets it
-        # verbatim and never derives the port itself (ADR-0015). token stays opaque.
         return CompressionEndpoint(
             token=f"headroom://session/{port}",
             base_url=f"http://{PROXY_HOST}:{port}",
@@ -121,49 +106,52 @@ class HeadroomContextCompressionProvider:
             self._engine_stop_proxy(self._proxy)
             self._proxy = None
 
-    # ===================== headroom engine seams =====================
-    # The ONLY code that touches headroom / the proxy process. Wired against
-    # headroom 0.27.0 and exercised by the live integration tests (TASK-010).
+    # ============ engine seams (the only OS / headroom touch points) ============
 
-    def _engine_validate_configured_ccr_directory(self) -> None:
+    def _engine_prepare_ccr_store(self) -> pathlib.Path:
         """
-        Validate headroom's configured CCR store location before activation
-        (ADR-0018). headroom stores CCR originals in a sqlite `store_url`
-        (default `sqlite:///headroom.db`, which resolves into the CWD — unsafe
-        inside a repo). Reject a store dir that is inside the git worktree or
-        under a known cloud-sync path. In-memory / non-file stores are exempt.
-
-        Raises CompressionError on an unsafe location (callers degrade to
-        passthrough rather than risk leaking governed originals).
+        #2 (ADR-0021/0018): own a safe CCR store. Reject an unsafe location (inside
+        the git worktree or under a cloud-sync path), create the store dir 700, and
+        return the sqlite db path. No operator config; an explicit `ccr_store`
+        override is validated the same way.
         """
-        anchor = self._repo_root or pathlib.Path.cwd()
-        store_dir = _sqlite_store_dir(headroom.HeadroomConfig().store_url, base_dir=anchor)
-        if store_dir is None:
-            return None
-        worktree = _git_worktree_root(anchor)
-        home = pathlib.Path.home().resolve()
+        store_dir = self._ccr_store.resolve()
+        worktree = _git_worktree_root(self._repo_root or pathlib.Path.cwd())
         if worktree is not None and (store_dir == worktree or worktree in store_dir.parents):
-            raise CompressionError(f"headroom CCR store {store_dir} is inside the git worktree (ADR-0018)")
+            raise CompressionError(f"CCR store {store_dir} is inside the git worktree (ADR-0018)")
+        home = pathlib.Path.home().resolve()
         for rel in _CLOUD_SYNC_RELATIVE_PREFIXES:
             prefix = (home / rel).resolve()
             if store_dir == prefix or prefix in store_dir.parents:
-                raise CompressionError(f"headroom CCR store {store_dir} is under cloud-sync path {rel} (ADR-0018)")
-        return None
+                raise CompressionError(f"CCR store {store_dir} is under cloud-sync path {rel} (ADR-0018)")
+        store_dir.mkdir(parents=True, exist_ok=True)
+        os.chmod(store_dir, 0o700)
+        return store_dir / "headroom.db"
 
-    def _engine_start_proxy_loopback_only(self):
+    def _engine_ensure_headroom(self) -> pathlib.Path:
         """
-        Start `headroom proxy --host 127.0.0.1 --port <p>` as a subprocess bound
-        to loopback, wait for readiness, and return (handle, port). The base-URL
-        the host is pointed at is http://127.0.0.1:<p> (ADR-0015 / TASK-006).
+        #1 (ADR-0021): ensure the managed venv has the pinned headroom and return
+        its `headroom` executable. Idempotent — skipped if present. The create+install
+        is delegated to an injectable installer (default: `python -m venv` + pinned
+        `pip install`) so tests don't hit network.
         """
+        bin_path = MANAGED_VENV / "bin" / "headroom"
+        if bin_path.exists():
+            return bin_path
+        installer = self._installer or _default_installer
+        installer(MANAGED_VENV, HEADROOM_PIN)
+        if not bin_path.exists():
+            raise CompressionError(f"managed headroom venv missing executable at {bin_path}")
+        return bin_path
+
+    def _engine_start_proxy_loopback_only(self, headroom_bin, store_db):
+        """Start `<venv>/headroom proxy --host 127.0.0.1 --port <p>` bound to loopback."""
         port = self._engine_pick_loopback_port()
-        cmd = ["headroom", "proxy", "--host", PROXY_HOST, "--port", str(port)]
-        logger.info("starting headroom proxy on %s:%s", PROXY_HOST, port)
+        env = dict(os.environ)
+        env[STORE_ENV] = f"sqlite:///{store_db}"
         proxy = subprocess.Popen(
-            cmd,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            text=True,
+            [str(headroom_bin), "proxy", "--host", PROXY_HOST, "--port", str(port)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env, text=True,
         )
         try:
             self._engine_wait_for_port(port, proxy, timeout_s=PROXY_READY_TIMEOUT_S)
@@ -173,10 +161,7 @@ class HeadroomContextCompressionProvider:
         return proxy, port
 
     def _engine_stop_proxy(self, proxy) -> None:
-        """Gracefully terminate the proxy subprocess started in activate()."""
-        if proxy is None:
-            return None
-        if proxy.poll() is not None:
+        if proxy is None or proxy.poll() is not None:
             return None
         proxy.terminate()
         try:
@@ -187,16 +172,11 @@ class HeadroomContextCompressionProvider:
         return None
 
     def _engine_pick_loopback_port(self) -> int:
-        """Reserve an ephemeral loopback port for the proxy subprocess."""
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.bind((PROXY_HOST, 0))
             return int(sock.getsockname()[1])
 
     def _engine_wait_for_port(self, port: int, proxy, *, timeout_s: float) -> None:
-        """
-        Poll loopback until the proxy accepts TCP connections, or raise if the
-        subprocess exits early / readiness times out.
-        """
         deadline = time.monotonic() + timeout_s
         while time.monotonic() < deadline:
             if proxy.poll() is not None:
@@ -207,3 +187,11 @@ class HeadroomContextCompressionProvider:
                     return None
             time.sleep(PROXY_POLL_INTERVAL_S)
         raise TimeoutError(f"headroom proxy readiness timed out on port {port}")
+
+
+def _default_installer(venv_dir: pathlib.Path, pin: str) -> None:
+    """Create the managed venv (if absent) and pip-install the pinned headroom."""
+    venv_dir.parent.mkdir(parents=True, exist_ok=True)
+    if not (venv_dir / "bin" / "python").exists():
+        subprocess.run([sys.executable, "-m", "venv", str(venv_dir)], check=True)
+    subprocess.run([str(venv_dir / "bin" / "python"), "-m", "pip", "install", "--quiet", pin], check=True)
