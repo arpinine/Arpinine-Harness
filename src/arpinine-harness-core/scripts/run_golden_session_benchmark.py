@@ -137,12 +137,6 @@ class NoopEngine:
         return len(json.dumps(off_outcome, sort_keys=True))
 
 
-class HeadroomEngine:
-    """Not wired yet — the headroom `_engine_*` seams land at integration."""
-    available = False
-    name = "headroom"
-
-
 class SimulateHeadroomEngine:
     """
     Measures real proxy-pipeline reduction via headroom's `TransformPipeline.simulate()`
@@ -265,10 +259,10 @@ def _payloads_path(repo: pathlib.Path, slug: str) -> pathlib.Path:
 def _build_engine(name: str, repo: pathlib.Path, slug: str):
     if name == "headroom-simulate":
         return SimulateHeadroomEngine(_payloads_path(repo, slug))
-    return {"noop": NoopEngine, "headroom": HeadroomEngine}[name]()
+    return {"noop": NoopEngine}[name]()
 
 
-_ENGINE_NAMES = ("noop", "headroom", "headroom-simulate")
+_ENGINE_NAMES = ("noop", "headroom-simulate")
 
 
 def _main(argv: list[str]) -> int:
@@ -278,8 +272,8 @@ def _main(argv: list[str]) -> int:
     parser.add_argument("--engine", choices=_ENGINE_NAMES, default="noop",
                         help="noop = runnable self-test (band fails, no compression); "
                              "headroom-simulate = real proxy-pipeline reduction via "
-                             "TransformPipeline.simulate() (needs headroom-ai installed); "
-                             "headroom = live proxy server (not wired)")
+                             "TransformPipeline.simulate() (needs headroom-ai installed; "
+                             "fails closed if absent)")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 

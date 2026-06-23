@@ -121,10 +121,14 @@ class TestRunBenchmark(unittest.TestCase):
         self.assertEqual(report["status"], "incomplete")
 
     def test_unavailable_engine_fails_closed(self) -> None:
-        report = self.m.run_benchmark(self.manifest, self.ex, self.m.HeadroomEngine())
+        # An engine reporting available=False -> incomplete (fail closed), never a pass.
+        class _Unavailable:
+            available = False
+            name = "unavailable"
+
+        report = self.m.run_benchmark(self.manifest, self.ex, _Unavailable())
         self.assertEqual(report["status"], "incomplete")
         self.assertFalse(report.get("passed"))
-        self.assertIn("headroom", report["reason"].lower())
 
     def test_empty_scenarios_fails_closed(self) -> None:
         report = self.m.run_benchmark({"scenarios": []}, self.ex, _FakeEngine())

@@ -219,7 +219,7 @@ def run_checks(
     before the headroom provider config lands:
       - store_path defaults to the expected configured headroom CCR directory
         (~/.arpinine/ccr-store) when no explicit engine config is supplied
-      - provider_root defaults to <repo>/compression (scanned only if present)
+      - provider_root defaults to <repo>/context_compression (scanned only if present)
       - logging_config defaults to {} (clean)
       - headroom: {version, hash, pinned_version, pinned_hash}; None => not
         installed, which is itself a HIGH finding while enabled.

@@ -172,6 +172,20 @@ The result is a shared, governed work queue across heterogeneous assistants. The
 
 ---
 
+## Context Compression 
+
+When you build with AI, long sessions get expensive. Every turn sends a lot of context to the model — the conversation, tool output, file dumps — and that is real token cost and latency. Context compression shrinks what goes out, so a governed session stays affordable without changing what the harness decides.
+
+It follows the same shape as the rest of the harness: one replaceable abstraction (`ContextCompressionProvider`) with a default backed by [headroom](https://github.com/chopratejas/headroom). When enabled, your assistant — Claude, Codex, or Copilot — routes its model calls through a local, loopback-only proxy, so governed content never leaves the machine.
+
+It is **off by default**. You make the call once, when the constitution is created at `/arpinine-harness:at-init`, and the choice is recorded there. Disabled means no proxy and no overhead — identical to not having the feature.
+
+Because compression is lossy, it is governed like everything else. An evaluation gate replays a fixed session and requires the harness to reach the **same decisions** — routing, drift findings, acceptance criteria — plus a measured reduction, before compression is trusted. And if the proxy is ever unreachable, the session falls back to sending context uncompressed with a warning. The point of the harness is to ship what you intended; compression is held to that same bar.
+
+See [`docs/context-compression.md`](docs/context-compression.md) for the details.
+
+---
+
 ## Hooks
 
 Automatic checks fire on every file write:

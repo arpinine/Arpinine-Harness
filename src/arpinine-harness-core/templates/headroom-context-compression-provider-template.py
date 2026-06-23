@@ -75,17 +75,17 @@ def _sqlite_store_dir(store_url: str) -> pathlib.Path | None:
     return pathlib.Path(db_path).resolve().parent
 
 
-def _git_worktree_root(start: pathlib.Path) -> pathlib.Path:
+def _git_worktree_root(start: pathlib.Path) -> pathlib.Path | None:
     """
-    Return the enclosing git worktree root for `start`, falling back to `start`
-    when no `.git` ancestor is found. This enforces ADR-0018 against the actual
-    repository boundary, not merely the process cwd.
+    Return the enclosing git worktree root for `start`, or None when no `.git`
+    ancestor is found. This enforces ADR-0018 against the actual repository
+    boundary, not merely the process cwd.
     """
     current = start.resolve()
     for candidate in (current, *current.parents):
         if (candidate / ".git").exists():
             return candidate
-    return current
+    return None
 
 
 class HeadroomContextCompressionProvider:
@@ -136,7 +136,7 @@ class HeadroomContextCompressionProvider:
             return None
         worktree = _git_worktree_root(pathlib.Path.cwd())
         home = pathlib.Path.home().resolve()
-        if store_dir == worktree or worktree in store_dir.parents:
+        if worktree is not None and (store_dir == worktree or worktree in store_dir.parents):
             raise CompressionError(f"headroom CCR store {store_dir} is inside the git worktree (ADR-0018)")
         for rel in _CLOUD_SYNC_RELATIVE_PREFIXES:
             prefix = (home / rel).resolve()

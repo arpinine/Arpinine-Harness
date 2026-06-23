@@ -128,6 +128,18 @@ class TestHeadroomContextCompressionProviderTemplate(unittest.TestCase):
         self._set_fake_store_url("sqlite:///:memory:")
         self.mod.HeadroomContextCompressionProvider()._engine_validate_configured_ccr_directory()
 
+    def test_ccr_validation_allows_default_store_outside_any_git_worktree(self) -> None:
+        outside_tmp = tempfile.TemporaryDirectory()
+        outside = pathlib.Path(outside_tmp.name).resolve()
+        prev = pathlib.Path.cwd()
+        os.chdir(outside)
+        self._set_fake_store_url("sqlite:///headroom.db")
+        try:
+            self.mod.HeadroomContextCompressionProvider()._engine_validate_configured_ccr_directory()
+        finally:
+            os.chdir(prev)
+            outside_tmp.cleanup()
+
     # --- live transport seam wiring (TASK-006/TASK-012 boundary) ---
 
     def test_start_proxy_invokes_headroom_cli_with_loopback_port(self) -> None:
@@ -254,23 +266,38 @@ class TestHeadroomContextCompressionProviderTemplate(unittest.TestCase):
     # --- real readiness-loop body (_engine_wait_for_port), deterministic, no headroom ---
 
     def test_wait_for_port_returns_when_socket_accepts(self) -> None:
-        import socket
-
         class _AliveProc:
             def poll(self):
                 return None  # still running
 
-        listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        listener.bind(("127.0.0.1", 0))
-        listener.listen(1)
-        port = listener.getsockname()[1]
+        calls = {"connects": 0}
+        real_socket = self.mod.socket.socket
+
+        class _FakeSocket:
+            def __init__(self, *a, **k):
+                pass
+
+            def settimeout(self, timeout):
+                return None
+
+            def connect_ex(self, addr):
+                calls["connects"] += 1
+                return 0
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+        self.mod.socket.socket = lambda *a, **k: _FakeSocket()  # type: ignore[assignment]
         try:
-            # A real listening loopback socket -> connect_ex == 0 -> returns fast.
             self.mod.HeadroomContextCompressionProvider()._engine_wait_for_port(
-                port, _AliveProc(), timeout_s=2.0
+                8787, _AliveProc(), timeout_s=2.0
             )
         finally:
-            listener.close()
+            self.mod.socket.socket = real_socket  # type: ignore[assignment]
+        self.assertEqual(calls["connects"], 1)
 
     def test_wait_for_port_raises_fast_if_proxy_exits_early(self) -> None:
         class _DeadProc:

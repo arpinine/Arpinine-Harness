@@ -41,6 +41,7 @@ assemble: clean
 	mkdir -p $(BUILD_DIR); \
 	cp -r $(CORE_DIR)/. $(BUILD_DIR)/; \
 	cp -r $(IMPLEMENTATION_DIR)/. $(BUILD_DIR)/; \
+	python3 $(BUILD_DIR)/scripts/scaffold_compression_setup.py --target-dir $(BUILD_DIR) > /dev/null; \
 	chmod +x $(BUILD_DIR)/scripts/*.sh 2>/dev/null || true; \
 	find $(BUILD_DIR) -type d -name tests -prune -exec rm -rf {} +; \
 	find $(BUILD_DIR) -type d -name "__pycache__" -prune -exec rm -rf {} +; \
@@ -172,6 +173,13 @@ validate-structure: assemble
 		grep -q '"skills"[[:space:]]*:[[:space:]]*"./skills/"' $(BUILD_DIR)/.claude-plugin/plugin.json || (echo "Claude plugin manifest must declare skills at ./skills/" && exit 1); \
 		! grep -q '"hooks"' $(BUILD_DIR)/.claude-plugin/plugin.json || (echo "Claude plugin manifest must NOT declare hooks: Claude auto-loads hooks/hooks.json, and a manifest reference causes a duplicate-load failure" && exit 1); \
 		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json (auto-loaded by Claude)" && exit 1); \
+		test -d $(BUILD_DIR)/context_compression || (echo "Missing scaffolded context_compression package" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/__init__.py || (echo "Missing context_compression/__init__.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/context_compression_provider.py || (echo "Missing context_compression/context_compression_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/noop_provider.py || (echo "Missing context_compression/noop_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/headroom_provider.py || (echo "Missing context_compression/headroom_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/host_wiring.py || (echo "Missing context_compression/host_wiring.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/security.py || (echo "Missing context_compression/security.py" && exit 1); \
 		test -d $(BUILD_DIR)/commands || (echo "Missing commands directory" && exit 1); \
 		test -d $(BUILD_DIR)/scripts || (echo "Missing scripts directory" && exit 1); \
 		test -d $(BUILD_DIR)/skills || (echo "Missing skills directory" && exit 1); \
@@ -180,6 +188,13 @@ validate-structure: assemble
 		test -f $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Missing .codex-plugin/plugin.json" && exit 1); \
 		grep -q '"hooks"[[:space:]]*:[[:space:]]*"./hooks/hooks.json"' $(BUILD_DIR)/.codex-plugin/plugin.json || (echo "Codex plugin manifest must declare hooks at ./hooks/hooks.json" && exit 1); \
 		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json" && exit 1); \
+		test -d $(BUILD_DIR)/context_compression || (echo "Missing scaffolded context_compression package" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/__init__.py || (echo "Missing context_compression/__init__.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/context_compression_provider.py || (echo "Missing context_compression/context_compression_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/noop_provider.py || (echo "Missing context_compression/noop_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/headroom_provider.py || (echo "Missing context_compression/headroom_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/host_wiring.py || (echo "Missing context_compression/host_wiring.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/security.py || (echo "Missing context_compression/security.py" && exit 1); \
 		for agent in product-owner tech-architect security-reviewer ai-engineer devops data-engineer tdd-guide domain-linguist; do \
 			test -f "$(BUILD_DIR)/skills/$$agent/SKILL.md" || (echo "Missing Codex specialist wrapper: $$agent" && exit 1); \
 		done; \
@@ -198,6 +213,13 @@ validate-structure: assemble
 		grep -q '"skills"[[:space:]]*:[[:space:]]*"./skills/"' $(BUILD_DIR)/plugin.json || (echo "Copilot plugin manifest must declare skills at ./skills/" && exit 1); \
 		grep -q '"hooks"[[:space:]]*:[[:space:]]*"./hooks/hooks.json"' $(BUILD_DIR)/plugin.json || (echo "Copilot plugin manifest must declare hooks at ./hooks/hooks.json" && exit 1); \
 		test -f $(BUILD_DIR)/hooks/hooks.json || (echo "Missing hooks/hooks.json" && exit 1); \
+		test -d $(BUILD_DIR)/context_compression || (echo "Missing scaffolded context_compression package" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/__init__.py || (echo "Missing context_compression/__init__.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/context_compression_provider.py || (echo "Missing context_compression/context_compression_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/noop_provider.py || (echo "Missing context_compression/noop_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/headroom_provider.py || (echo "Missing context_compression/headroom_provider.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/host_wiring.py || (echo "Missing context_compression/host_wiring.py" && exit 1); \
+		test -f $(BUILD_DIR)/context_compression/security.py || (echo "Missing context_compression/security.py" && exit 1); \
 		for agent in product-owner tech-architect security-reviewer ai-engineer devops data-engineer tdd-guide domain-linguist; do \
 			test -f "$(BUILD_DIR)/skills/$$agent/SKILL.md" || (echo "Missing Copilot specialist wrapper: $$agent" && exit 1); \
 		done; \

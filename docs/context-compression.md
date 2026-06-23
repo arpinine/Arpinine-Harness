@@ -70,9 +70,10 @@ Run it:
 # Proves the pipeline end to end without pretending noop compresses anything.
 python3 "<plugin>/scripts/run_golden_session_benchmark.py" --engine noop
 
-# real engine: fails closed ("incomplete") until the headroom _engine_* seams
-# are wired against the installed SDK — never a silent green.
-python3 "<plugin>/scripts/run_golden_session_benchmark.py" --engine headroom
+# real measurable path: proxy-pipeline reduction via TransformPipeline.simulate()
+# over the payloads fixture. Needs headroom-ai installed; fails closed
+# ("incomplete") if absent — never a silent green.
+python3 "<plugin>/scripts/run_golden_session_benchmark.py" --engine headroom-simulate
 ```
 
 The golden session lives at
@@ -127,12 +128,16 @@ package imports, never ad-hoc file-path loading (keeps one interface identity).
 
 ## Status / current limitations
 
-- Disabled path, abstraction, noop, `/at-init` toggle, scaffolder, setup checks,
-  golden session, FidelityGate, and the benchmark runner are implemented and
-  tested.
-- The headroom default provider is a structural template: the actual
-  `headroom-ai` SDK calls live behind `_engine_*` seams that must be wired and
-  verified against the installed SDK before the ON path can run live. Until then
-  the `--engine headroom` benchmark reports `incomplete` (fail-closed).
-- Per-host proxy wiring (Claude/Codex/Copilot) and live integration tests are the
-  remaining work and require a live headroom runtime.
+- The scaffolded `context_compression/` package now ships in assembled Claude,
+  Codex, and Copilot plugin artifacts, including the lifecycle interface, noop
+  provider, headroom provider, host wiring, and security helpers.
+- The headroom provider lifecycle seams are wired and have a live smoke-tested
+  path against `headroom-ai[proxy]==0.27.0`: loopback-only proxy startup,
+  readiness wait, endpoint export, and shutdown.
+- The deterministic fidelity benchmark is runnable. `--engine
+  headroom-simulate` is the supported measurable path for release governance; it
+  validates zero-divergence plus in-band reduction against committed payload
+  fixtures.
+- What is still not proven here is host-native end-to-end interception inside a
+  real Claude/Codex/Copilot session. The harness now ships the host env wiring,
+  but a full interactive host run remains an external smoke/integration step.
