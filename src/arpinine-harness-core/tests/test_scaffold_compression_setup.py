@@ -120,18 +120,20 @@ class TestScaffoldCompressionSetup(unittest.TestCase):
         self.assertNotIn("spec_from_file_location", wiring_src)
 
     def test_headroom_import_confined_to_headroom_provider(self) -> None:
-        """ADR-0014: only headroom_provider.py may IMPORT headroom (per the real checker)."""
+        """ADR-0021: the package imports headroom NOWHERE (proxy is subprocess-only)."""
         self.m.scaffold(self.target)
         comp = self.target / "context_compression"
-        # headroom_provider.py has the import statement.
-        self.assertIn("import headroom", (comp / "headroom_provider.py").read_text())
-        # Run the enforced boundary check: zero violations when the allowed
-        # module is headroom_provider.py.
+        # Boundary check must be clean even with NO module importing headroom.
         checker = _load_checker()
         findings = checker.check_headroom_import_boundary(
             comp, comp / "headroom_provider.py"
         )
         self.assertEqual(findings, [])
+        # And no module (including headroom_provider) imports headroom in-process.
+        for f in comp.glob("*.py"):
+            text = f.read_text()
+            self.assertNotIn("import headroom", text)
+            self.assertNotIn("from headroom", text)
 
     def test_security_module_has_no_headroom_import_statement(self) -> None:
         self.m.scaffold(self.target)
