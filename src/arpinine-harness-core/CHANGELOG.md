@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-06-23
+
+### Added
+- **Context Compression governance (`spec 011`)** — an optional, governed capability that reduces the outbound LLM token cost of governed sessions by routing the host's provider calls through a local, loopback-only compression proxy. Off by default; the enable/disable choice is made at `/at-init` and recorded in the constitution. Disabled = no proxy, zero overhead, identical to a pre-feature install.
+- One shared, swappable `ContextCompressionProvider` abstraction (lifecycle-only: `activate`/`deactivate`) with a **headroom** default (`headroom-ai[proxy]`, pinned + SHA256-verified, imports confined to one module) and a noop default; scaffolded into products as the importable `context_compression/` package and shipped live in the plugin for the launcher.
+- **Live launcher** `run_compressed_session.py` (`--host claude|codex|copilot -- <argv>`) — the harness-provided entry point that makes compression live: starts the proxy, points the host at it via base-URL env (`ANTHROPIC_BASE_URL` / `OPENAI_BASE_URL`+`/v1`), launches the host in the target repo with signal forwarding, and tears the proxy down on exit. Disabled → real direct `exec`; proxy-unavailable → uncompressed passthrough + `compression_passthrough_fallback` signal (the session always runs).
+- **Deterministic fidelity benchmark** (`run_golden_session_benchmark.py` + `FidelityGate`) gating compression-enabled releases: replays a golden harness session and requires zero governance-outcome divergence (routing, AC state, drift findings) plus a measured token-reduction band. `--engine headroom-simulate` is the supported measurable path; fails closed when headroom is absent.
+- Security controls: local-first / no third-party egress (loopback-only proxy), credential scrubbing on log paths, no full-payload logging, and an engine-owned CCR directory validated against the no-sync + 700/600 invariant at setup and at activation. Governed by ADRs 0013–0020.
+
+### Notes
+- Measured in-harness reduction (model-free `TransformPipeline.simulate()`) is ~38–56% on representative content; the release-gate band is **30–95%** (justified in ADR-0017). headroom's published 60–95% needs live multi-request CCR/cache accumulation, out of harness scope.
+- Live host interception (AC-008) is delivered by the launcher and unit-tested with mocks; a true interactive run requires `headroom-ai[proxy]` installed in the operator runtime (documented live-smoke checklist).
+
 ## [1.7.0] - 2026-06-16
 
 ### Added

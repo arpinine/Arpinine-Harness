@@ -96,4 +96,12 @@ This must:
    - Install `pre-commit` and `pre-push` git hooks
    - Report the setup summary (languages detected, hooks installed, tools configured)
    - If `pre-commit` is not installed, report the missing dependency with install instructions but do not block the rest of the init workflow
-13. Print a final summary including both governance structure and security tooling status.
+12a. **Context compression setup (optional, governed by ADR-0016):** Ask the operator whether to enable context compression for this project. Default is **disabled** — when disabled, the harness behaves exactly as a pre-feature install (the noop provider, no proxy, zero overhead).
+   - Explain the tradeoff before asking: compression is lossy and can change the AI assistant's output; teams that cannot accept any result variance keep it disabled; teams prioritizing token savings enable it and rely on the golden-session fidelity gate.
+   - If the operator enables it, and the headroom default provider cannot be guaranteed to run network-restricted (see ADR-0014), surface the residual-risk acknowledgment and require explicit confirmation.
+   - Record the choice in the constitution (single source of truth) by running:
+   ```
+   python3 "scripts/compression_config.py" --repo <project-root> set --enabled <true|false> [--network-restriction-ack <true|false>]
+   ```
+   - Do not record a provider class — only the enabled flag and the residual-risk acknowledgment. Existing repositories with no compression block read as disabled.
+13. Print a final summary including governance structure, security tooling status, and whether context compression is enabled.
