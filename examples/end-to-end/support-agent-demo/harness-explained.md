@@ -226,7 +226,7 @@ DOMAIN_PATH_RE = re.compile(r"(^|/)(domain|core|business)(/|$)", re.IGNORECASE)
 
 If `openharness` appears outside `adapters/` → HIGH drift warning fires automatically via PostToolUse hook.
 
-**The intentional drift fixture** (`app/support_triage/application/drift_example_bad_direct_harness_import.py`) shows exactly what triggers it:
+**The intentional drift fixture** (`app/_drift_fixtures/drift_example_bad_direct_harness_import.py`) shows exactly what triggers it:
 
 ```python
 from openharness import AgentRuntime  # ← OPENHARNESS_IMPORT_RE fires

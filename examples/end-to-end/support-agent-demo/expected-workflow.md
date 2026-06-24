@@ -113,7 +113,7 @@ Run:
 
 Expected discussion:
 - clean path validates spec, plan, ADR, eval, and observation alignment
-- `app/support_triage/application/drift_example_bad_direct_harness_import.py` shows how a future implementation could violate the harness boundary
+- `app/_drift_fixtures/drift_example_bad_direct_harness_import.py` shows how a future implementation could violate the harness boundary
 
 ## 8. Learn
 

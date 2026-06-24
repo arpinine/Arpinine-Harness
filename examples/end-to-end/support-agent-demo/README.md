@@ -100,14 +100,14 @@ For full local script behavior, run Arpinine Harness commands from this demo dir
 
 ## Intentional Drift Example
 
-See `app/support_triage/application/drift_example_bad_direct_harness_import.py`.
+See `app/_drift_fixtures/drift_example_bad_direct_harness_import.py`.
 
 That file intentionally imports a harness runtime concept outside an adapter/infrastructure boundary. It represents the kind of issue Arpinine Harness should surface as harness drift or a rule violation.
 
 To simulate the post-edit hook check:
 
 ```bash
-printf '{"tool_input":{"file_path":"app/support_triage/application/drift_example_bad_direct_harness_import.py"}}' \
+printf '{"tool_input":{"file_path":"app/_drift_fixtures/drift_example_bad_direct_harness_import.py"}}' \
   | python3 ../../../src/arpinine-harness-core/scripts/quick_drift_check.py
 ```
 
