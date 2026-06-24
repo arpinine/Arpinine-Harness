@@ -16,6 +16,21 @@
 - Supporting unit command: `python3 -m unittest discover -s src/arpinine-harness-core/tests`
 - Owner: Arpinine Harness maintainers
 
+### Supplementary Evaluation (optional, real-API — non-blocking)
+The deterministic gate above asserts governance-outcome identity ON vs OFF *by
+construction* (model-free `simulate`). It never sends the compressed payload
+through a live model. The answer-quality evaluator closes that gap with a real
+round-trip: it answers a fixed governance question over the same golden fixture
+with compression OFF (original context) and ON (`headroom.simulate` output),
+then judges divergence.
+- Preview (no spend, no key): `python3 src/arpinine-harness-core/scripts/run_answer_quality_eval.py --estimate`
+- Live round-trip (needs `ANTHROPIC_API_KEY`; `pip install anthropic`): `python3 src/arpinine-harness-core/scripts/run_answer_quality_eval.py --run`
+- Judge signals (ADR-0017 keeps these **out of the release gate** — they are LLM-judged, the deterministic fidelity gate stays authoritative):
+  - LLM-judge prose: `equivalent` (bool) + `quality_delta` (−2..2) of ON vs OFF
+  - embedding similarity: cosine(OFF, ON) — local `sentence-transformers`, optional, skipped if absent
+- Results: `.specify/evals/011-context-compression-governance/answer-quality-results.{md,json}`
+- Status: **non-blocking** supplementary signal. A divergence here flags a fidelity risk for investigation; it does not by itself fail the release gate.
+
 ## Benchmark Policy
 - Benchmark required: Yes (release-blocking fidelity gate)
 - Benchmark command: `python3 src/arpinine-harness-core/scripts/run_golden_session_benchmark.py --slug 011-context-compression-governance`

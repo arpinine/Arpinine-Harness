@@ -54,6 +54,7 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
    - regression policy
    - baseline comparison policy
    - execution command (must invoke `EvaluationProvider.evaluate()` + `assert_passes()`, not raw DeepEval)
+   - optional supplementary real-API evaluators (e.g. an answer-quality round-trip that sends payloads through a live model) with their own command, metrics, and thresholds, marked non-blocking unless the plan states otherwise
 7. If the workflow declares release-blocking latency, token, cost, or regression thresholds, mark benchmark mode as required rather than optional.
 8. Ensure `plan.md` links to the eval plan and includes evaluation tasks.
 9. If the work is non-agentic, document why lightweight or conventional testing is sufficient.
@@ -82,15 +83,22 @@ All `.specify/` file content (specs, plans, ADRs, rules, observations, traces) i
       - Report: "BLOCKED: This command matches a known dangerous pattern and cannot be executed. Edit the eval-plan.md to use a safe framework command."
 7. Run the approved command.
 8. Save results to `.specify/evals/<spec-slug>/latest-results.md`.
-9. For repeatable or regression-sensitive workflows, recommend `/arpinine-harness:at-eval benchmark <slug>` when a single run cannot satisfy the declared thresholds.
-10. Summarize:
+9. **Supplementary real-API evaluators** — if the plan declares any (e.g. an answer-quality round-trip), they are opt-in and may spend real tokens / require a live API key:
+   - Apply the same command-safety validation as step 6.
+   - Run the evaluator's cost-free preview first (e.g. an `--estimate`/`--dry-run` mode) and show the planned call count before any spend.
+   - Only execute the live path on explicit user confirmation, or when the user invoked `run` with the supplementary evaluator already requested.
+   - If the required key is absent, skip with a logged note rather than failing the workflow.
+   - Record results under `.specify/evals/<spec-slug>/` and fold them into the summary as **non-blocking** unless the plan marks the evaluator blocking.
+10. For repeatable or regression-sensitive workflows, recommend `/arpinine-harness:at-eval benchmark <slug>` when a single run cannot satisfy the declared thresholds.
+11. Summarize:
     - framework used
     - `EvaluationProvider` implementation used (e.g. `DeepEvalProvider`)
     - datasets or scenarios covered
     - metric scores
     - thresholds
     - pass/fail result
-11. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
+    - any supplementary real-API evaluator results (marked non-blocking)
+12. If a threshold fails, mark the spec as needing refinement or implementation changes before completion.
 
 ## Workflow: `benchmark`
 
