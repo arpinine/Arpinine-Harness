@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.8.4] - 2026-06-24
+
+### Added
+- Answer-quality eval for context compression (spec 011): `scripts/run_answer_quality_eval.py` sends the golden fixture through a live model with compression OFF (original context) and ON (`headroom.simulate` output), then judges divergence via an LLM-judge (semantic equivalence + quality delta) and optional local embedding similarity. Closes the gap left by the deterministic benchmark, which asserts governance-outcome identity model-free. Gated: `--estimate` previews call count with no spend; `--run` needs `ANTHROPIC_API_KEY`.
+- `/at-eval` now supports optional supplementary real-API evaluators (opt-in, cost-previewed, key-gated, **non-blocking** unless the plan states otherwise). Spec 011's eval-plan declares the answer-quality evaluator as a non-blocking signal; the deterministic fidelity gate stays authoritative (ADR-0017).
+
 ## [1.8.3] - 2026-06-23
 
 ### Fixed
